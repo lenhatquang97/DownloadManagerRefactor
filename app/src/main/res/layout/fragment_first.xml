@@ -32,6 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
+            android:singleLine="true"
             android:hint="Search"
             android:textColorHint="@color/white"
             />

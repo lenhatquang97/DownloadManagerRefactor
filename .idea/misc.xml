@@ -5,21 +5,28 @@
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.1273980815347722" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.13" />
+        <entry key="app/src/main/res/drawable/background_white.xml" value="0.145" />
+        <entry key="app/src/main/res/drawable/border_radius.xml" value="0.145" />
         <entry key="app/src/main/res/drawable/circle_shape.xml" value="0.13" />
+        <entry key="app/src/main/res/drawable/dialog_bg.xml" value="0.145" />
         <entry key="app/src/main/res/drawable/ic_article.xml" value="0.13" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.13" />
+        <entry key="app/src/main/res/drawable/ic_baseline_folder_24.xml" value="0.145" />
+        <entry key="app/src/main/res/drawable/ic_baseline_folder_open_24.xml" value="0.145" />
         <entry key="app/src/main/res/drawable/ic_baseline_menu_24.xml" value="0.13" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.13" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2" />
+        <entry key="app/src/main/res/layout/add_download_dialog.xml" value="0.33" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.18854166666666666" />
         <entry key="app/src/main/res/layout/download_item.xml" value="0.7996241546669343" />
         <entry key="app/src/main/res/layout/fragment_first.xml" value="0.2958904109589041" />
-        <entry key="app/src/main/res/layout/fragment_second.xml" value="0.18854166666666666" />
+        <entry key="app/src/main/res/layout/fragment_second.xml" value="0.2857746925674567" />
         <entry key="app/src/main/res/layout/header_navigation_drawer.xml" value="0.1" />
         <entry key="app/src/main/res/layout/home_screen.xml" value="0.2038897705078125" />
         <entry key="app/src/main/res/layout/settings_screen.xml" value="0.1" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.40467071533203125" />
         <entry key="app/src/main/res/menu/navigation_drawer.xml" value="0.16979166666666667" />
+        <entry key="app/src/main/res/xml/preferences.xml" value="0.2554347826086957" />
       </map>
     </option>
   </component>

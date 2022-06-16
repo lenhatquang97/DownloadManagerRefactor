@@ -1,18 +1,25 @@
 package com.quangln2.mydownloadmanager
 
+import android.app.ProgressDialog.show
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.quangln2.mydownloadmanager.databinding.ActivityMainBinding
+import com.quangln2.mydownloadmanager.ui.dialog.AddToDownloadDialog
 import com.quangln2.mydownloadmanager.ui.home.HomeFragment
 
 
@@ -22,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val navController by lazy { findNavController(R.id.nav_host_fragment_content_main) }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
@@ -29,15 +37,15 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         setSupportActionBar(binding.toolbar)
         appBarConfiguration = AppBarConfiguration(navController.graph, binding.drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
 
         binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAnchorView(R.id.fab)
-                .setAction("Action", null).show()
+            val dialog = AddToDownloadDialog()
+            dialog.show(supportFragmentManager, "AddToDownloadDialog")
         }
         supportActionBar?.apply {
             //setDisplayHomeAsUpEnabled(true)
@@ -45,30 +53,28 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+
+
     }
 
-    override fun onResume() {
-        super.onResume()
-        if(navController.currentDestination?.id == R.id.FirstFragment){
-            binding.toolbar.title = "DownloadManager"
-        }
-    }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        println()
         return when (item.itemId) {
             R.id.action_settings -> {
                 if(navController.currentDestination?.id == R.id.FirstFragment){
+                    binding.fab.hide()
                     navController.navigate(R.id.action_FirstFragment_to_SecondFragment)
                 }
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            else -> {
+                binding.fab.show()
+                super.onOptionsItemSelected(item)
+            }
         }
     }
 
@@ -76,5 +82,10 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+    fun createAddDownloadDialog(){
+        MaterialAlertDialogBuilder(applicationContext)
+            .setTitle("Add new download file").show()
+
     }
 }

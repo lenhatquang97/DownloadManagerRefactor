@@ -8,8 +8,26 @@
     <style name="Theme.MyDownloadManager" parent="Base.Theme.MyDownloadManager" />
 
     <style name="AppBar" parent="Theme.Material3.DayNight">
-        <item name="titleTextColor">@color/success</item>
-        <item name="background">@color/blue</item>
-        <item name="titleTextStyle">@style/TextAppearance.Material3.BodyMedium</item>
+        <item name="titleTextColor">@color/white</item>
+        <item name="android:background">@color/blue</item>
+    </style>
+    <style name="MyThemeOverlay_Toolbar" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+        <!-- color used by navigation icon and overflow icon -->
+        <item name="colorOnPrimary">@color/white</item>
+    </style>
+    <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/border_radius</item>
+    </style>
+    <style name="SCBSwitch" parent="Theme.AppCompat.Light">
+        <!-- active thumb & track color (30% transparency) -->
+        <item name="colorControlActivated">@color/blue</item>
+
+        <!-- inactive thumb color -->
+        <item name="colorSwitchThumbNormal">@color/blue
+        </item>
+
+        <!-- inactive track color (30% transparency) -->
+        <item name="android:colorForeground">@color/grey
+        </item>
     </style>
 </resources>

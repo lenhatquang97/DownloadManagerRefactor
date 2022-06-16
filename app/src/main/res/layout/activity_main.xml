@@ -22,8 +22,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 style="@style/AppBar"
-                app:title="DownloadManager"
                 app:navigationIcon="@drawable/ic_baseline_menu_24"
+                android:theme="@style/MyThemeOverlay_Toolbar"
                 />
         </com.google.android.material.appbar.AppBarLayout>
         <include layout="@layout/content_main" />

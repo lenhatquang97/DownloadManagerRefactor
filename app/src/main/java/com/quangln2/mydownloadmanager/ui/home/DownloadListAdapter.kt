@@ -8,7 +8,6 @@ import com.quangln2.mydownloadmanager.R
 
 class DownloadListAdapter(private val data: MutableList<Int>): RecyclerView.Adapter<DownloadListAdapter.DownloadItemViewHolder>() {
     override fun getItemCount(): Int{
-        println(data.size)
         return data.size
     }
     class DownloadItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

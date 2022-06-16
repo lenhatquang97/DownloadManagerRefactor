@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
 
@@ -22,6 +23,10 @@ class HomeFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private val downloadList = mutableListOf<Int>()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        downloadList.addAll(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,9 +34,8 @@ class HomeFragment : Fragment() {
     ): View? {
 
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
-        downloadList.addAll(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
-        val adapterVal = DownloadListAdapter(downloadList)
 
+        val adapterVal = DownloadListAdapter(downloadList)
         binding.downloadLists.apply {
             adapter = adapterVal
             layoutManager = LinearLayoutManager(context)
@@ -51,4 +55,5 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }
