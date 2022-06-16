@@ -2,4 +2,10 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="blue">#0091FF</color>
+    <color name="failed">#EB0000</color>
+    <color name="paused">#ECC332</color>
+    <color name="success">#4B8673</color>
+    <color name="grey">#979797</color>
+    <color name="nearly_black">#1C1B1F</color>
 </resources>

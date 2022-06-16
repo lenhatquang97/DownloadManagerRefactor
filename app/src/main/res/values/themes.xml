@@ -6,4 +6,10 @@
     </style>
 
     <style name="Theme.MyDownloadManager" parent="Base.Theme.MyDownloadManager" />
+
+    <style name="AppBar" parent="Theme.Material3.DayNight">
+        <item name="titleTextColor">@color/success</item>
+        <item name="background">@color/blue</item>
+        <item name="titleTextStyle">@style/TextAppearance.Material3.BodyMedium</item>
+    </style>
 </resources>

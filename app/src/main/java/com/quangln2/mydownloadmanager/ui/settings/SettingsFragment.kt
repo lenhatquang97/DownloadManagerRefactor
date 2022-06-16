@@ -1,4 +1,4 @@
-package com.quangln2.mydownloadmanager
+package com.quangln2.mydownloadmanager.ui.settings
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.databinding.FragmentSecondBinding
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
-class SecondFragment : Fragment() {
+class SettingsFragment : Fragment() {
 
     private var _binding: FragmentSecondBinding? = null
 

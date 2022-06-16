@@ -1,21 +1,26 @@
 package com.quangln2.mydownloadmanager
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
+import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.snackbar.Snackbar
 import com.quangln2.mydownloadmanager.databinding.ActivityMainBinding
+import com.quangln2.mydownloadmanager.ui.home.HomeFragment
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private val navController by lazy { findNavController(R.id.nav_host_fragment_content_main) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -25,30 +30,44 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
-
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
+        appBarConfiguration = AppBarConfiguration(navController.graph, binding.drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
+        binding.navView.setupWithNavController(navController)
 
         binding.fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAnchorView(R.id.fab)
                 .setAction("Action", null).show()
         }
+        supportActionBar?.apply {
+            //setDisplayHomeAsUpEnabled(true)
+            setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24)
+
+        }
+
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(navController.currentDestination?.id == R.id.FirstFragment){
+            binding.toolbar.title = "DownloadManager"
+        }
+    }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        println()
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_settings -> {
+                if(navController.currentDestination?.id == R.id.FirstFragment){
+                    navController.navigate(R.id.action_FirstFragment_to_SecondFragment)
+                }
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
