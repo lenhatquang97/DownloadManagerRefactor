@@ -19,19 +19,25 @@ class DefaultDownloadRepository: DownloadRepository {
         file.downloadLink = url
         file.downloadTo = downloadTo
     }
-    override fun createConnection(file: StrucDownFile): Deferred<URLConnection> = CoroutineScope(Dispatchers.IO).async {
-        val connection = URL(file.downloadLink).openConnection()
-        return@async connection
-    }
 
-    override fun fetchDownloadInfo(file: StrucDownFile) = CoroutineScope(Dispatchers.IO).async {
-        val connection = createConnection(file).await()
+
+    //TODO: Need to fix this bug
+    override fun fetchDownloadInfo(file: StrucDownFile) = CoroutineScope(Dispatchers.IO).launch {
+        println("fetchDownloadInfo ${file.downloadLink}")
+        val defer = async{
+            return@async URL(file.downloadLink).openConnection()
+        }
+        val connection = defer.await()
+        connection.doInput = true
+        connection.doOutput = true
         file.fileName = URLUtil.guessFileName(file.downloadLink, null, connection.contentType)
         file.mimeType = connection.contentType
         file.size = connection.contentLength.toLong()
     }
-    override fun writeToFileAPI29Above(file: StrucDownFile, context: Context) = CoroutineScope(Dispatchers.IO).async {
-        val connection = createConnection(file).await()
+    override fun writeToFileAPI29Above(file: StrucDownFile, context: Context) = CoroutineScope(Dispatchers.IO).launch {
+        val connection =  URL(file.downloadLink).openConnection()
+        connection.doInput = true
+        connection.doOutput = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
@@ -54,8 +60,8 @@ class DefaultDownloadRepository: DownloadRepository {
     }
 
 
-    override fun downloadAFile(file: StrucDownFile, context: Context) = CoroutineScope(Dispatchers.IO).async {
-        val connection = createConnection(file).await()
+    override fun downloadAFile(file: StrucDownFile, context: Context) = CoroutineScope(Dispatchers.IO).launch {
+        val connection =  URL(file.downloadLink).openConnection()
         connection.setRequestProperty("Range", "bytes=${file.bytesCopied}-")
         connection.doInput = true
         connection.doOutput = true
@@ -71,7 +77,7 @@ class DefaultDownloadRepository: DownloadRepository {
             writeStreamIO(inp, fos, file).await()
         }
     }
-    override fun writeStreamIO(inp: BufferedInputStream, out: OutputStream, file: StrucDownFile) = CoroutineScope(Dispatchers.IO).async {
+    private fun writeStreamIO(inp: BufferedInputStream, out: OutputStream, file: StrucDownFile) = CoroutineScope(Dispatchers.IO).async {
         val data = ByteArray(1024)
         var x = 0
         x = inp.read(data,0,1024)
@@ -101,7 +107,7 @@ class DefaultDownloadRepository: DownloadRepository {
 
     override suspend fun retryDowwnload(file: StrucDownFile, context: Context) {
         file.downloadState = DownloadingState(0,0)
-        downloadAFile(file, context).await()
+        downloadAFile(file, context)
     }
     override fun queueDownload(file: StrucDownFile) {
         file.downloadState = QueuedState(10)

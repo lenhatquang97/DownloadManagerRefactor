@@ -6,10 +6,14 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.mydownloadmanager.R
+import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
 
 /**
@@ -18,17 +22,15 @@ import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentFirstBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
+
     private val downloadList = mutableListOf<Int>()
-
-
+    private val homeViewModel: HomeViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        downloadList.addAll(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+        downloadList.addAll(listOf(1))
+
     }
 
     override fun onCreateView(
@@ -37,12 +39,11 @@ class HomeFragment : Fragment() {
     ): View? {
 
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
-
         val adapterVal = DownloadListAdapter(downloadList)
+
         binding.downloadLists.apply {
             adapter = adapterVal
             layoutManager = LinearLayoutManager(context)
-
         }
 
         return binding.root

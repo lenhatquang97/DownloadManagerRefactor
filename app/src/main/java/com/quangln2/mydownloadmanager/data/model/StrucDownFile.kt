@@ -18,6 +18,7 @@ data class StrucDownFile (
     var fileName: String,
     var uri: Uri? = null,
 ){
+
     fun convertToSizeUnit(): String{
         if (size < ConstantClass.KB){
             return size.toString() + "B"

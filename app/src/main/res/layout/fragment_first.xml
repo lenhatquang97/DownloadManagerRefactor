@@ -114,12 +114,12 @@
         android:id="@+id/downloadLists"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintHeight_default="wrap"
-        android:layout_marginTop="12dp"
         android:layout_marginBottom="24dp"
         android:nestedScrollingEnabled="false"
+        app:layout_constraintVertical_bias="0.05"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chipGroup"/>
+        app:layout_constraintHeight_default="wrap"
+        app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
 
 
 

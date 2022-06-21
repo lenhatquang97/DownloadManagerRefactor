@@ -18,8 +18,8 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2" />
         <entry key="app/src/main/res/layout/add_download_dialog.xml" value="0.33" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.18854166666666666" />
-        <entry key="app/src/main/res/layout/download_item.xml" value="0.7996241546669343" />
-        <entry key="app/src/main/res/layout/fragment_first.xml" value="0.2958904109589041" />
+        <entry key="app/src/main/res/layout/download_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_first.xml" value="0.2244918823242187" />
         <entry key="app/src/main/res/layout/fragment_second.xml" value="0.2857746925674567" />
         <entry key="app/src/main/res/layout/header_navigation_drawer.xml" value="0.1" />
         <entry key="app/src/main/res/layout/home_screen.xml" value="0.2038897705078125" />
