@@ -37,16 +37,19 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
+        //Setup AppBar and Navigation Drawer
         setSupportActionBar(binding.toolbar)
         appBarConfiguration = AppBarConfiguration(navController.graph, binding.drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
 
+        //Open dialog
         binding.fab.setOnClickListener { view ->
             val dialog = AddToDownloadDialog()
             dialog.show(supportFragmentManager, "AddToDownloadDialog")
         }
+
+        //Set burger menu
         supportActionBar?.apply {
             //setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24)
@@ -82,10 +85,5 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
-    }
-    fun createAddDownloadDialog(){
-        MaterialAlertDialogBuilder(applicationContext)
-            .setTitle("Add new download file").show()
-
     }
 }

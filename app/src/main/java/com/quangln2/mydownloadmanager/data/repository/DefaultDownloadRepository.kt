@@ -1,0 +1,119 @@
+package com.quangln2.mydownloadmanager.data.repository
+import android.content.ContentValues
+import android.content.Context
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
+import android.webkit.URLUtil
+import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
+import kotlinx.coroutines.*
+import java.io.BufferedInputStream
+import java.io.FileOutputStream
+import java.io.OutputStream
+import java.net.URL
+import java.net.URLConnection
+
+class DefaultDownloadRepository: DownloadRepository {
+    override fun addNewDownloadInfo(url: String, downloadTo: String, file: StrucDownFile) {
+        file.downloadLink = url
+        file.downloadTo = downloadTo
+    }
+    override fun createConnection(file: StrucDownFile): Deferred<URLConnection> = CoroutineScope(Dispatchers.IO).async {
+        val connection = URL(file.downloadLink).openConnection()
+        return@async connection
+    }
+
+    override fun fetchDownloadInfo(file: StrucDownFile) = CoroutineScope(Dispatchers.IO).async {
+        val connection = createConnection(file).await()
+        file.fileName = URLUtil.guessFileName(file.downloadLink, null, connection.contentType)
+        file.mimeType = connection.contentType
+        file.size = connection.contentLength.toLong()
+    }
+    override fun writeToFileAPI29Above(file: StrucDownFile, context: Context) = CoroutineScope(Dispatchers.IO).async {
+        val connection = createConnection(file).await()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
+                put(MediaStore.MediaColumns.MIME_TYPE, connection.contentType)
+                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+            }
+            val resolver = context.contentResolver
+
+            //Query check file exists
+            val selection = MediaStore.MediaColumns.DISPLAY_NAME + " = ?"
+            val selectionArgs = arrayOf(file.fileName)
+            val cursor = resolver.query(MediaStore.Downloads.EXTERNAL_CONTENT_URI, null, selection, selectionArgs, null)
+            if(cursor!!.count <= 0) {
+                file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            }
+        }
+    }
+    override fun writeToFileAPI29Below(file: StrucDownFile): String{
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName
+    }
+
+
+    override fun downloadAFile(file: StrucDownFile, context: Context) = CoroutineScope(Dispatchers.IO).async {
+        val connection = createConnection(file).await()
+        connection.setRequestProperty("Range", "bytes=${file.bytesCopied}-")
+        connection.doInput = true
+        connection.doOutput = true
+        val inp = BufferedInputStream(connection.getInputStream())
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            val out = context.contentResolver.openOutputStream(file.uri!!,"wa")
+            if (out != null) {
+                writeStreamIO(inp, out, file).await()
+            }
+        } else {
+            val downloadPath = writeToFileAPI29Below(file)
+            var fos = if (file.bytesCopied == 0L) FileOutputStream(downloadPath) else FileOutputStream(downloadPath, true)
+            writeStreamIO(inp, fos, file).await()
+        }
+    }
+    override fun writeStreamIO(inp: BufferedInputStream, out: OutputStream, file: StrucDownFile) = CoroutineScope(Dispatchers.IO).async {
+        val data = ByteArray(1024)
+        var x = 0
+        x = inp.read(data,0,1024)
+        while(x >= 0){
+            out?.write(data,0,x)
+            file.bytesCopied += x
+            if(file.downloadState is PausedState || file.downloadState is FailedState){
+                return@async
+            }
+            x = inp.read(data,0,1024)
+        }
+    }
+
+
+
+    override fun resumeDownload(file: StrucDownFile) {
+        file.downloadState = DownloadingState(0,0)
+    }
+
+    override fun pauseDownload(file: StrucDownFile) {
+        file.downloadState = PausedState()
+    }
+
+    override fun stopDownload(file: StrucDownFile) {
+        file.downloadState = FailedState()
+    }
+
+    override suspend fun retryDowwnload(file: StrucDownFile, context: Context) {
+        file.downloadState = DownloadingState(0,0)
+        downloadAFile(file, context).await()
+    }
+    override fun queueDownload(file: StrucDownFile) {
+        file.downloadState = QueuedState(10)
+
+    }
+
+    override suspend fun copyFile() {
+
+    }
+
+    override suspend fun openDownloadFile() {
+
+    }
+
+}

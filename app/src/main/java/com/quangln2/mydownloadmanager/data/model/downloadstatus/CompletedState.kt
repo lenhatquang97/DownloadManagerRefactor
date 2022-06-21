@@ -1,8 +1,8 @@
-package com.quangln2.mydownloadmanager.ui.state.downloadstatus
+package com.quangln2.mydownloadmanager.data.model.downloadstatus
 
 import java.util.*
 
-class CompletedUIState: DownloadStatusUiState{
+class CompletedState: DownloadStatusState {
     private var completedDownDate: Date
     private var timeDone: Int
     constructor(timeDone: Int){

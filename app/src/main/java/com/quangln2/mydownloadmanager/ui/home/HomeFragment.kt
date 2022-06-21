@@ -23,6 +23,9 @@ class HomeFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private val downloadList = mutableListOf<Int>()
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         downloadList.addAll(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))

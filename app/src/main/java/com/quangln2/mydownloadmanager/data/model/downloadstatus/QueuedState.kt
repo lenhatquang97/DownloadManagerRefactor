@@ -1,6 +1,6 @@
-package com.quangln2.mydownloadmanager.ui.state.downloadstatus
+package com.quangln2.mydownloadmanager.data.model.downloadstatus
 
-class QueuedUiState: DownloadStatusUiState{
+class QueuedState: DownloadStatusState {
     private var priority: Int = 0
     constructor(priority: Int) {
         this.priority = priority
