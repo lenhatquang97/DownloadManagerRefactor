@@ -4,15 +4,18 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.webkit.URLUtil
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.flow
 import java.io.BufferedInputStream
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.net.URL
-import java.net.URLConnection
+import kotlinx.coroutines.flow.Flow
+import java.util.*
 
 class DefaultDownloadRepository: DownloadRepository {
     override fun addNewDownloadInfo(url: String, downloadTo: String, file: StrucDownFile) {
@@ -22,20 +25,21 @@ class DefaultDownloadRepository: DownloadRepository {
 
 
     //TODO: Need to fix this bug
-    override fun fetchDownloadInfo(file: StrucDownFile) = CoroutineScope(Dispatchers.IO).launch {
-        println("fetchDownloadInfo ${file.downloadLink}")
-        val defer = async{
-            return@async URL(file.downloadLink).openConnection()
-        }
-        val connection = defer.await()
+    override fun fetchDownloadInfo(file: StrucDownFile): Flow<StrucDownFile> = flow {
+        val connection = URL(file.downloadLink).openConnection()
         connection.doInput = true
         connection.doOutput = true
         file.fileName = URLUtil.guessFileName(file.downloadLink, null, connection.contentType)
         file.mimeType = connection.contentType
         file.size = connection.contentLength.toLong()
+        emit(file)
+        delay(200)
     }
-    override fun writeToFileAPI29Above(file: StrucDownFile, context: Context) = CoroutineScope(Dispatchers.IO).launch {
-        val connection =  URL(file.downloadLink).openConnection()
+    override fun writeToFileAPI29Above(file: StrucDownFile, context: Context) = CoroutineScope(Dispatchers.IO).async {
+        val defer = async {
+            URL(file.downloadLink).openConnection()
+        }
+        val connection = defer.await()
         connection.doInput = true
         connection.doOutput = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
@@ -45,12 +49,14 @@ class DefaultDownloadRepository: DownloadRepository {
                 put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
             }
             val resolver = context.contentResolver
-
-            //Query check file exists
             val selection = MediaStore.MediaColumns.DISPLAY_NAME + " = ?"
             val selectionArgs = arrayOf(file.fileName)
             val cursor = resolver.query(MediaStore.Downloads.EXTERNAL_CONTENT_URI, null, selection, selectionArgs, null)
-            if(cursor!!.count <= 0) {
+             if(cursor!!.count <= 0) {
+                file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            } else if(file.uri == null){
+                file.fileName = file.fileName + "_" + UUID.randomUUID().toString().substring(0,4)
+                contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
                 file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
             }
         }
@@ -61,12 +67,16 @@ class DefaultDownloadRepository: DownloadRepository {
 
 
     override fun downloadAFile(file: StrucDownFile, context: Context) = CoroutineScope(Dispatchers.IO).launch {
-        val connection =  URL(file.downloadLink).openConnection()
+        val defer = async {
+            URL(file.downloadLink).openConnection()
+        }
+        val connection = defer.await()
         connection.setRequestProperty("Range", "bytes=${file.bytesCopied}-")
         connection.doInput = true
         connection.doOutput = true
         val inp = BufferedInputStream(connection.getInputStream())
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            writeToFileAPI29Above(file, context).await()
             val out = context.contentResolver.openOutputStream(file.uri!!,"wa")
             if (out != null) {
                 writeStreamIO(inp, out, file).await()
@@ -84,6 +94,7 @@ class DefaultDownloadRepository: DownloadRepository {
         while(x >= 0){
             out?.write(data,0,x)
             file.bytesCopied += x
+            println(file.bytesCopied)
             if(file.downloadState is PausedState || file.downloadState is FailedState){
                 return@async
             }

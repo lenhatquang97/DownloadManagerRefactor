@@ -9,10 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.domain.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 
 class HomeViewModel(
     private val addNewDownloadInfoUseCase: AddNewDownloadInfoUseCase,
@@ -27,11 +25,11 @@ class HomeViewModel(
     fun addNewDownloadInfo(url: String, downloadTo: String){
         addNewDownloadInfoUseCase(url, downloadTo, _item.value!!)
     }
-    suspend fun fetchDownloadInfoToUI() {
-        fetchDownloadInfoUseCase(_item.value!!)
-        //set value in viewmodel
-
+    fun fetchDownloadInfoToUI(): Flow<StrucDownFile> = fetchDownloadInfoUseCase(_item.value!!)
+    suspend fun downloadAFile(){
+        downloadAFileUseCase(_item.value!!, context)
+        withContext(Dispatchers.Main.immediate){
+            println("In another scope")
+        }
     }
-
-    suspend fun downloadAFile() = downloadAFileUseCase(_item.value!!, context)
 }

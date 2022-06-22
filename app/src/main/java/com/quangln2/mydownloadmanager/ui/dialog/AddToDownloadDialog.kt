@@ -1,7 +1,9 @@
 package com.quangln2.mydownloadmanager.ui.dialog
 
 import android.app.Dialog
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,13 +13,16 @@ import androidx.core.view.get
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.mydownloadmanager.R
+import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
 import com.quangln2.mydownloadmanager.getViewModelFactory
 import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.NonCancellable.cancel
+import kotlinx.coroutines.flow.collect
 
 class AddToDownloadDialog: DialogFragment() {
     private var _binding: AddDownloadDialogBinding? = null
@@ -44,23 +49,28 @@ class AddToDownloadDialog: DialogFragment() {
         _binding = null
     }
     fun showDownloadAlertDialog() {
-        val coroutineScope = CoroutineScope(Dispatchers.Main)
-        coroutineScope.launch {
-            viewModel.fetchDownloadInfoToUI()
+        lifecycleScope.launch(Dispatchers.Main) {
+            viewModel.fetchDownloadInfoToUI().collect {
+                val builder = MaterialAlertDialogBuilder(requireActivity(), R.style.AlertDialogShow)
+                    .setTitle(it.fileName)
+                    .setIcon(R.drawable.ic_baseline_arrow_downward_24)
+                    .setMessage("Do you want to download this file? This will cost ${it.convertToSizeUnit()}.")
+                    .setPositiveButton("OK") { _, _ ->
+                        lifecycleScope.launch(Dispatchers.IO){
+                            viewModel.downloadAFile()
+                        }
+                        dismiss()
+                    }
+                    .setNegativeButton("CANCEL") { _, _ ->
+                        dismiss()
+                    }
+                if(it.size > 0L){
+                    builder.show()
+                }
+            }
+
+
         }
-        println(viewModel.item.value?.downloadLink)
     }
-//        val builder = MaterialAlertDialogBuilder(requireActivity(), R.style.AlertDialogShow)
-//            .setTitle(viewModel.item.value?.fileName)
-//            .setIcon(R.drawable.ic_baseline_arrow_downward_24)
-//            .setMessage("Do you want to download this file? This will cost ${viewModel.item.value?.convertToSizeUnit()}.")
-//            .setPositiveButton("OK") { _, _ ->
-//                dismiss()
-//            }
-//            .setNegativeButton("CANCEL") { _, _ ->
-//                dismiss()
-//            }
-//        if(viewModel.item.value?.size!! > 0L) {
-//            builder.show()
-//        }
+
 }
