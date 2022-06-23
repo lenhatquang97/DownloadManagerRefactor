@@ -3,6 +3,7 @@ package com.quangln2.mydownloadmanager.data.repository
 import android.content.Context
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import java.io.BufferedInputStream
@@ -11,7 +12,7 @@ import java.net.URLConnection
 
 interface DownloadRepository {
     fun addNewDownloadInfo(url: String, downloadTo: String, file: StrucDownFile)
-    fun fetchDownloadInfo(file: StrucDownFile): Flow<StrucDownFile>
+    fun fetchDownloadInfo(file: StrucDownFile)
     fun writeToFileAPI29Above(file: StrucDownFile, context: Context): Job
     fun writeToFileAPI29Below(file: StrucDownFile): String
     fun downloadAFile(file: StrucDownFile, context: Context): Job

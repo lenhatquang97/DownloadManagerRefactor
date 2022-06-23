@@ -23,6 +23,7 @@ import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
 import com.quangln2.mydownloadmanager.getViewModelFactory
+import com.quangln2.mydownloadmanager.ui.dialog.AddToDownloadDialog
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -36,8 +37,6 @@ class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        downloadList.addAll(listOf(ServiceLocator.initializeStrucDownFile()))
-
     }
 
     override fun onCreateView(
@@ -48,21 +47,26 @@ class HomeFragment : Fragment() {
         binding = FragmentFirstBinding.inflate(inflater, container,false)
 
         val downloadViewModelFactory = ViewModelFactory(DefaultDownloadRepository(), context!!)
-        viewModel = ViewModelProvider(this, downloadViewModelFactory).get(HomeViewModel::class.java)
+        viewModel = activity?.run {
+            ViewModelProvider(this, downloadViewModelFactory).get(HomeViewModel::class.java)
+        }!!
 
         binding.viewModel = viewModel
 
         val adapterVal = DownloadListAdapter()
+        adapterVal.submitList(mutableListOf())
+
         binding.downloadLists.apply {
             viewModel = viewModel
             adapter = adapterVal
             layoutManager = LinearLayoutManager(context)
         }
 
-        viewModel.downloadList.observe(viewLifecycleOwner, Observer {
+        viewModel._downloadList.observe(viewLifecycleOwner, Observer {
             it?.let {
-                adapterVal.submitList(it)
                 if(!it.isEmpty()){
+                    adapterVal.submitList(it)
+                    adapterVal.notifyItemChanged(it.size-1)
                     println("Listen: " + it.first().fileName)
                 }
 
@@ -70,9 +74,13 @@ class HomeFragment : Fragment() {
         })
         binding.lifecycleOwner = this
 
+
         binding.chip1.setOnClickListener {
+            if(viewModel._downloadList.value?.size!! > 0){
+                println(viewModel._downloadList.value?.get(0)!!.fileName)
+            }
             if(viewModel._item.value != null){
-                println(viewModel._item.value?.fileName)
+                println("HomeFragment " + viewModel._item.value?.fileName)
             }
             else{
                 println("Failed")

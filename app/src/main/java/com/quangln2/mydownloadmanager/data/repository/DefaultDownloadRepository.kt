@@ -9,12 +9,11 @@ import android.webkit.URLUtil
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import java.io.BufferedInputStream
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.net.URL
-import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 class DefaultDownloadRepository: DownloadRepository {
@@ -25,15 +24,15 @@ class DefaultDownloadRepository: DownloadRepository {
 
 
     //TODO: Need to fix this bug
-    override fun fetchDownloadInfo(file: StrucDownFile): Flow<StrucDownFile> = flow {
+    override fun fetchDownloadInfo(file: StrucDownFile) {
         val connection = URL(file.downloadLink).openConnection()
         connection.doInput = true
         connection.doOutput = true
         file.fileName = URLUtil.guessFileName(file.downloadLink, null, connection.contentType)
         file.mimeType = connection.contentType
         file.size = connection.contentLength.toLong()
-        emit(file)
-        delay(200)
+        println("Fetch download info "+file.fileName)
+
     }
     override fun writeToFileAPI29Above(file: StrucDownFile, context: Context) = CoroutineScope(Dispatchers.IO).async {
         val defer = async {

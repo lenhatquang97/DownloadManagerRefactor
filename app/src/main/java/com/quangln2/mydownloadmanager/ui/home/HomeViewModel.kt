@@ -11,6 +11,7 @@ import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.domain.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 
 class HomeViewModel(
     private val addNewDownloadInfoUseCase: AddNewDownloadInfoUseCase,
@@ -30,15 +31,24 @@ class HomeViewModel(
         addNewDownloadInfoUseCase(url, downloadTo, _item.value!!)
     }
 
-    fun fetchDownloadInfoToUI(): Flow<StrucDownFile> = fetchDownloadInfoUseCase(_item.value!!)
+    fun fetchDownloadInfoToUI(){
+        fetchDownloadInfoUseCase(_item.value!!)
+    }
 
-    suspend fun downloadAFile(){
-        println("VIEWMODEL NAME " + _item.value?.fileName)
-        _downloadList.value?.add(_item.value!!)
+
+    fun downloadAFile(){
+        val currentList = _downloadList.value
+        currentList?.add(_item.value!!)
+        _downloadList.postValue(currentList)
 
 //        downloadAFileUseCase(_item.value!!, context)
 //        withContext(Dispatchers.Main.immediate){
 //            println("In another scope")
 //        }
+    }
+    fun changeFile(){
+        _item.value?.kindOf = "Video"
+        val newFile = _item.value
+        _item.postValue(newFile)
     }
 }

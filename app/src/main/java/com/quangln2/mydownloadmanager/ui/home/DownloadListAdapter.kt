@@ -12,6 +12,7 @@ class DownloadListAdapter: ListAdapter<StrucDownFile, DownloadListAdapter.Downlo
 
     class DownloadItemViewHolder private constructor(private val binding: DownloadItemBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(item: StrucDownFile){
+
             binding.heading.text = item.fileName
             binding.textView.text = item.convertToSizeUnit()
             binding.progressBar.progress = 50
@@ -31,6 +32,7 @@ class DownloadListAdapter: ListAdapter<StrucDownFile, DownloadListAdapter.Downlo
 
     override fun onBindViewHolder(holder: DownloadItemViewHolder, position: Int) {
         val item = getItem(position)
+        println("Bind viewholder " + item.fileName)
         holder.bind(item)
     }
 
@@ -41,6 +43,8 @@ class DownloadListDiffCallback: DiffUtil.ItemCallback<StrucDownFile>() {
     }
 
     override fun areContentsTheSame(oldItem: StrucDownFile, newItem: StrucDownFile): Boolean {
-        return oldItem == newItem
+        return oldItem.downloadLink == newItem.downloadLink &&
+                oldItem.size == newItem.size
+                oldItem.mimeType == newItem.mimeType && oldItem.downloadTo == newItem.downloadTo && oldItem.fileName == newItem.fileName
     }
 }
