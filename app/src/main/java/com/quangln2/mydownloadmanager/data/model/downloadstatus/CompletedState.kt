@@ -10,4 +10,8 @@ class CompletedState: DownloadStatusState {
         completedDownDate = Date()
     }
 
+    override fun toString(): String {
+        return "Completed"
+    }
+
 }

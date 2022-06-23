@@ -4,12 +4,10 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.webkit.URLUtil
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import java.io.BufferedInputStream
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -93,7 +91,7 @@ class DefaultDownloadRepository: DownloadRepository {
         while(x >= 0){
             out?.write(data,0,x)
             file.bytesCopied += x
-            println(file.bytesCopied)
+            //println(file.bytesCopied)
             if(file.downloadState is PausedState || file.downloadState is FailedState){
                 return@async
             }

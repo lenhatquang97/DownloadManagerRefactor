@@ -40,15 +40,11 @@ class HomeViewModel(
         val currentList = _downloadList.value
         currentList?.add(_item.value!!)
         _downloadList.postValue(currentList)
-
-//        downloadAFileUseCase(_item.value!!, context)
-//        withContext(Dispatchers.Main.immediate){
-//            println("In another scope")
-//        }
-    }
-    fun changeFile(){
-        _item.value?.kindOf = "Video"
-        val newFile = _item.value
-        _item.postValue(newFile)
+        CoroutineScope(Dispatchers.IO).launch {
+            downloadAFileUseCase(_item.value!!, context)
+            withContext(Dispatchers.Main.immediate){
+                println("In another scope")
+            }
+        }
     }
 }

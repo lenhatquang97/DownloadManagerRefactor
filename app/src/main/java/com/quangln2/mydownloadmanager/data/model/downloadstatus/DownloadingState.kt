@@ -9,5 +9,8 @@ class DownloadingState : DownloadStatusState {
         this.timeRemaining = timeRemaining
         this.downloadSpeed = downloadSpeed
     }
+    override fun toString(): String {
+        return "Downloading"
+    }
 
 }

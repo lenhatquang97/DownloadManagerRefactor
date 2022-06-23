@@ -11,4 +11,7 @@ class QueuedState: DownloadStatusState {
     public fun decreasePriority(){
         priority--
     }
+    override fun toString(): String {
+        return "Queued"
+    }
 }

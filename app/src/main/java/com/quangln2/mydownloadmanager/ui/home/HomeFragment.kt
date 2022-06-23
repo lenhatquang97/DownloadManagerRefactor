@@ -3,27 +3,15 @@ package com.quangln2.mydownloadmanager.ui.home
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.quangln2.mydownloadmanager.R
-import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
-import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
-import com.quangln2.mydownloadmanager.getViewModelFactory
-import com.quangln2.mydownloadmanager.ui.dialog.AddToDownloadDialog
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -87,10 +75,6 @@ class HomeFragment : Fragment() {
             }
 
         }
-
-
-
-
         return binding.root
 
     }
