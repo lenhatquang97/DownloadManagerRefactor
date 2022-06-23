@@ -35,7 +35,6 @@ class AddToDownloadDialog: DialogFragment() {
     private lateinit var viewModel: HomeViewModel
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         binding = AddDownloadDialogBinding.inflate(LayoutInflater.from(context))
         binding.addNewDownloadFileButton.setOnClickListener {
             viewModel.addNewDownloadInfo(binding.linkTextField.editText?.text.toString(), binding.downloadToTextField.editText?.text.toString())
@@ -52,41 +51,28 @@ class AddToDownloadDialog: DialogFragment() {
         viewModel = activity?.run {
             ViewModelProvider(this, downloadViewModelFactory).get(HomeViewModel::class.java)
         }!!
-        parentFragment?.viewLifecycleOwner?.let{itr ->
-            binding.lifecycleOwner = itr
-            viewModel._item.observe(itr, Observer<StrucDownFile> {
-                println("Change change change")
-                it?.let {
-                    val builder =
-                        MaterialAlertDialogBuilder(requireActivity(), R.style.AlertDialogShow)
-                            .setTitle(it.fileName)
-                            .setIcon(R.drawable.ic_baseline_arrow_downward_24)
-                            .setMessage("Do you want to download this file? This will cost ${it.convertToSizeUnit()}.")
-                            .setPositiveButton("OK") { _, _ ->
-                                lifecycleScope.launch(Dispatchers.IO) {
-                                    viewModel.downloadAFile()
-                                }
-                                dismiss()
-                            }
-                            .setNegativeButton("CANCEL") { _, _ ->
-                                dismiss()
-                            }
-                    builder.show()
-                }
-            })
-        }
-
 
         return AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog).setView(binding.root).create()
     }
 
     fun showDownloadAlertDialog() {
         lifecycleScope.launch {
-            withContext(Dispatchers.IO){
-                viewModel.fetchDownloadInfoToUI()
-                viewModel.changeFile()
-            }
-
+            viewModel.fetchDownloadInfoToUI()
+            val builder =
+                MaterialAlertDialogBuilder(requireActivity(), R.style.AlertDialogShow)
+                    .setTitle(viewModel._item.value?.fileName)
+                    .setIcon(R.drawable.ic_baseline_arrow_downward_24)
+                    .setMessage("Do you want to download this file? This will cost ${viewModel._item.value?.convertToSizeUnit()}.")
+                    .setPositiveButton("OK") { _, _ ->
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            viewModel.downloadAFile()
+                        }
+                        dismiss()
+                    }
+                    .setNegativeButton("CANCEL") { _, _ ->
+                        dismiss()
+                    }
+            builder.show()
         }
 
     }
