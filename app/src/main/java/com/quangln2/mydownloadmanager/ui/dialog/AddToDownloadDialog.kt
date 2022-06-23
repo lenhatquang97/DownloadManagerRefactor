@@ -13,10 +13,13 @@ import androidx.core.view.get
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.mydownloadmanager.R
+import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
 import com.quangln2.mydownloadmanager.getViewModelFactory
 import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
@@ -25,14 +28,11 @@ import kotlinx.coroutines.NonCancellable.cancel
 import kotlinx.coroutines.flow.collect
 
 class AddToDownloadDialog: DialogFragment() {
-    private var _binding: AddDownloadDialogBinding? = null
-    private val binding get() = _binding!!
-    private val viewModel: HomeViewModel by viewModels<HomeViewModel> {getViewModelFactory(context!!)}
+    private lateinit var binding: AddDownloadDialogBinding
+    private lateinit var viewModel: HomeViewModel
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _binding = AddDownloadDialogBinding.inflate(LayoutInflater.from(context))
-
-
+        binding = AddDownloadDialogBinding.inflate(LayoutInflater.from(context))
         binding.addNewDownloadFileButton.setOnClickListener {
             viewModel.addNewDownloadInfo(binding.linkTextField.editText?.text.toString(), binding.downloadToTextField.editText?.text.toString())
             showDownloadAlertDialog()
@@ -41,13 +41,14 @@ class AddToDownloadDialog: DialogFragment() {
         binding.cancelAddNewDownloadFileButton.setOnClickListener {
             dismiss()
         }
+
+        val downloadViewModelFactory = ViewModelFactory(DefaultDownloadRepository(), context!!)
+        viewModel = ViewModelProvider(this, downloadViewModelFactory).get(HomeViewModel::class.java)
+
+
         return AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog).setView(binding.root).create()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
     fun showDownloadAlertDialog() {
         lifecycleScope.launch(Dispatchers.Main) {
             viewModel.fetchDownloadInfoToUI().collect {

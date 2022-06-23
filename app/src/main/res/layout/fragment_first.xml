@@ -1,126 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment"
-    android:padding="16dp">
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/searchField"
-        app:boxCornerRadiusBottomEnd="28dp"
-        app:boxCornerRadiusTopEnd="28dp"
-        app:boxCornerRadiusBottomStart="28dp"
-        app:boxCornerRadiusTopStart="28dp"
-        app:boxBackgroundColor="@color/blue"
-        app:boxStrokeColor="@color/white"
-        app:boxStrokeWidth="0dp"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.quangln2.mydownloadmanager.ui.home.HomeViewModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        app:startIconDrawable="@drawable/ic_baseline_search_24"
-        app:startIconTint="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:hintEnabled="false"
-        android:textColorHint="@color/white"
-        >
-        <com.google.android.material.textfield.TextInputEditText
+        android:layout_height="match_parent"
+        tools:context=".ui.home.HomeFragment"
+        android:padding="16dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/searchField"
+            app:boxCornerRadiusBottomEnd="28dp"
+            app:boxCornerRadiusTopEnd="28dp"
+            app:boxCornerRadiusBottomStart="28dp"
+            app:boxCornerRadiusTopStart="28dp"
+            app:boxBackgroundColor="@color/blue"
+            app:boxStrokeColor="@color/white"
+            app:boxStrokeWidth="0dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:singleLine="true"
-            android:hint="Search"
+            android:minHeight="48dp"
+            app:startIconDrawable="@drawable/ic_baseline_search_24"
+            app:startIconTint="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:hintEnabled="false"
             android:textColorHint="@color/white"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-    <HorizontalScrollView
-        app:layout_constraintTop_toBottomOf="@id/searchField"
-        android:id="@+id/chipGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none">
-        <com.google.android.material.chip.ChipGroup
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:singleLine="true"
+                android:hint="Search"
+                android:textColorHint="@color/white"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+        <HorizontalScrollView
+            app:layout_constraintTop_toBottomOf="@id/searchField"
+            android:id="@+id/chipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:chipSpacingVertical="20dp"
-            android:paddingTop="16dp"
-            >
+            android:scrollbars="none">
+            <com.google.android.material.chip.ChipGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:chipSpacingVertical="20dp"
+                android:paddingTop="16dp"
+                >
 
-        <com.google.android.material.chip.Chip
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:id="@+id/chip1"
-            android:text="Downloading"
-            android:textColor="@color/white"
-            app:chipBackgroundColor="@color/blue"
-            app:chipCornerRadius="28dp"
-            app:chipStrokeColor="@color/blue"
-            app:chipMinHeight="36dp"
-            />
-        <com.google.android.material.chip.Chip
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:id="@+id/chip2"
-            android:text="Failed"
-            android:textColor="@color/white"
-            app:chipBackgroundColor="@color/failed"
-            app:chipCornerRadius="28dp"
-            app:chipStrokeColor="@color/failed"
-            app:chipMinHeight="36dp"
-            />
-        <com.google.android.material.chip.Chip
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:id="@+id/chip3"
-            android:text="Paused"
-            android:textColor="@color/white"
-            app:chipBackgroundColor="@color/paused"
-            app:chipCornerRadius="28dp"
-            app:chipStrokeColor="@color/paused"
-            app:chipMinHeight="36dp"
-            />
-            <com.google.android.material.chip.Chip
-                android:layout_height="match_parent"
-                android:layout_width="wrap_content"
-                android:id="@+id/chip4"
-                android:text="Success"
-                android:textColor="@color/white"
-                app:chipBackgroundColor="@color/success"
-                app:chipCornerRadius="28dp"
-                app:chipStrokeColor="@color/success"
-                app:chipMinHeight="36dp"
-                />
-            <com.google.android.material.chip.Chip
-                android:layout_height="match_parent"
-                android:layout_width="wrap_content"
-                android:id="@+id/chip5"
-                android:text="Queued"
-                android:textColor="@color/white"
-                app:chipBackgroundColor="@color/grey"
-                app:chipCornerRadius="28dp"
-                app:chipStrokeColor="@color/grey"
-                app:chipMinHeight="36dp"
-                />
+                <com.google.android.material.chip.Chip
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/chip1"
+                    android:text="Downloading"
+                    android:textColor="@color/white"
+                    app:chipBackgroundColor="@color/blue"
+                    app:chipCornerRadius="28dp"
+                    app:chipStrokeColor="@color/blue"
+                    app:chipMinHeight="36dp"
+                    />
+                <com.google.android.material.chip.Chip
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/chip2"
+                    android:text="Failed"
+                    android:textColor="@color/white"
+                    app:chipBackgroundColor="@color/failed"
+                    app:chipCornerRadius="28dp"
+                    app:chipStrokeColor="@color/failed"
+                    app:chipMinHeight="36dp"
+                    />
+                <com.google.android.material.chip.Chip
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/chip3"
+                    android:text="Paused"
+                    android:textColor="@color/white"
+                    app:chipBackgroundColor="@color/paused"
+                    app:chipCornerRadius="28dp"
+                    app:chipStrokeColor="@color/paused"
+                    app:chipMinHeight="36dp"
+                    />
+                <com.google.android.material.chip.Chip
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/chip4"
+                    android:text="Success"
+                    android:textColor="@color/white"
+                    app:chipBackgroundColor="@color/success"
+                    app:chipCornerRadius="28dp"
+                    app:chipStrokeColor="@color/success"
+                    app:chipMinHeight="36dp"
+                    />
+                <com.google.android.material.chip.Chip
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/chip5"
+                    android:text="Queued"
+                    android:textColor="@color/white"
+                    app:chipBackgroundColor="@color/grey"
+                    app:chipCornerRadius="28dp"
+                    app:chipStrokeColor="@color/grey"
+                    app:chipMinHeight="36dp"
+                    />
 
-    </com.google.android.material.chip.ChipGroup>
-    </HorizontalScrollView>
-
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/downloadLists"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="24dp"
-        android:nestedScrollingEnabled="false"
-        app:layout_constraintVertical_bias="0.05"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHeight_default="wrap"
-        app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
 
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/downloadLists"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="24dp"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintVertical_bias="0.05"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHeight_default="wrap"
+            app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
