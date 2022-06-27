@@ -18,7 +18,6 @@ class ViewModelFactory constructor(
                 isAssignableFrom(HomeViewModel::class.java) ->
                     HomeViewModel(
                         AddNewDownloadInfoUseCase(downloadRepository),
-                        DownloadAFileUseCase(downloadRepository),
                         FetchDownloadInfoUseCase(downloadRepository),
                         PauseDownloadUseCase(downloadRepository),
                         ResumeDownloadUseCase(downloadRepository),

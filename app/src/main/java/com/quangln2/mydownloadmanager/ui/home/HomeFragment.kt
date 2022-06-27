@@ -5,61 +5,44 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.quangln2.mydownloadmanager.ViewModelFactory
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
 
-/**
- * A simple [Fragment] subclass as the default destination in the navigation.
- */
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentFirstBinding
+    private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(), requireContext()) }
 
-    private val downloadList = mutableListOf<StrucDownFile>()
-    private lateinit var viewModel: HomeViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         binding = FragmentFirstBinding.inflate(inflater, container,false)
-
-        val downloadViewModelFactory = ViewModelFactory(DefaultDownloadRepository(), context!!)
-        viewModel = activity?.run {
-            ViewModelProvider(this, downloadViewModelFactory).get(HomeViewModel::class.java)
-        }!!
-
         binding.viewModel = viewModel
 
-        val adapterVal = DownloadListAdapter()
-        adapterVal.submitList(mutableListOf())
+        val adapterVal = DownloadListAdapter(requireContext())
+        adapterVal.submitList(viewModel._downloadList.value)
 
         binding.downloadLists.apply {
-            viewModel = viewModel
             adapter = adapterVal
             layoutManager = LinearLayoutManager(context)
         }
 
-        viewModel._downloadList.observe(viewLifecycleOwner, Observer {
+        viewModel._downloadList.observe(viewLifecycleOwner) {
             it?.let {
-                if(!it.isEmpty()){
+                if (it.isNotEmpty()) {
                     adapterVal.submitList(it)
-                    adapterVal.notifyItemChanged(it.size-1)
+                    adapterVal.notifyItemChanged(it.size - 1)
                     println("Listen: " + it.first().fileName)
                 }
 
             }
-        })
+        }
         binding.lifecycleOwner = this
 
 
@@ -77,10 +60,6 @@ class HomeFragment : Fragment() {
         }
         return binding.root
 
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
     }
 
 }

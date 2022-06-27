@@ -27,6 +27,7 @@
             android:paddingLeft="16dp"
             app:layout_constraintLeft_toRightOf="@id/round_category"
             app:layout_constraintTop_toTopOf="parent"
+            android:textStyle="bold"
             android:textColor="@color/black"
              />
 
@@ -40,9 +41,25 @@
             app:layout_constraintLeft_toRightOf="@id/round_category"
             app:layout_constraintTop_toBottomOf="@+id/heading" />
 
+        <ImageView
+            android:id="@+id/download_state_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_pause"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/stop_button"/>
+
+        <ImageView
+            android:id="@+id/stop_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_stop"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/more_button"/>
 
 
         <ImageView
+            android:id="@+id/more_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_more_vert_24"

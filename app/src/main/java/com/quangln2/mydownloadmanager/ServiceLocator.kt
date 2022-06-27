@@ -21,7 +21,7 @@ object ServiceLocator {
             "test",
             "test",
             "Documents",
-            0,
+            -1,
             0,
             DownloadStatusState(),
             "*/*",

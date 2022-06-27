@@ -23,17 +23,15 @@ data class StrucDownFile (
         if (size < ConstantClass.KB){
             return size.toString() + "B"
         }
-        if (size >= ConstantClass.KB && size < ConstantClass.MB){
+        return if (size >= ConstantClass.KB && size < ConstantClass.MB){
             val sizeKB = size.toFloat() / 1024.0
-            return String.format("%.2f", sizeKB) + "KB"
-        }
-        else if (size >= ConstantClass.MB && size < ConstantClass.GB){
+            String.format("%.2f", sizeKB) + "KB"
+        } else if (size >= ConstantClass.MB && size < ConstantClass.GB){
             val sizeMB = size.toFloat() / 1024.0 / 1024.0
-            return String.format("%.2f", sizeMB) + "MB"
-        }
-        else {
+            String.format("%.2f", sizeMB) + "MB"
+        } else {
             val sizeGB = size.toFloat() / 1024.0 / 1024.0 / 1024.0
-            return String.format("%.2f", sizeGB) + "GB"
+            String.format("%.2f", sizeGB) + "GB"
         }
     }
     fun getCategory() = kindOf
