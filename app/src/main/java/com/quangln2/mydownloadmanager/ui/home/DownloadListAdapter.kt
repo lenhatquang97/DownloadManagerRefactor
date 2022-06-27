@@ -22,7 +22,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
 
     class DownloadItemViewHolder private constructor(private val binding: DownloadItemBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(item: StrucDownFile, context: Context){
-            binding.heading.text = item.fileName
+            binding.heading.text = if(item.fileName.length < 25) item.fileName else item.fileName.substring(0,10) + "..." + item.fileName.substring(item.fileName.length - 10, item.fileName.length)
             binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
             binding.progressBar.progress = 0
             binding.progressBar.visibility = View.VISIBLE
@@ -80,7 +80,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
         private fun downloadAFileWithProgressBar(binding: DownloadItemBinding, item: StrucDownFile, context: Context){
             CoroutineScope(Dispatchers.Main).launch {
                 DownloadManagerApplication.downloadAFileUseCase(item, context).collect { itr ->
-                    binding.heading.text = item.fileName
+                    binding.heading.text = if(item.fileName.length < 25) item.fileName else item.fileName.substring(0,10) + "..." + item.fileName.substring(item.fileName.length - 10, item.fileName.length)
                     binding.progressBar.progress = itr
                     if(itr == 100){
                         item.downloadState = CompletedState(0)
