@@ -16,6 +16,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.quangln2.mydownloadmanager.databinding.ActivityMainBinding
+import com.quangln2.mydownloadmanager.notification.DownloadNotification
 import com.quangln2.mydownloadmanager.ui.dialog.AddToDownloadDialog
 
 
@@ -55,10 +56,14 @@ class MainActivity : AppCompatActivity() {
             dialog.show(supportFragmentManager, "AddToDownloadDialog")
         }
 
+
         //Set burger menu
         supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24)
         }
+
+        //Register notification
+        DownloadNotification.createNotificationChannel(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

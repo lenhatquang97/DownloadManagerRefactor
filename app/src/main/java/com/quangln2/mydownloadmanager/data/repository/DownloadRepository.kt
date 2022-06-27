@@ -8,7 +8,7 @@ interface DownloadRepository {
     fun addNewDownloadInfo(url: String, downloadTo: String, file: StrucDownFile)
     fun fetchDownloadInfo(file: StrucDownFile): StrucDownFile
     fun writeToFileAPI29Above(file: StrucDownFile, context: Context)
-    fun writeToFileAPI29Below(file: StrucDownFile): String
+    fun writeToFileAPI29Below(file: StrucDownFile)
     fun downloadAFile(file: StrucDownFile, context: Context): Flow<Int>
 
     fun resumeDownload(file: StrucDownFile)
