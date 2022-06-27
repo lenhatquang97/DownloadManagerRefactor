@@ -15,6 +15,7 @@ import com.quangln2.mydownloadmanager.util.UIComponentUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.io.BufferedInputStream
+import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
 import java.util.*
@@ -125,7 +126,6 @@ class DefaultDownloadRepository: DownloadRepository {
 
 
     override fun resumeDownload(file: StrucDownFile) {
-        file.bytesCopied = 0
         file.downloadState = DownloadingState(0,0)
     }
 
@@ -138,7 +138,18 @@ class DefaultDownloadRepository: DownloadRepository {
         file.downloadState = FailedState()
     }
 
-    override suspend fun retryDownload(file: StrucDownFile, context: Context) {
+    override fun retryDownload(file: StrucDownFile,context: Context) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            val resolver = context.contentResolver
+            if(file.uri != null){
+                resolver.delete(file.uri!!,null,null)
+            }
+        } else {
+            val filePath = File(writeToFileAPI29Below(file))
+            if(filePath.exists()){
+                filePath.delete()
+            }
+        }
         file.bytesCopied = 0
         file.uri = null
         file.downloadState = DownloadingState(0,0)

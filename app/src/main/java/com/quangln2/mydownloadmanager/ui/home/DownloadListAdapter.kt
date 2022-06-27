@@ -50,7 +50,8 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         item.downloadState = DownloadingState(0,0)
                         binding.progressBar.progress = 0
                         binding.progressBar.visibility = View.VISIBLE
-                        DownloadManagerApplication.resumeDownloadUseCase(item)
+                        DownloadManagerApplication.retryDownloadUseCase(item, context)
+                        downloadAFileWithProgressBar(binding, item, context)
                         binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
                     }

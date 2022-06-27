@@ -14,7 +14,7 @@ interface DownloadRepository {
     fun resumeDownload(file: StrucDownFile)
     fun pauseDownload(file: StrucDownFile)
     fun stopDownload(file: StrucDownFile)
-    suspend fun retryDownload(file: StrucDownFile, context: Context)
+    fun retryDownload(file: StrucDownFile, context: Context)
     fun queueDownload(file: StrucDownFile)
 
     suspend fun copyFile()
