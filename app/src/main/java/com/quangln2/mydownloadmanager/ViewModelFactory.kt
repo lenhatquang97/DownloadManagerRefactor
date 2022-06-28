@@ -19,9 +19,6 @@ class ViewModelFactory constructor(
                     HomeViewModel(
                         AddNewDownloadInfoUseCase(downloadRepository),
                         FetchDownloadInfoUseCase(downloadRepository),
-                        PauseDownloadUseCase(downloadRepository),
-                        ResumeDownloadUseCase(downloadRepository),
-                        context
                     )
                 else ->
                     throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

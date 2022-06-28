@@ -1,11 +1,9 @@
 package com.quangln2.mydownloadmanager.ui.dialog
 
-import android.R.string
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
@@ -17,6 +15,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
@@ -28,7 +27,7 @@ import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
 class AddToDownloadDialog: DialogFragment() {
     private lateinit var binding: AddDownloadDialogBinding
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
-    private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(), requireContext()) }
+    private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(DownloadManagerApplication().database.downloadDao()), requireContext()) }
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         viewModel.fetchedFileInfo.observe(this) {
@@ -45,6 +44,7 @@ class AddToDownloadDialog: DialogFragment() {
                 if(uri != null && context != null){
                     val df = DocumentFile.fromTreeUri(context!!, uri)
                     println(df?.uri?.path)
+                    println(Environment.DIRECTORY_DOWNLOADS)
                     binding.downloadToTextField.editText?.setText(getRealPath(df))
                 }
 

@@ -7,14 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
 
-class HomeFragment : Fragment() {
+class HomeFragment() : Fragment() {
 
     private lateinit var binding: FragmentFirstBinding
-    private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(), requireContext()) }
+    private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(DownloadManagerApplication().database.downloadDao()), requireContext()) }
 
 
     override fun onCreateView(
@@ -26,7 +27,6 @@ class HomeFragment : Fragment() {
         binding.viewModel = viewModel
 
         val adapterVal = DownloadListAdapter(requireContext())
-        adapterVal.submitList(viewModel._downloadList.value)
 
         binding.downloadLists.apply {
             adapter = adapterVal
@@ -34,7 +34,7 @@ class HomeFragment : Fragment() {
         }
 
 
-        viewModel._downloadList.observe(viewLifecycleOwner) {
+        viewModel.downloadList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
                     adapterVal.submitList(it)

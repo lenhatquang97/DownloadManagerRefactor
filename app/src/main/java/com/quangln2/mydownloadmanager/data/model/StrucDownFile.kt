@@ -1,22 +1,28 @@
 package com.quangln2.mydownloadmanager.data.model
 
 import android.net.Uri
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 
+@Entity(tableName ="download_list")
 data class StrucDownFile (
-    private val id: Int,
-    var downloadLink: String,
-    var downloadTo: String,
 
-    var kindOf: String,
-    var size: Long,
-    var bytesCopied: Long,
-    var downloadState: DownloadStatusState,
-    var mimeType: String,
+    @PrimaryKey(autoGenerate = true) val id: Int,
+    @ColumnInfo(name="download_link") var downloadLink: String,
+    @ColumnInfo(name="download_to") var downloadTo: String,
+    @ColumnInfo(name="kind_of") var kindOf: String,
+    @ColumnInfo(name="size") var size: Long,
 
-    var fileName: String,
-    var uri: Uri? = null,
+    @Ignore var bytesCopied: Long,
+
+    @ColumnInfo(name="download_state") var downloadState: DownloadStatusState,
+    @ColumnInfo(name="mime_type") var mimeType: String,
+    @ColumnInfo(name="file_name") var fileName: String,
+    @ColumnInfo(name="uri") var uri: Uri? = null,
 ){
 
     fun convertToSizeUnit(): String{

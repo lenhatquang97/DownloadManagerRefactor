@@ -5,17 +5,20 @@ import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.app.NotificationManagerCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.R
-import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
 import com.quangln2.mydownloadmanager.databinding.DownloadItemBinding
 import com.quangln2.mydownloadmanager.notification.DownloadNotification
+import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.downloadAFileUseCase
+import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.pauseDownloadUseCase
+import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.resumeDownloadUseCase
+import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.retryDownloadUseCase
+import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.writeToFileAPI29AboveUseCase
+import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.writeToFileAPI29BelowUseCase
 import com.quangln2.mydownloadmanager.util.LogicUtil
 import com.quangln2.mydownloadmanager.util.LogicUtil.Companion.cutFileName
 import com.quangln2.mydownloadmanager.util.UIComponentUtil
@@ -36,20 +39,20 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
             binding.roundCategory.setImageResource(UIComponentUtil.defineIcon(item.kindOf))
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                DownloadManagerApplication.writeToFileAPI29AboveUseCase(item, context)
+                writeToFileAPI29AboveUseCase(item, context)
             } else {
-                DownloadManagerApplication.writeToFileAPI29BelowUseCase(item)
+                writeToFileAPI29BelowUseCase(item)
             }
             notification = DownloadNotification(context, item)
 
             binding.downloadStateButton.setOnClickListener {
                 when(item.downloadState){
                     DownloadStatusState.DOWNLOADING -> {
-                        DownloadManagerApplication.pauseDownloadUseCase(item)
+                        pauseDownloadUseCase(item)
                         binding.downloadStateButton.setImageResource(R.drawable.ic_start)
                     }
                     DownloadStatusState.PAUSED -> {
-                        DownloadManagerApplication.resumeDownloadUseCase(item)
+                        resumeDownloadUseCase(item)
                         downloadAFileWithProgressBar(binding, item, context)
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
                     }
@@ -62,11 +65,11 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         item.downloadState = DownloadStatusState.DOWNLOADING
                         binding.progressBar.progress = 0
                         binding.progressBar.visibility = View.VISIBLE
-                        DownloadManagerApplication.retryDownloadUseCase(item, context)
+                        retryDownloadUseCase(item, context)
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                            DownloadManagerApplication.writeToFileAPI29AboveUseCase(item, context)
+                            writeToFileAPI29AboveUseCase(item, context)
                         } else {
-                            DownloadManagerApplication.writeToFileAPI29BelowUseCase(item)
+                            writeToFileAPI29BelowUseCase(item)
                         }
                         downloadAFileWithProgressBar(binding, item, context)
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
@@ -96,7 +99,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
 
                 }
             }
-            downloadAFileWithProgressBar(binding, item, context)
+            //downloadAFileWithProgressBar(binding, item, context)
 
 
         }
@@ -111,10 +114,10 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
 
         private fun downloadAFileWithProgressBar(binding: DownloadItemBinding, item: StrucDownFile, context: Context){
             var startTime = System.currentTimeMillis()
-            var endTime = 0L
+            var endTime: Long
 
             var startBytes = 0L
-            var endBytes = 0L
+            var endBytes: Long
 
             CoroutineScope(Dispatchers.Main).launch {
                 withContext(Dispatchers.IO){
@@ -122,13 +125,13 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                     notification.showNotification(context, item)
                 }
                 binding.heading.text = cutFileName(item.fileName)
-                DownloadManagerApplication.downloadAFileUseCase(item, context).collect { itr ->
+                downloadAFileUseCase(item, context).collect { itr ->
                     binding.progressBar.progress = itr
 
                     endTime = System.currentTimeMillis()
                     endBytes = item.bytesCopied
 
-                    var seconds = ((endTime.toDouble() - startTime.toDouble()) / 1000.0)
+                    val seconds = ((endTime.toDouble() - startTime.toDouble()) / 1000.0)
                     if(seconds > 1){
                         val result = LogicUtil.calculateDownloadSpeed(seconds, startBytes, endBytes)
 

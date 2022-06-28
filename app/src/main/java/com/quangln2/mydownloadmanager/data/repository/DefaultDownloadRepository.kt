@@ -6,6 +6,8 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
+import androidx.annotation.WorkerThread
+import com.quangln2.mydownloadmanager.data.database.DownloadDao
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
 import com.quangln2.mydownloadmanager.util.UIComponentUtil
@@ -19,7 +21,16 @@ import java.net.URL
 import java.util.*
 
 
-class DefaultDownloadRepository: DownloadRepository {
+class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadRepository {
+    val downloadList: Flow<List<StrucDownFile>> = downloadDao.getAll()
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun insert(strucDownFile: StrucDownFile) {
+        downloadDao.insert(strucDownFile)
+    }
+
+
     override fun addNewDownloadInfo(url: String, downloadTo: String, file: StrucDownFile) {
         file.downloadLink = url
         file.downloadTo = downloadTo

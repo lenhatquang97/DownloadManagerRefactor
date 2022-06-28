@@ -1,5 +1,6 @@
 package com.quangln2.mydownloadmanager
 
+import com.quangln2.mydownloadmanager.data.database.DownloadDao
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
@@ -7,13 +8,13 @@ import com.quangln2.mydownloadmanager.data.repository.DownloadRepository
 
 object ServiceLocator {
     var downloadRepository: DownloadRepository? = null
-    fun provideDownloadRepository(): DownloadRepository {
+    fun provideDownloadRepository(database: DownloadDao): DownloadRepository {
         synchronized(this){
-            return downloadRepository ?: downloadRepository ?: createDownloadRepository()
+            return downloadRepository ?: downloadRepository ?: createDownloadRepository(database)
         }
     }
-    private fun createDownloadRepository(): DownloadRepository {
-        return DefaultDownloadRepository()
+    private fun createDownloadRepository(database: DownloadDao): DownloadRepository {
+        return DefaultDownloadRepository(database)
     }
     fun initializeStrucDownFile(): StrucDownFile {
         return StrucDownFile(
