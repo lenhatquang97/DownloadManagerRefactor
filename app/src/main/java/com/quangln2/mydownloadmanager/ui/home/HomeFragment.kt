@@ -33,31 +33,17 @@ class HomeFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
         }
 
+
         viewModel._downloadList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
                     adapterVal.submitList(it)
                     adapterVal.notifyItemChanged(it.size - 1)
-                    println("Listen: " + it.first().fileName)
                 }
 
             }
         }
         binding.lifecycleOwner = this
-
-
-        binding.chip1.setOnClickListener {
-            if(viewModel._downloadList.value?.size!! > 0){
-                println(viewModel._downloadList.value?.get(0)!!.fileName)
-            }
-            if(viewModel._item.value != null){
-                println("HomeFragment " + viewModel._item.value?.fileName)
-            }
-            else{
-                println("Failed")
-            }
-
-        }
         return binding.root
 
     }

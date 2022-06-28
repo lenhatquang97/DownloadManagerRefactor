@@ -7,16 +7,14 @@ import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
-import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadingState
-import com.quangln2.mydownloadmanager.data.model.downloadstatus.FailedState
-import com.quangln2.mydownloadmanager.data.model.downloadstatus.PausedState
-import com.quangln2.mydownloadmanager.data.model.downloadstatus.QueuedState
+import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
 import com.quangln2.mydownloadmanager.util.UIComponentUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 
@@ -39,14 +37,14 @@ class DefaultDownloadRepository: DownloadRepository {
 
     //TODO: Need to fix this bug
     override fun fetchDownloadInfo(file: StrucDownFile): StrucDownFile {
-        val connection = URL(file.downloadLink).openConnection()
+        val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
         connection.doInput = true
         connection.doOutput = true
         file.fileName = URLUtil.guessFileName(file.downloadLink, null, connection.contentType)
         file.mimeType = if(connection.contentType == null) getMimeType(file.downloadLink) else connection.contentType
         file.size = connection.contentLength.toLong()
         file.kindOf = UIComponentUtil.defineTypeOfCategoriesBasedOnFileName(file.mimeType)
-        println("file.mimeType: ${file.mimeType}")
+        connection.disconnect()
         return file
 
 
@@ -69,6 +67,7 @@ class DefaultDownloadRepository: DownloadRepository {
                 contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
                 file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
             }
+            println("API 29 ABOVE: " + file.uri?.path)
         }
     }
     override fun writeToFileAPI29Below(file: StrucDownFile){
@@ -77,13 +76,13 @@ class DefaultDownloadRepository: DownloadRepository {
 
 
     override fun downloadAFile(file: StrucDownFile, context: Context): Flow<Int> = flow {
-        val connection = URL(file.downloadLink).openConnection()
+        val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
         if(connection != null){
             connection.setRequestProperty("Range", "bytes=${file.bytesCopied}-")
             connection.doInput = true
             connection.doOutput = true
         }
-        val inp = BufferedInputStream(connection?.getInputStream())
+        val inp = BufferedInputStream(connection.inputStream)
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
             val out = context.contentResolver.openOutputStream(file.uri!!,"wa")
             if (out != null) {
@@ -93,9 +92,8 @@ class DefaultDownloadRepository: DownloadRepository {
                     out.write(data,0,x)
                     file.bytesCopied += x
                     val percent = file.bytesCopied.toFloat() / file.size.toFloat() * 100.0
-                    println(percent)
                     emit(percent.toInt())
-                    if(file.downloadState is PausedState || file.downloadState is FailedState){
+                    if(file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED){
                         break
                     }
                     x = inp.read(data,0,1024)
@@ -109,28 +107,28 @@ class DefaultDownloadRepository: DownloadRepository {
                 fos.write(data,0,x)
                 file.bytesCopied += x
                 val percent = file.bytesCopied.toFloat() / file.size.toFloat() * 100.0
-                println(percent)
                 emit(percent.toInt())
-                if(file.downloadState is PausedState || file.downloadState is FailedState){
+                if(file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED){
                     break
                 }
                 x = inp.read(data,0,1024)
             }
         }
+        connection.disconnect()
     }.flowOn(Dispatchers.IO)
 
 
     override fun resumeDownload(file: StrucDownFile) {
-        file.downloadState = DownloadingState(0,0)
+        file.downloadState = DownloadStatusState.DOWNLOADING
     }
 
     override fun pauseDownload(file: StrucDownFile) {
-        file.downloadState = PausedState()
+        file.downloadState = DownloadStatusState.PAUSED
     }
 
     override fun stopDownload(file: StrucDownFile) {
         file.bytesCopied = 0
-        file.downloadState = FailedState()
+        file.downloadState = DownloadStatusState.FAILED
     }
 
     override fun retryDownload(file: StrucDownFile,context: Context) {
@@ -148,10 +146,10 @@ class DefaultDownloadRepository: DownloadRepository {
         }
         file.bytesCopied = 0
         file.uri = null
-        file.downloadState = DownloadingState(0,0)
+        file.downloadState = DownloadStatusState.DOWNLOADING
     }
     override fun queueDownload(file: StrucDownFile) {
-        file.downloadState = QueuedState(10)
+        file.downloadState = DownloadStatusState.QUEUED
 
     }
 

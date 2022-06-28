@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
-import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadingState
+import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.domain.*
 import kotlinx.coroutines.*
 
@@ -27,6 +27,8 @@ class HomeViewModel(
     private var _fetchedFileInfo = MutableLiveData<StrucDownFile>()
     val fetchedFileInfo : LiveData<StrucDownFile> get() = _fetchedFileInfo
 
+
+
     fun addNewDownloadInfo(url: String, downloadTo: String){
         addNewDownloadInfoUseCase(url, downloadTo, _item.value!!)
     }
@@ -43,7 +45,7 @@ class HomeViewModel(
 
     fun downloadAFile(){
         if(_item.value != null){
-            _item.value!!.downloadState = DownloadingState(0,0)
+            _item.value!!.downloadState = DownloadStatusState.DOWNLOADING
             val currentList = _downloadList.value
             currentList?.add(_item.value!!.copy())
             _downloadList.postValue(currentList)

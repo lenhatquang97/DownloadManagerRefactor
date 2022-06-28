@@ -23,7 +23,7 @@ object ServiceLocator {
             "Documents",
             -1,
             0,
-            DownloadStatusState(),
+            DownloadStatusState.COMPLETED,
             "*/*",
             "test.apk",
             null
