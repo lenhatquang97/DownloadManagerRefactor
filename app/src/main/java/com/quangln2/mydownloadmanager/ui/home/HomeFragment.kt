@@ -17,9 +17,6 @@ class HomeFragment() : Fragment() {
     private lateinit var binding: FragmentFirstBinding
     private lateinit var viewModel: HomeViewModel
     private lateinit var dao: DownloadDao
-//    private val viewModel: HomeViewModel by activityViewModels {
-//        ViewModelFactory(DefaultDownloadRepository(DownloadManagerApplication().database.downloadDao()),activity?.applicationContext!!)
-//    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dao = getDatabase(requireContext()).downloadDao()
@@ -49,9 +46,18 @@ class HomeFragment() : Fragment() {
             layoutManager = LinearLayoutManager(context)
         }
 
+        viewModel.downloadListSchema.observe(viewLifecycleOwner) {
+            it?.let {
+                if (it.isNotEmpty() && viewModel._downloadList.value != null && viewModel._downloadList.value?.size == 0) {
+                    viewModel._downloadList.value = it.toMutableList()
+                }
+            }
+        }
+
         viewModel.downloadList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
+                    println("Is not empty")
                     adapterVal.submitList(it)
                     adapterVal.notifyItemChanged(it.size - 1)
                 }

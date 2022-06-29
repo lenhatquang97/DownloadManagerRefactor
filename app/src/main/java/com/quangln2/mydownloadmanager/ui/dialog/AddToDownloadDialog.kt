@@ -37,9 +37,10 @@ class AddToDownloadDialog: DialogFragment() {
         super.onCreate(savedInstanceState)
         viewModel.fetchedFileInfo.observe(this) {
             file ->
-            if(file != null && file.downloadLink != "test"){
+            if(file != null && file.downloadLink != "test" && viewModel._isOpenDialog.value!!){
                 showDownloadAlertDialog(file)
             }
+            viewModel._isOpenDialog.value = false
         }
         resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
                 result ->
@@ -48,8 +49,6 @@ class AddToDownloadDialog: DialogFragment() {
                 val uri = data?.data
                 if(uri != null && context != null){
                     val df = DocumentFile.fromTreeUri(context!!, uri)
-                    println(df?.uri?.path)
-                    println(Environment.DIRECTORY_DOWNLOADS)
                     binding.downloadToTextField.editText?.setText(getRealPath(df))
                 }
 
@@ -62,7 +61,9 @@ class AddToDownloadDialog: DialogFragment() {
         binding.addNewDownloadFileButton.setOnClickListener {
             viewModel.addNewDownloadInfo(binding.linkTextField.editText?.text.toString(), binding.downloadToTextField.editText?.text.toString())
             viewModel.fetchDownloadFileInfo()
+            viewModel._isOpenDialog.value = true
             closeKeyboard(binding.linkTextField)
+
         }
         binding.cancelAddNewDownloadFileButton.setOnClickListener {
             dismiss()
@@ -85,7 +86,6 @@ class AddToDownloadDialog: DialogFragment() {
                     dismiss()
                 }
                 .setNegativeButton("CANCEL") { _, _ ->
-                    file.downloadLink = "test"
                     dismiss()
                 }
         builder.show()

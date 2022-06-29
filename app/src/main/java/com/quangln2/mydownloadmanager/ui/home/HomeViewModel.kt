@@ -1,10 +1,10 @@
 package com.quangln2.mydownloadmanager.ui.home
 
 import android.content.Context
+import android.os.Build
 import androidx.lifecycle.*
 import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.ServiceLocator
-import com.quangln2.mydownloadmanager.data.database.DownloadDatabase
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.domain.*
@@ -19,15 +19,16 @@ class HomeViewModel(
     var _item = MutableLiveData<StrucDownFile>().apply { value = ServiceLocator.initializeStrucDownFile() }
     val item: LiveData<StrucDownFile> get() = _item
 
-    //val database by lazy{ DownloadDatabase.getDatabase(context)}
-    //val downloadRepository by lazy{ServiceLocator.provideDownloadRepository(database.downloadDao())}
+    var _downloadList = MutableLiveData<MutableList<StrucDownFile>>().apply { value = mutableListOf() }
+    val downloadList: LiveData<MutableList<StrucDownFile>> get() = _downloadList
 
-    val downloadList: LiveData<List<StrucDownFile>> get() = DownloadManagerApplication().database.downloadDao().getAll().asLiveData()
+   var downloadListSchema: LiveData<List<StrucDownFile>> =
+        (DownloadManagerApplication()).database.downloadDao().getAll().asLiveData()
 
     private var _fetchedFileInfo = MutableLiveData<StrucDownFile>()
     val fetchedFileInfo : LiveData<StrucDownFile> get() = _fetchedFileInfo
 
-
+    var _isOpenDialog = MutableLiveData<Boolean>().apply { value = false }
 
 
     fun addNewDownloadInfo(url: String, downloadTo: String){
@@ -44,13 +45,25 @@ class HomeViewModel(
         }
     }
 
-    fun downloadAFile() = viewModelScope.launch{
-        if(_item.value != null){
-            _item.value!!.downloadState = DownloadStatusState.DOWNLOADING
-            val currentVal = _item.value!!.copy()
-            CoroutineScope(Dispatchers.IO).launch {
-                ExternalUse.insertToListUseCase(context)(currentVal)
+    fun downloadAFile() {
+        val file = _fetchedFileInfo.value
+        if(file != null){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ExternalUse.writeToFileAPI29AboveUseCase(context)(file, context)
+            } else {
+                ExternalUse.writeToFileAPI29BelowUseCase(context)(file)
             }
+
+            val currentList = _downloadList.value
+            if(currentList != null){
+                currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
+                _downloadList.postValue(currentList)
+                ExternalUse.howManyFileDownloading += 1
+            }
+            CoroutineScope(Dispatchers.IO).launch{
+                ExternalUse.insertToListUseCase(context)(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
+            }
+
         }
 
     }

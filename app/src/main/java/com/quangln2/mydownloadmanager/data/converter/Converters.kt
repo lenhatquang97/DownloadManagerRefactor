@@ -25,7 +25,7 @@ class Converters {
         if(value == null){
             return ""
         }
-        return value.path!!
+        return value.toString()
     }
     @TypeConverter
     fun convertUri(value: String): Uri{

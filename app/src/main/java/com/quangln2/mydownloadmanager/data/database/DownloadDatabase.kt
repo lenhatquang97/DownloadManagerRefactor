@@ -29,16 +29,6 @@ abstract class DownloadDatabase: RoomDatabase() {
                 }
             }
             return INSTANCE!!
-//            return INSTANCE ?: synchronized(this) {
-//                val instance = Room.databaseBuilder(
-//                    context.applicationContext,
-//                    DownloadDatabase::class.java,
-//                    "download_database"
-//                ).build()
-//                INSTANCE = instance
-//                // return instance
-//                instance
-//            }
         }
     }
 }

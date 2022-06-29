@@ -21,4 +21,7 @@ interface DownloadRepository {
     suspend fun openDownloadFile()
 
     suspend fun insert(strucDownFile: StrucDownFile)
+    suspend fun update(strucDownFile: StrucDownFile)
+
+    fun getBytesFromExistingFile(file: StrucDownFile, context: Context): Long
 }

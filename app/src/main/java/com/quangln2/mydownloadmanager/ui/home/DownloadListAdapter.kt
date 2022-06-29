@@ -32,20 +32,58 @@ import kotlinx.coroutines.withContext
 class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFile, DownloadListAdapter.DownloadItemViewHolder>(DownloadListDiffCallback()) {
     class DownloadItemViewHolder private constructor(private val binding: DownloadItemBinding): RecyclerView.ViewHolder(binding.root){
         private lateinit var notification: DownloadNotification
-        fun bind(item: StrucDownFile, context: Context){
+        private fun initialSetup(item: StrucDownFile){
             binding.heading.text = cutFileName(item.fileName)
             binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
             binding.progressBar.progress = 0
-            binding.progressBar.visibility = View.VISIBLE
             binding.roundCategory.setImageResource(UIComponentUtil.defineIcon(item.kindOf))
+            if(item.downloadState == DownloadStatusState.COMPLETED){
 
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                writeToFileAPI29AboveUseCase(context)(item, context)
-            } else {
-                writeToFileAPI29BelowUseCase(context)(item)
+                binding.apply {
+                    progressBar.visibility = View.GONE
+                    stopButton.visibility = View.GONE
+                    downloadStateButton.visibility = View.VISIBLE
+                    downloadStateButton.setImageResource(R.drawable.ic_open)
+                }
             }
-            notification = DownloadNotification(context, item)
+            else if(item.downloadState == DownloadStatusState.DOWNLOADING){
+                binding.apply {
+                    progressBar.visibility = View.VISIBLE
+                    stopButton.visibility = View.VISIBLE
+                    downloadStateButton.visibility = View.VISIBLE
+                    downloadStateButton.setImageResource(R.drawable.ic_pause)
+                }
+            }
+            else if(item.downloadState == DownloadStatusState.QUEUED){
+                binding.apply {
+                    progressBar.visibility = View.GONE
+                    stopButton.visibility = View.GONE
+                    downloadStateButton.visibility = View.GONE
+                }
+            }
+            else if(item.downloadState == DownloadStatusState.PAUSED){
+                binding.apply {
+                    progressBar.visibility = View.VISIBLE
+                    stopButton.visibility = View.VISIBLE
+                    downloadStateButton.visibility = View.VISIBLE
+                    downloadStateButton.setImageResource(R.drawable.ic_start)
+                }
+            }
+            else if(item.downloadState == DownloadStatusState.FAILED){
+                binding.apply {
+                    progressBar.visibility = View.GONE
+                    stopButton.visibility = View.GONE
+                    downloadStateButton.visibility = View.VISIBLE
+                    downloadStateButton.setImageResource(R.drawable.ic_retry)
+                }
+            }
+        }
+        fun bind(item: StrucDownFile, context: Context){
+            initialSetup(item)
 
+            item.bytesCopied = ExternalUse.getBytesFromExistingFileUseCase(context)(item,context)
+
+            notification = DownloadNotification(context, item)
             binding.downloadStateButton.setOnClickListener {
                 when(item.downloadState){
                     DownloadStatusState.DOWNLOADING -> {
@@ -83,8 +121,11 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                 CoroutineScope(Dispatchers.IO).launch {
                     notification.builder.setContentText(binding.textView.text)
                     notification.showNotification(context, item)
+                    ExternalUse.updateToListUseCase(context)(item)
                 }
             }
+
+
             binding.stopButton.setOnClickListener {
                 if(item.downloadState == DownloadStatusState.DOWNLOADING || item.downloadState == DownloadStatusState.PAUSED){
                     item.downloadState = DownloadStatusState.FAILED
@@ -95,12 +136,13 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                     CoroutineScope(Dispatchers.IO).launch {
                         notification.builder.setContentText(item.convertToSizeUnit() + " - " + item.downloadState.toString())
                         notification.showNotification(context, item)
+                        ExternalUse.updateToListUseCase(context)(item)
                     }
 
 
                 }
             }
-            if(item.downloadState != DownloadStatusState.COMPLETED){
+            if(item.downloadState == DownloadStatusState.DOWNLOADING){
                 downloadAFileWithProgressBar(binding, item, context)
             }
 
@@ -159,7 +201,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                             notification.builder.setContentText(binding.textView.text)
                             notification.showProgress(context, item)
                             notification.showNotification(context, item)
-                            ExternalUse.insertToListUseCase(context)(item)
+                            ExternalUse.updateToListUseCase(context)(item)
                         }
 
                     }

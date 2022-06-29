@@ -18,7 +18,7 @@ object ServiceLocator {
     }
     fun initializeStrucDownFile(): StrucDownFile {
         return StrucDownFile(
-            -1,
+            "",
             "test",
             "test",
             "Documents",

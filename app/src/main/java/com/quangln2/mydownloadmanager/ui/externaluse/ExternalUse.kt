@@ -8,6 +8,8 @@ import com.quangln2.mydownloadmanager.domain.*
 
 class ExternalUse() {
     companion object{
+        var howManyFileDownloading = 0
+
         fun database(context: Context): DownloadDatabase{
             return DownloadDatabase.getDatabase(context)
         }
@@ -33,6 +35,12 @@ class ExternalUse() {
         }
         fun insertToListUseCase(context: Context): InsertToListUseCase{
             return InsertToListUseCase(getRepo(context))
+        }
+        fun updateToListUseCase(context: Context): UpdateToListUseCase{
+            return UpdateToListUseCase(getRepo(context))
+        }
+        fun getBytesFromExistingFileUseCase(context: Context): GetBytesFromExistingFileUseCase{
+            return GetBytesFromExistingFileUseCase(getRepo(context))
         }
     }
 }

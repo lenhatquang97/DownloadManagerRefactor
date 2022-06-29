@@ -30,8 +30,15 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
         downloadDao.insert(strucDownFile)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun update(strucDownFile: StrucDownFile) {
+        downloadDao.update(strucDownFile)
+    }
+
 
     override fun addNewDownloadInfo(url: String, downloadTo: String, file: StrucDownFile) {
+        file.id = UUID.randomUUID().toString()
         file.downloadLink = url
         file.downloadTo = downloadTo
         file.bytesCopied = 0
@@ -60,6 +67,25 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
 
 
     }
+    override fun getBytesFromExistingFile(file: StrucDownFile, context: Context): Long {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
+            put(MediaStore.MediaColumns.MIME_TYPE, getMimeType(file.downloadLink))
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+        }
+        val resolver = context.contentResolver
+        val selection = MediaStore.MediaColumns.DISPLAY_NAME + " LIKE ?"
+        val selectionArgs = arrayOf(file.fileName)
+        val cursor = resolver.query(MediaStore.Downloads.EXTERNAL_CONTENT_URI, null, selection, selectionArgs, null)
+        if(cursor != null && cursor.count > 0){
+            while(cursor.moveToNext()){
+                println("BYTES FROM EXISTING FILE: " + cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE)).toString())
+                return cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))
+            }
+        }
+        return 0L
+    }
+
     override fun writeToFileAPI29Above(file: StrucDownFile, context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
             val contentValues = ContentValues().apply {
@@ -68,18 +94,25 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
                 put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
             }
             val resolver = context.contentResolver
-            val selection = MediaStore.MediaColumns.DISPLAY_NAME + " = ?"
+            val selection = MediaStore.MediaColumns.DISPLAY_NAME + " LIKE ?"
             val selectionArgs = arrayOf(file.fileName)
             val cursor = resolver.query(MediaStore.Downloads.EXTERNAL_CONTENT_URI, null, selection, selectionArgs, null)
-             if(cursor!!.count <= 0) {
-                file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-            } else if(file.uri == null){
-                file.fileName = file.fileName + "_" + UUID.randomUUID().toString().substring(0,4)
+            if(cursor != null && cursor.count <= 0 || file.uri == null){
+                if(file.fileName.contains(".")){
+                    //get substring of extension
+                    val extension = file.fileName.substring(file.fileName.lastIndexOf("."))
+                    //get name without extension
+                    val name = file.fileName.substring(0, file.fileName.lastIndexOf("."))
+                    file.fileName = name + "_" + UUID.randomUUID().toString().substring(0,4) + extension
+                } else {
+                    file.fileName = file.fileName + "_" + UUID.randomUUID().toString().substring(0,4)
+                }
                 contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
                 file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                println(file.uri)
             }
-            println("API 29 ABOVE: " + file.uri?.path)
         }
+
     }
     override fun writeToFileAPI29Below(file: StrucDownFile){
         file.downloadTo = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName
@@ -95,6 +128,9 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
         }
         val inp = BufferedInputStream(connection.inputStream)
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            if(file.uri == null){
+                return@flow
+            }
             val out = context.contentResolver.openOutputStream(file.uri!!,"wa")
             if (out != null) {
                 val data = ByteArray(1024)

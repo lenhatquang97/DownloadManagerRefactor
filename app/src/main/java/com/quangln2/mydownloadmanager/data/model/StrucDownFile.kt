@@ -3,13 +3,12 @@ package com.quangln2.mydownloadmanager.data.model
 import android.net.Uri
 import androidx.room.*
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
-import com.quangln2.mydownloadmanager.data.converter.Converters
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 
 @Entity(tableName ="download_list")
 data class StrucDownFile (
 
-    @PrimaryKey(autoGenerate = true) var id: Int,
+    @PrimaryKey var id: String,
     @ColumnInfo(name="download_link") var downloadLink: String,
     @ColumnInfo(name="download_to") var downloadTo: String,
     @ColumnInfo(name="kind_of") var kindOf: String,
@@ -24,7 +23,7 @@ data class StrucDownFile (
     @ColumnInfo(name="uri") var uri: Uri? = null,
 ){
     constructor():
-            this(0, "", "", "", -1, 0, DownloadStatusState.DOWNLOADING, "", "", null)
+            this("", "", "", "", -1, 0, DownloadStatusState.DOWNLOADING, "", "", null)
 
     fun convertToSizeUnit(): String{
         if (size < ConstantClass.KB){
