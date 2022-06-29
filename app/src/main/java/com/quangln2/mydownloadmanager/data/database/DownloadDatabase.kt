@@ -23,8 +23,8 @@ abstract class DownloadDatabase: RoomDatabase() {
             // if it is, then create the database
             if(INSTANCE == null){
                 synchronized(this){
-                    INSTANCE = Room.databaseBuilder(context.applicationContext,
-                        DownloadDatabase::class.java, "download_database")
+                    INSTANCE = Room.databaseBuilder(context,
+                        DownloadDatabase::class.java, "download_database.db")
                         .build()
                 }
             }

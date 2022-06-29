@@ -15,9 +15,10 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.R
+import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.ViewModelFactory
+import com.quangln2.mydownloadmanager.data.database.DownloadDatabase
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
@@ -27,7 +28,11 @@ import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
 class AddToDownloadDialog: DialogFragment() {
     private lateinit var binding: AddDownloadDialogBinding
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
-    private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(DownloadManagerApplication().database.downloadDao()), requireContext()) }
+
+
+    private val database by lazy{ DownloadDatabase.getDatabase(requireContext())}
+    val downloadRepository by lazy{ ServiceLocator.provideDownloadRepository(database.downloadDao())}
+    private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(database.downloadDao()), requireContext()) }
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         viewModel.fetchedFileInfo.observe(this) {

@@ -13,6 +13,7 @@ import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
 import com.quangln2.mydownloadmanager.databinding.DownloadItemBinding
 import com.quangln2.mydownloadmanager.notification.DownloadNotification
+import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.downloadAFileUseCase
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.pauseDownloadUseCase
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.resumeDownloadUseCase
@@ -39,20 +40,20 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
             binding.roundCategory.setImageResource(UIComponentUtil.defineIcon(item.kindOf))
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                writeToFileAPI29AboveUseCase(item, context)
+                writeToFileAPI29AboveUseCase(context)(item, context)
             } else {
-                writeToFileAPI29BelowUseCase(item)
+                writeToFileAPI29BelowUseCase(context)(item)
             }
             notification = DownloadNotification(context, item)
 
             binding.downloadStateButton.setOnClickListener {
                 when(item.downloadState){
                     DownloadStatusState.DOWNLOADING -> {
-                        pauseDownloadUseCase(item)
+                        pauseDownloadUseCase(context)(item)
                         binding.downloadStateButton.setImageResource(R.drawable.ic_start)
                     }
                     DownloadStatusState.PAUSED -> {
-                        resumeDownloadUseCase(item)
+                        resumeDownloadUseCase(context)(item)
                         downloadAFileWithProgressBar(binding, item, context)
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
                     }
@@ -65,11 +66,11 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         item.downloadState = DownloadStatusState.DOWNLOADING
                         binding.progressBar.progress = 0
                         binding.progressBar.visibility = View.VISIBLE
-                        retryDownloadUseCase(item, context)
+                        retryDownloadUseCase(context)(item, context)
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                            writeToFileAPI29AboveUseCase(item, context)
+                            writeToFileAPI29AboveUseCase(context)(item, context)
                         } else {
-                            writeToFileAPI29BelowUseCase(item)
+                            writeToFileAPI29BelowUseCase(context)(item)
                         }
                         downloadAFileWithProgressBar(binding, item, context)
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
@@ -99,7 +100,10 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
 
                 }
             }
-            //downloadAFileWithProgressBar(binding, item, context)
+            if(item.downloadState != DownloadStatusState.COMPLETED){
+                downloadAFileWithProgressBar(binding, item, context)
+            }
+
 
 
         }
@@ -125,7 +129,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                     notification.showNotification(context, item)
                 }
                 binding.heading.text = cutFileName(item.fileName)
-                downloadAFileUseCase(item, context).collect { itr ->
+                downloadAFileUseCase(context)(item, context).collect { itr ->
                     binding.progressBar.progress = itr
 
                     endTime = System.currentTimeMillis()
@@ -148,12 +152,14 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                     if(itr == 100){
                         item.downloadState = DownloadStatusState.COMPLETED
                         binding.stopButton.visibility = View.GONE
+                        binding.progressBar.visibility = View.GONE
                         binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
                         binding.downloadStateButton.setImageResource(R.drawable.ic_open)
                         withContext(Dispatchers.IO){
                             notification.builder.setContentText(binding.textView.text)
                             notification.showProgress(context, item)
                             notification.showNotification(context, item)
+                            ExternalUse.insertToListUseCase(context)(item)
                         }
 
                     }
