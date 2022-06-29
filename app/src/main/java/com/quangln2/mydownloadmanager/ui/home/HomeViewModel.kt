@@ -1,31 +1,32 @@
 package com.quangln2.mydownloadmanager.ui.home
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.ServiceLocator
+import com.quangln2.mydownloadmanager.data.database.DownloadDatabase
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.domain.*
+import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import kotlinx.coroutines.*
 
 class HomeViewModel(
     private val addNewDownloadInfoUseCase: AddNewDownloadInfoUseCase,
     private val fetchDownloadInfoUseCase: FetchDownloadInfoUseCase,
-    private val pauseDownloadUseCase: PauseDownloadUseCase,
-    private val resumeDownloadUseCase: ResumeDownloadUseCase,
     private val context: Context
 ): ViewModel() {
     var _item = MutableLiveData<StrucDownFile>().apply { value = ServiceLocator.initializeStrucDownFile() }
     val item: LiveData<StrucDownFile> get() = _item
 
-    var _downloadList = MutableLiveData<MutableList<StrucDownFile>>().apply { value = mutableListOf() }
-    val downloadList: LiveData<MutableList<StrucDownFile>> get() = _downloadList
+    //val database by lazy{ DownloadDatabase.getDatabase(context)}
+    //val downloadRepository by lazy{ServiceLocator.provideDownloadRepository(database.downloadDao())}
+
+    val downloadList: LiveData<List<StrucDownFile>> get() = DownloadManagerApplication().database.downloadDao().getAll().asLiveData()
 
     private var _fetchedFileInfo = MutableLiveData<StrucDownFile>()
     val fetchedFileInfo : LiveData<StrucDownFile> get() = _fetchedFileInfo
+
 
 
 
@@ -43,13 +44,13 @@ class HomeViewModel(
         }
     }
 
-    fun downloadAFile(){
+    fun downloadAFile() = viewModelScope.launch{
         if(_item.value != null){
             _item.value!!.downloadState = DownloadStatusState.DOWNLOADING
-            val currentList = _downloadList.value
-            currentList?.add(_item.value!!.copy())
-            _downloadList.postValue(currentList)
-            _fetchedFileInfo.postValue(null)
+            val currentVal = _item.value!!.copy()
+            CoroutineScope(Dispatchers.IO).launch {
+                ExternalUse.insertToListUseCase(context)(currentVal)
+            }
         }
 
     }

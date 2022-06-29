@@ -19,4 +19,6 @@ interface DownloadRepository {
 
     suspend fun copyFile()
     suspend fun openDownloadFile()
+
+    suspend fun insert(strucDownFile: StrucDownFile)
 }
