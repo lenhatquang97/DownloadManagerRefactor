@@ -5,25 +5,22 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.data.database.DownloadDao
 import com.quangln2.mydownloadmanager.data.database.DownloadDatabase.Companion.getDatabase
+import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
 
 class HomeFragment() : Fragment() {
 
     private lateinit var binding: FragmentFirstBinding
-    private lateinit var viewModel: HomeViewModel
-    private lateinit var dao: DownloadDao
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        dao = getDatabase(requireContext()).downloadDao()
-        viewModel = activity?.run{
-            ViewModelFactory(DefaultDownloadRepository(dao),requireContext()).create(HomeViewModel::class.java)
-        }!!
 
+    private val viewModel: HomeViewModel by activityViewModels {
+        ViewModelFactory(DefaultDownloadRepository((activity?.application as DownloadManagerApplication).database.downloadDao()),requireContext())
     }
 
     override fun onCreateView(
@@ -61,8 +58,37 @@ class HomeFragment() : Fragment() {
                     adapterVal.submitList(it)
                     adapterVal.notifyItemChanged(it.size - 1)
                 }
-
             }
+        }
+
+        viewModel.filterList.observe(viewLifecycleOwner) {
+            it?.let {
+                if (it.isNotEmpty()) {
+                    println("Is not empty")
+                    adapterVal.submitList(it)
+                    adapterVal.notifyDataSetChanged()
+                }
+            }
+        }
+
+        binding.chip0.setOnClickListener {
+            adapterVal.submitList(viewModel.downloadList.value)
+            adapterVal.notifyDataSetChanged()
+        }
+        binding.chip1.setOnClickListener {
+            viewModel.filterList(DownloadStatusState.DOWNLOADING.toString())
+        }
+        binding.chip2.setOnClickListener {
+            viewModel.filterList(DownloadStatusState.FAILED.toString())
+        }
+        binding.chip3.setOnClickListener {
+            viewModel.filterList(DownloadStatusState.PAUSED.toString())
+        }
+        binding.chip4.setOnClickListener {
+            viewModel.filterList(DownloadStatusState.COMPLETED.toString())
+        }
+        binding.chip5.setOnClickListener {
+            viewModel.filterList(DownloadStatusState.QUEUED.toString())
         }
     }
 

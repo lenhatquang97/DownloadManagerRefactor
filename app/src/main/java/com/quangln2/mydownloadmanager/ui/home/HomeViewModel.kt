@@ -25,6 +25,9 @@ class HomeViewModel(
    var downloadListSchema: LiveData<List<StrucDownFile>> =
         (DownloadManagerApplication()).database.downloadDao().getAll().asLiveData()
 
+    var _filterList = MutableLiveData<MutableList<StrucDownFile>>().apply { value = mutableListOf() }
+    val filterList: LiveData<MutableList<StrucDownFile>> get() = _filterList
+
     private var _fetchedFileInfo = MutableLiveData<StrucDownFile>()
     val fetchedFileInfo : LiveData<StrucDownFile> get() = _fetchedFileInfo
 
@@ -66,5 +69,13 @@ class HomeViewModel(
 
         }
 
+    }
+
+    fun filterList(downloadStatusState: String){
+        val currentList = _downloadList.value
+        if(currentList != null){
+            val newList = currentList.filter { it.downloadState.toString() == downloadStatusState }
+            _filterList.postValue(newList.toMutableList())
+        }
     }
 }

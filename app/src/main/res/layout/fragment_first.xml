@@ -58,6 +58,18 @@
                 <com.google.android.material.chip.Chip
                     android:layout_height="match_parent"
                     android:layout_width="wrap_content"
+                    android:id="@+id/chip0"
+                    android:text="All"
+                    android:textColor="@color/white"
+                    app:chipBackgroundColor="@color/black"
+                    app:chipCornerRadius="28dp"
+                    app:chipStrokeColor="@color/blue"
+                    app:chipMinHeight="36dp"
+                    />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
                     android:id="@+id/chip1"
                     android:text="Downloading"
                     android:textColor="@color/white"
