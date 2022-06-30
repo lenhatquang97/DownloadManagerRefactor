@@ -68,19 +68,24 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
 
     }
     override fun getBytesFromExistingFile(file: StrucDownFile, context: Context): Long {
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
-            put(MediaStore.MediaColumns.MIME_TYPE, getMimeType(file.downloadLink))
-            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
-        }
-        val resolver = context.contentResolver
-        val selection = MediaStore.MediaColumns.DISPLAY_NAME + " LIKE ?"
-        val selectionArgs = arrayOf(file.fileName)
-        val cursor = resolver.query(MediaStore.Downloads.EXTERNAL_CONTENT_URI, null, selection, selectionArgs, null)
-        if(cursor != null && cursor.count > 0){
-            while(cursor.moveToNext()){
-                println("BYTES FROM EXISTING FILE: " + cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE)).toString())
-                return cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            val resolver = context.contentResolver
+            val selection = MediaStore.MediaColumns.DISPLAY_NAME + " LIKE ?"
+            val selectionArgs = arrayOf(file.fileName)
+            val cursor = resolver.query(MediaStore.Downloads.EXTERNAL_CONTENT_URI, null, selection, selectionArgs, null)
+            if(cursor != null && cursor.count > 0){
+                while(cursor.moveToNext()){
+                    println("BYTES FROM EXISTING FILE: " + cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE)).toString())
+                    return cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))
+                }
+            }
+        } else {
+            val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName
+            val fileOpen = File(filePath)
+            if(fileOpen.exists()){
+                val fileSize = fileOpen.length()
+                println("BYTES FROM EXISTING FILE: " + fileSize.toString())
+                return fileSize
             }
         }
         return 0L
@@ -115,7 +120,16 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
 
     }
     override fun writeToFileAPI29Below(file: StrucDownFile){
-        file.downloadTo = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName
+        if(file.fileName.contains(".")){
+            //get substring of extension
+            val extension = file.fileName.substring(file.fileName.lastIndexOf("."))
+            //get name without extension
+            val name = file.fileName.substring(0, file.fileName.lastIndexOf("."))
+            file.fileName = name + "_" + UUID.randomUUID().toString().substring(0,4) + extension
+        } else {
+            file.fileName = file.fileName + "_" + UUID.randomUUID().toString().substring(0,4)
+        }
+        file.downloadTo = if(file.downloadTo.isNullOrEmpty()) Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath else file.downloadTo + "/" + file.fileName
     }
 
 

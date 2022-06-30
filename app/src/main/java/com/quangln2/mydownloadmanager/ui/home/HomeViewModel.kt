@@ -10,6 +10,7 @@ import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusSt
 import com.quangln2.mydownloadmanager.domain.*
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import kotlinx.coroutines.*
+import java.util.*
 
 class HomeViewModel(
     private val addNewDownloadInfoUseCase: AddNewDownloadInfoUseCase,
@@ -32,6 +33,7 @@ class HomeViewModel(
     val fetchedFileInfo : LiveData<StrucDownFile> get() = _fetchedFileInfo
 
     var _isOpenDialog = MutableLiveData<Boolean>().apply { value = false }
+
 
 
     fun addNewDownloadInfo(url: String, downloadTo: String){
@@ -59,14 +61,19 @@ class HomeViewModel(
 
             val currentList = _downloadList.value
             if(currentList != null){
-                currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
-                _downloadList.postValue(currentList)
-                ExternalUse.howManyFileDownloading += 1
+                if(ExternalUse.howManyFileDownloading < 3){
+                    currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
+                    _downloadList.postValue(currentList)
+                    ExternalUse.howManyFileDownloading += 1
+                } else {
+                    currentList.add(file.copy(downloadState = DownloadStatusState.QUEUED))
+                    _downloadList.postValue(currentList)
+                }
+
             }
             CoroutineScope(Dispatchers.IO).launch{
                 ExternalUse.insertToListUseCase(context)(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
             }
-
         }
 
     }

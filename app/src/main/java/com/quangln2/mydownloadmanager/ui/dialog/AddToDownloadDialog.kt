@@ -4,8 +4,11 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.opengl.Visibility
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.text.InputType
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.ActivityResultLauncher
@@ -42,14 +45,23 @@ class AddToDownloadDialog: DialogFragment() {
             }
             viewModel._isOpenDialog.value = false
         }
+
         resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
                 result ->
             if(result.resultCode == Activity.RESULT_OK){
-                val data: Intent? = result.data
-                val uri = data?.data
-                if(uri != null && context != null){
-                    val df = DocumentFile.fromTreeUri(context!!, uri)
-                    binding.downloadToTextField.editText?.setText(getRealPath(df))
+                result?.data?.data.also {
+                    uri ->
+                    try{
+                        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q){
+                            val downFile = uri?.let { DocumentFile.fromTreeUri(requireContext(), it) }
+                            println("Path: " + downFile?.uri?.path)
+                            binding.downloadToTextField.editText?.setText(getRealPath(downFile))
+                            println("Another path: " + Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
+                        }
+
+                    } catch (e: Exception){
+                        e.printStackTrace()
+                    }
                 }
 
             }
@@ -68,9 +80,16 @@ class AddToDownloadDialog: DialogFragment() {
         binding.cancelAddNewDownloadFileButton.setOnClickListener {
             dismiss()
         }
-        binding.downloadToTextField.setOnClickListener {
+        binding.endIcon.setOnClickListener {
             getFilePath()
         }
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            binding.downloadToTextField.visibility = View.GONE
+        } else {
+            binding.endIcon.inputType = InputType.TYPE_NULL
+        }
+
 
         return AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog).setView(binding.root).create()
     }
