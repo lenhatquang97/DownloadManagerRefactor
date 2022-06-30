@@ -30,6 +30,7 @@ class DownloadService(): Service() {
                 .setContentTitle(fileName)
                 //file.content
                 .setContentText(content)
+                .setGroup(CHANNEL_ID)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
             val manager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

@@ -2,10 +2,14 @@ package com.quangln2.mydownloadmanager.ui.home
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -28,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.util.concurrent.Executors
 
 class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFile, DownloadListAdapter.DownloadItemViewHolder>(
@@ -42,7 +47,6 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
             binding.roundCategory.setImageResource(UIComponentUtil.defineIcon(item.kindOf))
             when (item.downloadState) {
                 DownloadStatusState.COMPLETED -> {
-
                     binding.apply {
                         progressBar.visibility = View.GONE
                         stopButton.visibility = View.GONE
@@ -105,6 +109,21 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         item.downloadState = DownloadStatusState.COMPLETED
                         binding.stopButton.visibility = View.GONE
                         binding.downloadStateButton.setImageResource(R.drawable.ic_open)
+                        val intent = Intent(Intent.ACTION_VIEW)
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            intent.setDataAndType(item.uri, item.mimeType)
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            context.startActivity(intent)
+
+                        } else {
+                            val file = File(item.downloadTo)
+                            if(file.exists()){
+                                val uri = Uri.fromFile(file)
+                                intent.setDataAndType(uri, item.mimeType)
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                context.startActivity(intent)
+                            }
+                        }
                     }
                     DownloadStatusState.FAILED -> {
                         item.downloadState = DownloadStatusState.DOWNLOADING

@@ -37,7 +37,7 @@ class HomeFragment() : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
 
-        val adapterVal = DownloadListAdapter(requireContext())
+        val adapterVal = DownloadListAdapter(context!!)
 
         binding.downloadLists.apply {
             adapter = adapterVal

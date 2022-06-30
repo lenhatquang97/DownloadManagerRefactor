@@ -3,6 +3,7 @@ package com.quangln2.mydownloadmanager
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.StrictMode
+import android.os.StrictMode.VmPolicy
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         //Internet permission
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
+
 
         //check permission for writing external storage
         val permissionCheck = ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
