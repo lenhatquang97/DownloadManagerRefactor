@@ -56,7 +56,7 @@ class HomeFragment() : Fragment() {
                 if (it.isNotEmpty()) {
                     println("Is not empty")
                     adapterVal.submitList(it)
-                    adapterVal.notifyItemChanged(it.size - 1)
+                    adapterVal.notifyItemChanged(it.size-1)
                 }
             }
         }
@@ -66,14 +66,12 @@ class HomeFragment() : Fragment() {
                 if (it.isNotEmpty()) {
                     println("Is not empty")
                     adapterVal.submitList(it)
-                    adapterVal.notifyDataSetChanged()
                 }
             }
         }
 
         binding.chip0.setOnClickListener {
             adapterVal.submitList(viewModel.downloadList.value)
-            adapterVal.notifyDataSetChanged()
         }
         binding.chip1.setOnClickListener {
             viewModel.filterList(DownloadStatusState.DOWNLOADING.toString())

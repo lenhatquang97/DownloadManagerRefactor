@@ -5,6 +5,7 @@ import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -28,8 +29,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.Executors
 
-class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFile, DownloadListAdapter.DownloadItemViewHolder>(DownloadListDiffCallback()) {
+class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFile, DownloadListAdapter.DownloadItemViewHolder>(
+    AsyncDifferConfig.Builder<StrucDownFile>(DownloadListDiffCallback()).setBackgroundThreadExecutor(Executors.newSingleThreadExecutor())
+        .build()
+) {
     class DownloadItemViewHolder private constructor(private val binding: DownloadItemBinding): RecyclerView.ViewHolder(binding.root){
         private lateinit var notification: DownloadNotification
         private fun initialSetup(item: StrucDownFile){
@@ -219,10 +224,14 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
         val item = getItem(position)
         holder.bind(item, context)
     }
+
+    override fun submitList(list: MutableList<StrucDownFile>?) {
+        super.submitList(list ?: mutableListOf())
+    }
 }
 class DownloadListDiffCallback: DiffUtil.ItemCallback<StrucDownFile>() {
     override fun areItemsTheSame(oldItem: StrucDownFile, newItem: StrucDownFile): Boolean {
-        return oldItem.downloadLink == newItem.downloadLink
+        return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: StrucDownFile, newItem: StrucDownFile): Boolean {
