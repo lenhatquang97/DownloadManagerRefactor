@@ -1,6 +1,7 @@
 package com.quangln2.mydownloadmanager.ui.home
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
@@ -13,14 +14,12 @@ import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
 import com.quangln2.mydownloadmanager.databinding.DownloadItemBinding
-import com.quangln2.mydownloadmanager.notification.DownloadNotification
+import com.quangln2.mydownloadmanager.service.DownloadService
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.downloadAFileUseCase
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.pauseDownloadUseCase
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.resumeDownloadUseCase
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.retryDownloadUseCase
-import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.writeToFileAPI29AboveUseCase
-import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse.Companion.writeToFileAPI29BelowUseCase
 import com.quangln2.mydownloadmanager.util.LogicUtil
 import com.quangln2.mydownloadmanager.util.LogicUtil.Companion.cutFileName
 import com.quangln2.mydownloadmanager.util.UIComponentUtil
@@ -32,63 +31,65 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFile, DownloadListAdapter.DownloadItemViewHolder>(
-    AsyncDifferConfig.Builder<StrucDownFile>(DownloadListDiffCallback()).setBackgroundThreadExecutor(Executors.newSingleThreadExecutor())
+    AsyncDifferConfig.Builder(DownloadListDiffCallback()).setBackgroundThreadExecutor(Executors.newSingleThreadExecutor())
         .build()
 ) {
     class DownloadItemViewHolder private constructor(private val binding: DownloadItemBinding): RecyclerView.ViewHolder(binding.root){
-        private lateinit var notification: DownloadNotification
         private fun initialSetup(item: StrucDownFile){
             binding.heading.text = cutFileName(item.fileName)
             binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
             binding.progressBar.progress = 0
             binding.roundCategory.setImageResource(UIComponentUtil.defineIcon(item.kindOf))
-            if(item.downloadState == DownloadStatusState.COMPLETED){
+            when (item.downloadState) {
+                DownloadStatusState.COMPLETED -> {
 
-                binding.apply {
-                    progressBar.visibility = View.GONE
-                    stopButton.visibility = View.GONE
-                    downloadStateButton.visibility = View.VISIBLE
-                    downloadStateButton.setImageResource(R.drawable.ic_open)
+                    binding.apply {
+                        progressBar.visibility = View.GONE
+                        stopButton.visibility = View.GONE
+                        downloadStateButton.visibility = View.VISIBLE
+                        downloadStateButton.setImageResource(R.drawable.ic_open)
+                    }
+                }
+                DownloadStatusState.DOWNLOADING -> {
+                    binding.apply {
+                        progressBar.visibility = View.VISIBLE
+                        stopButton.visibility = View.VISIBLE
+                        downloadStateButton.visibility = View.VISIBLE
+                        downloadStateButton.setImageResource(R.drawable.ic_pause)
+                    }
+                }
+                DownloadStatusState.QUEUED -> {
+                    binding.apply {
+                        progressBar.visibility = View.GONE
+                        stopButton.visibility = View.GONE
+                        downloadStateButton.visibility = View.GONE
+                    }
+                }
+                DownloadStatusState.PAUSED -> {
+                    binding.apply {
+                        progressBar.visibility = View.VISIBLE
+                        stopButton.visibility = View.VISIBLE
+                        downloadStateButton.visibility = View.VISIBLE
+                        downloadStateButton.setImageResource(R.drawable.ic_start)
+                    }
+                }
+                DownloadStatusState.FAILED -> {
+                    binding.apply {
+                        progressBar.visibility = View.GONE
+                        stopButton.visibility = View.GONE
+                        downloadStateButton.visibility = View.VISIBLE
+                        downloadStateButton.setImageResource(R.drawable.ic_retry)
+                    }
                 }
             }
-            else if(item.downloadState == DownloadStatusState.DOWNLOADING){
-                binding.apply {
-                    progressBar.visibility = View.VISIBLE
-                    stopButton.visibility = View.VISIBLE
-                    downloadStateButton.visibility = View.VISIBLE
-                    downloadStateButton.setImageResource(R.drawable.ic_pause)
-                }
-            }
-            else if(item.downloadState == DownloadStatusState.QUEUED){
-                binding.apply {
-                    progressBar.visibility = View.GONE
-                    stopButton.visibility = View.GONE
-                    downloadStateButton.visibility = View.GONE
-                }
-            }
-            else if(item.downloadState == DownloadStatusState.PAUSED){
-                binding.apply {
-                    progressBar.visibility = View.VISIBLE
-                    stopButton.visibility = View.VISIBLE
-                    downloadStateButton.visibility = View.VISIBLE
-                    downloadStateButton.setImageResource(R.drawable.ic_start)
-                }
-            }
-            else if(item.downloadState == DownloadStatusState.FAILED){
-                binding.apply {
-                    progressBar.visibility = View.GONE
-                    stopButton.visibility = View.GONE
-                    downloadStateButton.visibility = View.VISIBLE
-                    downloadStateButton.setImageResource(R.drawable.ic_retry)
-                }
-            }
+
         }
         fun bind(item: StrucDownFile, context: Context){
             initialSetup(item)
 
             item.bytesCopied = ExternalUse.getBytesFromExistingFileUseCase(context)(item,context)
 
-            notification = DownloadNotification(context, item)
+            val intent = Intent(context, DownloadService::class.java)
             binding.downloadStateButton.setOnClickListener {
                 when(item.downloadState){
                     DownloadStatusState.DOWNLOADING -> {
@@ -110,11 +111,6 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         binding.progressBar.progress = 0
                         binding.progressBar.visibility = View.VISIBLE
                         retryDownloadUseCase(context)(item, context)
-                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                            writeToFileAPI29AboveUseCase(context)(item, context)
-                        } else {
-                            writeToFileAPI29BelowUseCase(context)(item)
-                        }
                         downloadAFileWithProgressBar(binding, item, context)
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
                     }
@@ -124,8 +120,10 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                 }
                 binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
                 CoroutineScope(Dispatchers.IO).launch {
-                    notification.builder.setContentText(binding.textView.text)
-                    notification.showNotification(context, item)
+                    intent.putExtra("fileName", cutFileName(item.fileName))
+                    intent.putExtra("content", binding.textView.text)
+                    intent.putExtra("id", item.id.hashCode())
+                    context.startForegroundService(intent)
                     ExternalUse.updateToListUseCase(context)(item)
                 }
             }
@@ -139,8 +137,10 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                     binding.downloadStateButton.setImageResource(R.drawable.ic_retry)
 
                     CoroutineScope(Dispatchers.IO).launch {
-                        notification.builder.setContentText(item.convertToSizeUnit() + " - " + item.downloadState.toString())
-                        notification.showNotification(context, item)
+                        intent.putExtra("fileName", cutFileName(item.fileName))
+                        intent.putExtra("content", item.convertToSizeUnit() + " - " + item.downloadState.toString())
+                        intent.putExtra("id", item.id.hashCode())
+                        context.startForegroundService(intent)
                         ExternalUse.updateToListUseCase(context)(item)
                     }
 
@@ -170,10 +170,14 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
             var startBytes = 0L
             var endBytes: Long
 
+            val intent = Intent(context, DownloadService::class.java)
+
             CoroutineScope(Dispatchers.Main).launch {
                 withContext(Dispatchers.IO){
-                    notification.builder.setContentTitle(cutFileName(item.fileName))
-                    notification.showNotification(context, item)
+                    intent.putExtra("fileName", cutFileName(item.fileName))
+                    intent.putExtra("content", item.convertToSizeUnit() + " - " + item.downloadState.toString())
+                    intent.putExtra("id", item.id.hashCode())
+                    context.startForegroundService(intent)
                 }
                 binding.heading.text = cutFileName(item.fileName)
                 downloadAFileUseCase(context)(item, context).collect { itr ->
@@ -188,8 +192,11 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
 
                         binding.textView.text = result + " - "+ item.convertToSizeUnit() + " - " + item.downloadState.toString()
                         withContext(Dispatchers.IO){
-                            notification.builder.setContentText(result + " - "+ item.convertToSizeUnit() + " - " + item.downloadState.toString())
-                            notification.showProgress(context, item)
+                            intent.putExtra("fileName", cutFileName(item.fileName))
+                            intent.putExtra("content", result + " - "+ item.convertToSizeUnit() + " - " + item.downloadState.toString())
+                            intent.putExtra("progress", itr)
+                            intent.putExtra("id", item.id.hashCode())
+                            context.startForegroundService(intent)
                         }
 
                         startBytes = endBytes
@@ -203,9 +210,11 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
                         binding.downloadStateButton.setImageResource(R.drawable.ic_open)
                         withContext(Dispatchers.IO){
-                            notification.builder.setContentText(binding.textView.text)
-                            notification.showProgress(context, item)
-                            notification.showNotification(context, item)
+                            intent.putExtra("fileName", cutFileName(item.fileName))
+                            intent.putExtra("content", binding.textView.text)
+                            intent.putExtra("progress", 100)
+                            intent.putExtra("id", item.id.hashCode())
+                            context.startForegroundService(intent)
                             ExternalUse.updateToListUseCase(context)(item)
                         }
 

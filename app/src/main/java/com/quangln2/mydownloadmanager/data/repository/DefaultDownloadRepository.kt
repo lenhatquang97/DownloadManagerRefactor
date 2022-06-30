@@ -129,7 +129,9 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
         } else {
             file.fileName = file.fileName + "_" + UUID.randomUUID().toString().substring(0,4)
         }
-        file.downloadTo = if(file.downloadTo.isNullOrEmpty()) Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath else file.downloadTo + "/" + file.fileName
+        file.downloadTo = (if(file.downloadTo.isNullOrEmpty()) Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath else file.downloadTo) + "/" + file.fileName
+
+
     }
 
 
@@ -198,15 +200,21 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
             if(file.uri != null){
                 resolver.delete(file.uri!!,null,null)
             }
+
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
+                put(MediaStore.MediaColumns.MIME_TYPE, getMimeType(file.downloadLink))
+                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+            }
+            file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
         } else {
-            writeToFileAPI29Below(file)
             val filePath = File(file.downloadTo)
             if(filePath.exists()){
                 filePath.delete()
             }
+            file.uri = null
         }
         file.bytesCopied = 0
-        file.uri = null
         file.downloadState = DownloadStatusState.DOWNLOADING
     }
     override fun queueDownload(file: StrucDownFile) {
