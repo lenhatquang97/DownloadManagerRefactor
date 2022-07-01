@@ -1,5 +1,7 @@
 package com.quangln2.mydownloadmanager.ui.home
 
+import android.app.Notification
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -9,11 +11,13 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
@@ -33,6 +37,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.lang.Exception
 import java.util.concurrent.Executors
 
 class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFile, DownloadListAdapter.DownloadItemViewHolder>(
@@ -109,21 +114,24 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         item.downloadState = DownloadStatusState.COMPLETED
                         binding.stopButton.visibility = View.GONE
                         binding.downloadStateButton.setImageResource(R.drawable.ic_open)
-                        val intent = Intent(Intent.ACTION_VIEW)
-                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            intent.setDataAndType(item.uri, item.mimeType)
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            context.startActivity(intent)
-
-                        } else {
-                            val file = File(item.downloadTo)
-                            if(file.exists()){
-                                val uri = Uri.fromFile(file)
-                                intent.setDataAndType(uri, item.mimeType)
+                            val intent = Intent(Intent.ACTION_VIEW)
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                intent.setDataAndType(item.uri, item.mimeType)
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            } else {
+                                val file = File(item.downloadTo)
+                                if(file.exists()){
+                                    val uri = Uri.fromFile(file)
+                                    intent.setDataAndType(uri, item.mimeType)
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
+                            }
+                            if (intent.resolveActivity(context.packageManager) == null) {
+                                Toast.makeText(context, "There is no application to open this file", Toast.LENGTH_SHORT).show()
+                            }
+                            else{
                                 context.startActivity(intent)
                             }
-                        }
                     }
                     DownloadStatusState.FAILED -> {
                         item.downloadState = DownloadStatusState.DOWNLOADING

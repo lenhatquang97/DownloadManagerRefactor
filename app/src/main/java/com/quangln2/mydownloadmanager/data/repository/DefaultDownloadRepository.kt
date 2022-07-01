@@ -7,11 +7,11 @@ import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import androidx.annotation.WorkerThread
+import com.quangln2.mydownloadmanager.util.UIComponentUtil
+import kotlinx.coroutines.Dispatchers
 import com.quangln2.mydownloadmanager.data.database.DownloadDao
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
-import com.quangln2.mydownloadmanager.util.UIComponentUtil
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.io.BufferedInputStream
 import java.io.File
