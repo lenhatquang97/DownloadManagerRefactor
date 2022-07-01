@@ -189,7 +189,6 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
             }
         }
 
-
         private fun downloadAFileWithProgressBar(binding: DownloadItemBinding, item: StrucDownFile, context: Context){
             var startTime = System.currentTimeMillis()
             var endTime: Long
@@ -231,18 +230,25 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                     }
 
                     if(itr == 100){
+
+                        //Show on UI
                         item.downloadState = DownloadStatusState.COMPLETED
                         binding.stopButton.visibility = View.GONE
                         binding.progressBar.visibility = View.GONE
                         binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
                         binding.downloadStateButton.setImageResource(R.drawable.ic_open)
+
                         withContext(Dispatchers.IO){
+                            //Show notification
                             intent.putExtra("fileName", cutFileName(item.fileName))
                             intent.putExtra("content", binding.textView.text)
                             intent.putExtra("progress", 100)
                             intent.putExtra("id", item.id.hashCode())
                             context.startForegroundService(intent)
+
+                            //Update to list
                             ExternalUse.updateToListUseCase(context)(item)
+                            ExternalUse.howManyFileDownloading -= 1
                         }
 
                     }

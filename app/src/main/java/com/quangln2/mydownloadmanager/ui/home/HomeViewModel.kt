@@ -17,6 +17,7 @@ class HomeViewModel(
     private val fetchDownloadInfoUseCase: FetchDownloadInfoUseCase,
     private val context: Context
 ): ViewModel() {
+
     var _item = MutableLiveData<StrucDownFile>().apply { value = ServiceLocator.initializeStrucDownFile() }
     val item: LiveData<StrucDownFile> get() = _item
 
@@ -33,7 +34,6 @@ class HomeViewModel(
     val fetchedFileInfo : LiveData<StrucDownFile> get() = _fetchedFileInfo
 
     var _isOpenDialog = MutableLiveData<Boolean>().apply { value = false }
-
 
 
     fun addNewDownloadInfo(url: String, downloadTo: String){
@@ -63,16 +63,20 @@ class HomeViewModel(
             if(currentList != null){
                 if(ExternalUse.howManyFileDownloading < 3){
                     currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
-                    _downloadList.postValue(currentList)
                     ExternalUse.howManyFileDownloading += 1
                 } else {
                     currentList.add(file.copy(downloadState = DownloadStatusState.QUEUED))
-                    _downloadList.postValue(currentList)
                 }
+                _downloadList.postValue(currentList)
 
             }
             CoroutineScope(Dispatchers.IO).launch{
-                ExternalUse.insertToListUseCase(context)(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
+                if(ExternalUse.howManyFileDownloading < 3) {
+                    ExternalUse.insertToListUseCase(context)(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
+                } else {
+                    ExternalUse.insertToListUseCase(context)(file.copy(downloadState = DownloadStatusState.QUEUED))
+
+                }
             }
         }
 

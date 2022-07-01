@@ -54,7 +54,6 @@ class HomeFragment() : Fragment() {
 
         viewModel.downloadList.observe(viewLifecycleOwner) {
             it?.let {
-                println("Listen downloadList " + it.size)
                 if (it.isNotEmpty()) {
                     adapterVal.submitList(it)
                     adapterVal.notifyItemChanged(it.size-1)
@@ -70,7 +69,6 @@ class HomeFragment() : Fragment() {
                 }
             }
         }
-
 
         binding.chip0.setOnClickListener {
             adapterVal.submitList(viewModel.downloadList.value)

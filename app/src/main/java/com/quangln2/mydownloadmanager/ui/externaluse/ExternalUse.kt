@@ -1,8 +1,10 @@
 package com.quangln2.mydownloadmanager.ui.externaluse
 
 import android.content.Context
+import androidx.lifecycle.MutableLiveData
 import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.data.database.DownloadDatabase
+import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.data.repository.DownloadRepository
 import com.quangln2.mydownloadmanager.domain.*
 

@@ -21,7 +21,6 @@ class DownloadNotification(context: Context, file: StrucDownFile) {
                     val channel = NotificationChannel("download_notification", name, importance).apply {
                         description = descriptionText
                     }
-                    // Register the channel with the system
                     val notificationManager: NotificationManager? = getSystemService(context, NotificationManager::class.java)
                     notificationManager?.createNotificationChannel(channel)
                 }
