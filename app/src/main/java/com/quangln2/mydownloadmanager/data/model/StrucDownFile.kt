@@ -40,5 +40,4 @@ data class StrucDownFile (
             String.format("%.2f", sizeGB) + "GB"
         }
     }
-    fun getCategory() = kindOf
 }

@@ -10,14 +10,12 @@ import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusSt
 import com.quangln2.mydownloadmanager.domain.*
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import kotlinx.coroutines.*
-import java.util.*
 
 class HomeViewModel(
     private val addNewDownloadInfoUseCase: AddNewDownloadInfoUseCase,
     private val fetchDownloadInfoUseCase: FetchDownloadInfoUseCase,
     private val context: Context
 ): ViewModel() {
-
     var _item = MutableLiveData<StrucDownFile>().apply { value = ServiceLocator.initializeStrucDownFile() }
     val item: LiveData<StrucDownFile> get() = _item
 
@@ -89,4 +87,18 @@ class HomeViewModel(
             _filterList.postValue(newList.toMutableList())
         }
     }
+
+    fun filterCategories(categories: String){
+        val currentList = _downloadList.value
+        if(categories == "All"){
+            _filterList.postValue(currentList)
+            return
+        }
+        if(currentList != null){
+            val newList = currentList.filter { it.kindOf == categories }
+            _filterList.postValue(newList.toMutableList())
+        }
+
+    }
+
 }

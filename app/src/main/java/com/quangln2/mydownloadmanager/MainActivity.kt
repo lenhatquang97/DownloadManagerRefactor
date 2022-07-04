@@ -3,9 +3,9 @@ package com.quangln2.mydownloadmanager
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.StrictMode
-import android.os.StrictMode.VmPolicy
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -16,9 +16,10 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.ActivityMainBinding
-import com.quangln2.mydownloadmanager.notification.DownloadNotification
 import com.quangln2.mydownloadmanager.ui.dialog.AddToDownloadDialog
+import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,6 +27,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private val navController by lazy { findNavController(R.id.nav_host_fragment_content_main) }
+
+    private val viewModel: HomeViewModel by viewModels {
+        ViewModelFactory(DefaultDownloadRepository((application as DownloadManagerApplication).database.downloadDao()),this)
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,8 +64,20 @@ class MainActivity : AppCompatActivity() {
             setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24)
         }
 
-        //Register notification
-        DownloadNotification.createNotificationChannel(this)
+        binding.navView.setNavigationItemSelectedListener {
+            when(it.itemId){
+                R.id.all -> viewModel._downloadList.postValue(viewModel.downloadList.value)
+                R.id.compressed -> viewModel.filterCategories("Compressed")
+                R.id.documents -> viewModel.filterCategories("Documents")
+                R.id.packages -> viewModel.filterCategories("Packages")
+                R.id.music -> viewModel.filterCategories("Music")
+                R.id.video -> viewModel.filterCategories("Video")
+                R.id.others -> viewModel.filterCategories("Others")
+            }
+            binding.drawerLayout.closeDrawers()
+            binding.fab.show()
+            true
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -69,16 +86,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        binding.fab.hide()
         return when (item.itemId) {
             R.id.action_settings -> {
                 if(navController.currentDestination?.id == R.id.FirstFragment){
-                    binding.fab.hide()
                     navController.navigate(R.id.action_FirstFragment_to_SecondFragment)
                 }
                 true
             }
             else -> {
-                binding.fab.show()
                 super.onOptionsItemSelected(item)
             }
         }

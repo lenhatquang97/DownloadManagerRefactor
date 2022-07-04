@@ -1,11 +1,14 @@
 package com.quangln2.mydownloadmanager.data.repository
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
+import android.widget.Toast
 import androidx.annotation.WorkerThread
 import com.quangln2.mydownloadmanager.util.UIComponentUtil
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +25,6 @@ import java.util.*
 
 
 class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadRepository {
-    val downloadList: Flow<List<StrucDownFile>> = downloadDao.getAll()
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
@@ -75,17 +77,14 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
             val cursor = resolver.query(MediaStore.Downloads.EXTERNAL_CONTENT_URI, null, selection, selectionArgs, null)
             if(cursor != null && cursor.count > 0){
                 while(cursor.moveToNext()){
-                    println("BYTES FROM EXISTING FILE: " + cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE)).toString())
                     return cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))
                 }
             }
         } else {
             val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName
             val fileOpen = File(filePath)
-            if(fileOpen.exists()){
-                val fileSize = fileOpen.length()
-                println("BYTES FROM EXISTING FILE: " + fileSize.toString())
-                return fileSize
+            if(fileOpen.exists()) {
+                return fileOpen.length()
             }
         }
         return 0L
@@ -114,7 +113,6 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
                 }
                 contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
                 file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-                println(file.uri)
             }
         }
 
@@ -129,7 +127,7 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
         } else {
             file.fileName = file.fileName + "_" + UUID.randomUUID().toString().substring(0,4)
         }
-        file.downloadTo = (if(file.downloadTo.isNullOrEmpty()) Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath else file.downloadTo) + "/" + file.fileName
+        file.downloadTo = (file.downloadTo.ifEmpty { Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath }) + "/" + file.fileName
 
 
     }
@@ -137,11 +135,9 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
 
     override fun downloadAFile(file: StrucDownFile, context: Context): Flow<Int> = flow {
         val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
-        if(connection != null){
-            connection.setRequestProperty("Range", "bytes=${file.bytesCopied}-")
-            connection.doInput = true
-            connection.doOutput = true
-        }
+        connection.setRequestProperty("Range", "bytes=${file.bytesCopied}-")
+        connection.doInput = true
+        connection.doOutput = true
         val inp = BufferedInputStream(connection.inputStream)
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
             if(file.uri == null){
@@ -226,8 +222,25 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
 
     }
 
-    override suspend fun openDownloadFile() {
-
+    override fun openDownloadFile(item: StrucDownFile, context: Context) {
+        val intent = Intent(Intent.ACTION_VIEW)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            intent.setDataAndType(item.uri, item.mimeType)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        } else {
+            val file = File(item.downloadTo)
+            if(file.exists()){
+                val uri = Uri.fromFile(file)
+                intent.setDataAndType(uri, item.mimeType)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+        }
+        if (intent.resolveActivity(context.packageManager) == null) {
+            Toast.makeText(context, "There is no application to open this file", Toast.LENGTH_SHORT).show()
+        }
+        else{
+            context.startActivity(intent)
+        }
     }
 
 

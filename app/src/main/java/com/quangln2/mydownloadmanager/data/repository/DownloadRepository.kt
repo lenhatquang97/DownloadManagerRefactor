@@ -18,7 +18,7 @@ interface DownloadRepository {
     fun queueDownload(file: StrucDownFile)
 
     suspend fun copyFile()
-    suspend fun openDownloadFile()
+    fun openDownloadFile(item: StrucDownFile, context: Context)
 
     suspend fun insert(strucDownFile: StrucDownFile)
     suspend fun update(strucDownFile: StrucDownFile)

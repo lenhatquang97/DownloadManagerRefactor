@@ -21,6 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.ViewModelFactory
+import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.database.DownloadDatabase
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
@@ -40,7 +41,7 @@ class AddToDownloadDialog: DialogFragment() {
         super.onCreate(savedInstanceState)
         viewModel.fetchedFileInfo.observe(this) {
             file ->
-            if(file != null && file.downloadLink != "test" && viewModel._isOpenDialog.value!!){
+            if(file != null && file.downloadLink != ConstantClass.FILE_NAME_DEFAULT && viewModel._isOpenDialog.value!!){
                 showDownloadAlertDialog(file)
             }
             viewModel._isOpenDialog.value = false
@@ -54,10 +55,7 @@ class AddToDownloadDialog: DialogFragment() {
                     try{
                         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q){
                             val downFile = uri?.let { DocumentFile.fromTreeUri(requireContext(), it) }
-                            println("Path: " + downFile?.uri?.path)
-                            binding.downloadToTextField.editText?.setText(getRealPath(downFile))
-                            println("Another path: " + Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
-                        }
+                            binding.downloadToTextField.editText?.setText(getRealPath(downFile))                        }
 
                     } catch (e: Exception){
                         e.printStackTrace()
@@ -99,12 +97,12 @@ class AddToDownloadDialog: DialogFragment() {
             MaterialAlertDialogBuilder(requireActivity(), R.style.AlertDialogShow)
                 .setTitle(file.fileName)
                 .setIcon(R.drawable.ic_baseline_arrow_downward_24)
-                .setMessage("Do you want to download this file? This will cost ${file.convertToSizeUnit()}.")
-                .setPositiveButton("OK") { _, _ ->
+                .setMessage(ConstantClass.DOWNLOAD_MESSAGE + file.convertToSizeUnit())
+                .setPositiveButton(ConstantClass.POSITIVE_BUTTON) { _, _ ->
                     viewModel.downloadAFile()
                     dismiss()
                 }
-                .setNegativeButton("CANCEL") { _, _ ->
+                .setNegativeButton(ConstantClass.NEGATIVE_BUTTON) { _, _ ->
                     dismiss()
                 }
         builder.show()
