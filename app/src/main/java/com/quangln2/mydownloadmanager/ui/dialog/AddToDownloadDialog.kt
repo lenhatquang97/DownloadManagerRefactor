@@ -11,6 +11,8 @@ import android.os.Environment
 import android.text.InputType
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.webkit.URLUtil
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -27,6 +29,8 @@ import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
 import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
+import java.net.HttpURLConnection
+import java.net.URL
 
 
 class AddToDownloadDialog: DialogFragment() {
@@ -69,10 +73,23 @@ class AddToDownloadDialog: DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = AddDownloadDialogBinding.inflate(layoutInflater)
         binding.addNewDownloadFileButton.setOnClickListener {
-            viewModel.addNewDownloadInfo(binding.linkTextField.editText?.text.toString(), binding.downloadToTextField.editText?.text.toString())
-            viewModel.fetchDownloadFileInfo()
-            viewModel._isOpenDialog.value = true
-            closeKeyboard(binding.linkTextField)
+            val downloadLink = binding.linkTextField.editText?.text.toString()
+            val isValidURL = URLUtil.isValidUrl(downloadLink)
+            if(isValidURL){
+                val connection = URL(downloadLink).openConnection() as HttpURLConnection
+                val contentLengthValue = connection.contentLength
+                connection.disconnect()
+                if(contentLengthValue > 0){
+                    viewModel.addNewDownloadInfo(downloadLink, binding.downloadToTextField.editText?.text.toString())
+                    viewModel.fetchDownloadFileInfo()
+                    viewModel._isOpenDialog.value = true
+                    closeKeyboard(binding.linkTextField)
+                } else {
+                    Toast.makeText(requireContext(), ConstantClass.INVALID_LINK, Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(requireContext(), ConstantClass.INVALID_URL, Toast.LENGTH_SHORT).show()
+            }
 
         }
         binding.cancelAddNewDownloadFileButton.setOnClickListener {

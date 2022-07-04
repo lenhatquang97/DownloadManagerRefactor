@@ -3,6 +3,8 @@ package com.quangln2.mydownloadmanager.ui.home
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -85,6 +87,7 @@ class HomeFragment : Fragment() {
                     binding.heading.text = LogicUtil.cutFileName(item.fileName)
                     ExternalUse.downloadAFileUseCase(context)(item, context).collect { itr ->
                         binding.progressBar.progress = itr
+
                         endTime = System.currentTimeMillis()
                         endBytes = item.bytesCopied
                         val seconds = ((endTime.toDouble() - startTime.toDouble()) / 1000.0)
@@ -126,6 +129,7 @@ class HomeFragment : Fragment() {
         viewModel.downloadListSchema.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty() && viewModel._downloadList.value != null && viewModel._downloadList.value?.size == 0) {
+                    println("Update Schema")
                     viewModel._downloadList.value = it.toMutableList()
                 }
             }
@@ -152,6 +156,22 @@ class HomeFragment : Fragment() {
 
             }
         }
+
+        binding.searchField.editText?.addTextChangedListener( object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {}
+
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    if(s.toString().isNotEmpty()){
+                        viewModel.filterStartsWithNameCaseInsensitive(s.toString())
+                    } else {
+                        viewModel._downloadList.postValue(viewModel.downloadList.value)
+                    }
+
+                }
+
+            })
 
         binding.chip0.setOnClickListener {
             viewModel._downloadList.postValue(viewModel.downloadList.value)

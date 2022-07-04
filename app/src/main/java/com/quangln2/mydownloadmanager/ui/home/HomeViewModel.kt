@@ -10,6 +10,7 @@ import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusSt
 import com.quangln2.mydownloadmanager.domain.*
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import kotlinx.coroutines.*
+import java.util.*
 
 class HomeViewModel(
     private val addNewDownloadInfoUseCase: AddNewDownloadInfoUseCase,
@@ -99,6 +100,13 @@ class HomeViewModel(
             _filterList.postValue(newList.toMutableList())
         }
 
+    }
+    fun filterStartsWithNameCaseInsensitive(name: String){
+        val currentList = _downloadList.value
+        if(currentList != null){
+            val newList = currentList.filter { it.fileName.lowercase().startsWith(name.lowercase()) }
+            _filterList.postValue(newList.toMutableList())
+        }
     }
 
 }
