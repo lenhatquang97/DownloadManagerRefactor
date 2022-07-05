@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.navView.setNavigationItemSelectedListener {
             when(it.itemId){
-                R.id.all -> viewModel._downloadList.postValue(viewModel.downloadList.value)
+                R.id.all -> viewModel._filterList.postValue(viewModel.downloadList.value)
                 R.id.compressed -> viewModel.filterCategories("Compressed")
                 R.id.documents -> viewModel.filterCategories("Documents")
                 R.id.packages -> viewModel.filterCategories("Packages")

@@ -82,6 +82,10 @@ class HomeViewModel(
     }
 
     fun filterList(downloadStatusState: String){
+        if(downloadStatusState == DownloadStatusState.ALL.toString()){
+            _filterList.postValue(downloadList.value)
+            return
+        }
         val currentList = _downloadList.value
         if(currentList != null){
             val newList = currentList.filter { it.downloadState.toString() == downloadStatusState }
@@ -103,6 +107,10 @@ class HomeViewModel(
     }
     fun filterStartsWithNameCaseInsensitive(name: String){
         val currentList = _downloadList.value
+        if(name == ""){
+            _filterList.postValue(currentList)
+            return
+        }
         if(currentList != null){
             val newList = currentList.filter { it.fileName.lowercase().startsWith(name.lowercase()) }
             _filterList.postValue(newList.toMutableList())

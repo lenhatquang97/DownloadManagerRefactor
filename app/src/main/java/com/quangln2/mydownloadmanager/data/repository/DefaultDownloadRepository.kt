@@ -15,7 +15,11 @@ import kotlinx.coroutines.Dispatchers
 import com.quangln2.mydownloadmanager.data.database.DownloadDao
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -77,6 +81,7 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
             val cursor = resolver.query(MediaStore.Downloads.EXTERNAL_CONTENT_URI, null, selection, selectionArgs, null)
             if(cursor != null && cursor.count > 0){
                 while(cursor.moveToNext()){
+                    println(cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE)))
                     return cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))
                 }
             }
@@ -84,6 +89,7 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
             val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName
             val fileOpen = File(filePath)
             if(fileOpen.exists()) {
+                println(fileOpen.length())
                 return fileOpen.length()
             }
         }

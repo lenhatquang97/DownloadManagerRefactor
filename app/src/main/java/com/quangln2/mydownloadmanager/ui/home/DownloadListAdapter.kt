@@ -76,6 +76,9 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         downloadStateButton.setImageResource(R.drawable.ic_retry)
                     }
                 }
+                else -> {
+
+                }
             }
 
         }

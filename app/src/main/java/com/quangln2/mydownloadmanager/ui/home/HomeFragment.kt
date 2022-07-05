@@ -37,6 +37,8 @@ class HomeFragment : Fragment() {
         ViewModelFactory(DefaultDownloadRepository((activity?.application as DownloadManagerApplication).database.downloadDao()),requireContext())
     }
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -49,6 +51,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
+
 
         val adapterVal = DownloadListAdapter(context!!)
         adapterVal.eventListener = object : EventListener{
@@ -69,7 +72,11 @@ class HomeFragment : Fragment() {
                 requireContext().startForegroundService(intent)
             }
 
-            override fun downloadAFileWithProgressBar(binding: DownloadItemBinding, item: StrucDownFile, context: Context){
+            override fun downloadAFileWithProgressBar(
+                binding: DownloadItemBinding,
+                item: StrucDownFile,
+                context: Context
+            ) {
                 var startTime = System.currentTimeMillis()
                 var endTime: Long
 
@@ -79,7 +86,6 @@ class HomeFragment : Fragment() {
                 if(item.downloadState == DownloadStatusState.PAUSED){
                     return
                 }
-
                 CoroutineScope(Dispatchers.Main).launch {
                     withContext(Dispatchers.IO){
                         onOpenNotification(item, item.convertToSizeUnit() + " - " + item.downloadState.toString(), -1)
@@ -87,7 +93,6 @@ class HomeFragment : Fragment() {
                     binding.heading.text = LogicUtil.cutFileName(item.fileName)
                     ExternalUse.downloadAFileUseCase(context)(item, context).collect { itr ->
                         binding.progressBar.progress = itr
-
                         endTime = System.currentTimeMillis()
                         endBytes = item.bytesCopied
                         val seconds = ((endTime.toDouble() - startTime.toDouble()) / 1000.0)
@@ -116,8 +121,8 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
-
         }
+
 
 
 
@@ -126,11 +131,12 @@ class HomeFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
         }
 
+
         viewModel.downloadListSchema.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty() && viewModel._downloadList.value != null && viewModel._downloadList.value?.size == 0) {
-                    println("Update Schema")
                     viewModel._downloadList.value = it.toMutableList()
+                    viewModel._filterList.value = it.toMutableList()
                 }
             }
         }
@@ -138,9 +144,8 @@ class HomeFragment : Fragment() {
         viewModel.downloadList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
-                    binding.downloadLists.visibility = View.VISIBLE
-                    adapterVal.submitList(it)
-                    adapterVal.notifyItemChanged(it.size-1)
+                    viewModel._filterList.value = it
+                    adapterVal.notifyItemChanged(it.size - 1)
                 }
             }
         }
@@ -159,23 +164,14 @@ class HomeFragment : Fragment() {
 
         binding.searchField.editText?.addTextChangedListener( object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {}
-
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    if(s.toString().isNotEmpty()){
-                        viewModel.filterStartsWithNameCaseInsensitive(s.toString())
-                    } else {
-                        viewModel._downloadList.postValue(viewModel.downloadList.value)
-                    }
-
+                    viewModel.filterStartsWithNameCaseInsensitive(s.toString())
                 }
-
             })
 
         binding.chip0.setOnClickListener {
-            viewModel._downloadList.postValue(viewModel.downloadList.value)
-            adapterVal.submitList(viewModel.downloadList.value)
+            viewModel.filterList(DownloadStatusState.ALL.toString())
         }
         binding.chip1.setOnClickListener {
             viewModel.filterList(DownloadStatusState.DOWNLOADING.toString())

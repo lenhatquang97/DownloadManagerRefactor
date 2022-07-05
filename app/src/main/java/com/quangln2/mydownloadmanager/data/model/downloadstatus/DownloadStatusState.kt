@@ -1,6 +1,11 @@
 package com.quangln2.mydownloadmanager.data.model.downloadstatus
 
 enum class DownloadStatusState  {
+    ALL{
+        override fun toString(): String {
+            return "All"
+        }
+    },
     DOWNLOADING{
         override fun toString(): String {
             return "Downloading"
@@ -26,4 +31,9 @@ enum class DownloadStatusState  {
             return "Queued"
         }
     },
+    MIDDLE{
+        override fun toString(): String {
+            return "Middle"
+        }
+    }
 }
