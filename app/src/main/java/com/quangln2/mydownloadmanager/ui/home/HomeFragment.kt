@@ -10,9 +10,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.R
+import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
@@ -20,18 +22,20 @@ import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.DownloadItemBinding
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
 import com.quangln2.mydownloadmanager.listener.EventListener
+import com.quangln2.mydownloadmanager.listener.ProgressCallback
 import com.quangln2.mydownloadmanager.service.DownloadService
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import com.quangln2.mydownloadmanager.util.LogicUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentFirstBinding
+
+    var example = MutableLiveData<Int>().apply { value = 0 }
 
     private val viewModel: HomeViewModel by activityViewModels {
         ViewModelFactory(DefaultDownloadRepository((activity?.application as DownloadManagerApplication).database.downloadDao()),requireContext())
@@ -50,8 +54,15 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.viewModel = viewModel
 
+        val callback = object: ProgressCallback{
+            override fun onProgress(progress: Int): Int {
+                example.postValue(progress)
+                return progress
+            }
+        }
+        viewModel.callback = callback
+        binding.viewModel = viewModel
 
         val adapterVal = DownloadListAdapter(context!!)
         adapterVal.eventListener = object : EventListener{
@@ -77,22 +88,22 @@ class HomeFragment : Fragment() {
                 item: StrucDownFile,
                 context: Context
             ) {
-                var startTime = System.currentTimeMillis()
-                var endTime: Long
+                example.observeForever{
+                    var startTime = System.currentTimeMillis()
+                    var endTime: Long
 
-                var startBytes = 0L
-                var endBytes: Long
+                    var startBytes = 0L
+                    var endBytes: Long
 
-                if(item.downloadState == DownloadStatusState.PAUSED){
-                    return
-                }
-                CoroutineScope(Dispatchers.Main).launch {
-                    withContext(Dispatchers.IO){
-                        onOpenNotification(item, item.convertToSizeUnit() + " - " + item.downloadState.toString(), -1)
+                    if(item.downloadState == DownloadStatusState.PAUSED){
+                        return@observeForever
                     }
-                    binding.heading.text = LogicUtil.cutFileName(item.fileName)
-                    ExternalUse.downloadAFileUseCase(context)(item, context).collect { itr ->
-                        binding.progressBar.progress = itr
+                    CoroutineScope(Dispatchers.Main).launch {
+                        withContext(Dispatchers.IO){
+                            onOpenNotification(item, item.convertToSizeUnit() + " - " + item.downloadState.toString(), -1)
+                        }
+                        binding.heading.text = LogicUtil.cutFileName(item.fileName)
+                        binding.progressBar.progress = example.value!!
                         endTime = System.currentTimeMillis()
                         endBytes = item.bytesCopied
                         val seconds = ((endTime.toDouble() - startTime.toDouble()) / 1000.0)
@@ -100,12 +111,12 @@ class HomeFragment : Fragment() {
                             val result = LogicUtil.calculateDownloadSpeed(seconds, startBytes, endBytes)
                             binding.textView.text = result + " - "+ item.convertToSizeUnit() + " - " + item.downloadState.toString()
                             withContext(Dispatchers.IO){
-                                onOpenNotification(item, result + " - "+ item.convertToSizeUnit() + " - " + item.downloadState.toString(), itr)
+                                onOpenNotification(item, result + " - "+ item.convertToSizeUnit() + " - " + item.downloadState.toString(), example.value!!)
                             }
                             startBytes = endBytes
                             startTime = endTime
                         }
-                        if(itr == 100){
+                        if(example.value!! == 100){
                             item.downloadState = DownloadStatusState.COMPLETED
                             binding.stopButton.visibility = View.GONE
                             binding.progressBar.visibility = View.GONE
@@ -118,8 +129,11 @@ class HomeFragment : Fragment() {
                                 ExternalUse.howManyFileDownloading -= 1
                             }
                         }
+
                     }
                 }
+
+
             }
         }
 

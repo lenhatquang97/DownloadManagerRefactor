@@ -19,7 +19,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -159,6 +158,7 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
                     val percent = file.bytesCopied.toFloat() / file.size.toFloat() * 100.0
                     emit(percent.toInt())
                     if(file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED){
+                        out.close()
                         break
                     }
                     x = inp.read(data,0,1024)

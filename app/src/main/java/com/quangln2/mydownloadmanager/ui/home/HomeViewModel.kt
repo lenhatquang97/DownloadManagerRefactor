@@ -8,8 +8,10 @@ import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.domain.*
+import com.quangln2.mydownloadmanager.listener.ProgressCallback
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import java.util.*
 
 class HomeViewModel(
@@ -33,6 +35,8 @@ class HomeViewModel(
     val fetchedFileInfo : LiveData<StrucDownFile> get() = _fetchedFileInfo
 
     var _isOpenDialog = MutableLiveData<Boolean>().apply { value = false }
+
+    var callback: ProgressCallback? = null
 
 
     fun addNewDownloadInfo(url: String, downloadTo: String){
@@ -77,6 +81,15 @@ class HomeViewModel(
 
                 }
             }
+            val fileLs = currentList?.last()
+            if (fileLs != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    ExternalUse.downloadAFileUseCase(context)(fileLs, context).collect {
+                        callback?.onProgress(it)
+                    }
+                }
+
+            }
         }
 
     }
@@ -114,6 +127,7 @@ class HomeViewModel(
         if(currentList != null){
             val newList = currentList.filter { it.fileName.lowercase().startsWith(name.lowercase()) }
             _filterList.postValue(newList.toMutableList())
+
         }
     }
 
