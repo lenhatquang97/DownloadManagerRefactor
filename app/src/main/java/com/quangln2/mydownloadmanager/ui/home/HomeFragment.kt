@@ -77,6 +77,7 @@ class HomeFragment : Fragment() {
             ) {}
         }
 
+        (binding.downloadLists.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
 
         binding.downloadLists.apply {
