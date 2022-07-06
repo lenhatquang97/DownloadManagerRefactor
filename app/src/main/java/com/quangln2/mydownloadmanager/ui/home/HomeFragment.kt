@@ -10,12 +10,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.R
-import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.ViewModelFactory
+import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
@@ -26,22 +26,15 @@ import com.quangln2.mydownloadmanager.listener.ProgressCallback
 import com.quangln2.mydownloadmanager.service.DownloadService
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import com.quangln2.mydownloadmanager.util.LogicUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentFirstBinding
 
-    var example = MutableLiveData<Int>().apply { value = 0 }
 
     private val viewModel: HomeViewModel by activityViewModels {
         ViewModelFactory(DefaultDownloadRepository((activity?.application as DownloadManagerApplication).database.downloadDao()),requireContext())
     }
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,14 +48,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val callback = object: ProgressCallback{
-            override fun onProgress(progress: Int): Int {
-                example.postValue(progress)
-                return progress
-            }
-        }
-        viewModel.callback = callback
-        binding.viewModel = viewModel
 
         val adapterVal = DownloadListAdapter(context!!)
         adapterVal.eventListener = object : EventListener{
@@ -83,60 +68,16 @@ class HomeFragment : Fragment() {
                 requireContext().startForegroundService(intent)
             }
 
+
+
             override fun downloadAFileWithProgressBar(
                 binding: DownloadItemBinding,
                 item: StrucDownFile,
                 context: Context
-            ) {
-                example.observeForever{
-                    var startTime = System.currentTimeMillis()
-                    var endTime: Long
-
-                    var startBytes = 0L
-                    var endBytes: Long
-
-                    if(item.downloadState == DownloadStatusState.PAUSED){
-                        return@observeForever
-                    }
-                    CoroutineScope(Dispatchers.Main).launch {
-                        withContext(Dispatchers.IO){
-                            onOpenNotification(item, item.convertToSizeUnit() + " - " + item.downloadState.toString(), -1)
-                        }
-                        binding.heading.text = LogicUtil.cutFileName(item.fileName)
-                        binding.progressBar.progress = example.value!!
-                        endTime = System.currentTimeMillis()
-                        endBytes = item.bytesCopied
-                        val seconds = ((endTime.toDouble() - startTime.toDouble()) / 1000.0)
-                        if(seconds > 1){
-                            val result = LogicUtil.calculateDownloadSpeed(seconds, startBytes, endBytes)
-                            binding.textView.text = result + " - "+ item.convertToSizeUnit() + " - " + item.downloadState.toString()
-                            withContext(Dispatchers.IO){
-                                onOpenNotification(item, result + " - "+ item.convertToSizeUnit() + " - " + item.downloadState.toString(), example.value!!)
-                            }
-                            startBytes = endBytes
-                            startTime = endTime
-                        }
-                        if(example.value!! == 100){
-                            item.downloadState = DownloadStatusState.COMPLETED
-                            binding.stopButton.visibility = View.GONE
-                            binding.progressBar.visibility = View.GONE
-                            binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
-                            binding.downloadStateButton.setImageResource(R.drawable.ic_open)
-
-                            withContext(Dispatchers.IO){
-                                onOpenNotification(item, item.convertToSizeUnit() + " - " + item.downloadState.toString(), 100)
-                                ExternalUse.updateToListUseCase(context)(item)
-                                ExternalUse.howManyFileDownloading -= 1
-                            }
-                        }
-
-                    }
-                }
-
-
-            }
+            ) {}
         }
 
+        (binding.downloadLists.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
 
 
@@ -146,25 +87,19 @@ class HomeFragment : Fragment() {
         }
 
 
-        viewModel.downloadListSchema.observe(viewLifecycleOwner) {
-            it?.let {
-                if (it.isNotEmpty() && viewModel._downloadList.value != null && viewModel._downloadList.value?.size == 0) {
-                    viewModel._downloadList.value = it.toMutableList()
-                    viewModel._filterList.value = it.toMutableList()
-                }
-            }
-        }
 
-        viewModel.downloadList.observe(viewLifecycleOwner) {
+
+
+        DownloadManagerController.downloadList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
-                    viewModel._filterList.value = it
-                    adapterVal.notifyItemChanged(it.size - 1)
+                    DownloadManagerController._filterList.value = it
+                    adapterVal.notifyItemInserted(it.size - 1)
                 }
             }
         }
 
-        viewModel.filterList.observe(viewLifecycleOwner) {
+        DownloadManagerController.filterList.observe(viewLifecycleOwner) {
             it?.let {
                 if(it.isEmpty()){
                     binding.downloadLists.visibility = View.INVISIBLE
@@ -176,31 +111,41 @@ class HomeFragment : Fragment() {
             }
         }
 
+        DownloadManagerController.progressFile.observe(viewLifecycleOwner){
+            it?.let {
+                if(it != null && it.size != -1L){
+                    adapterVal.updateProgress(it)
+                }
+
+            }
+        }
+
+
         binding.searchField.editText?.addTextChangedListener( object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {}
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    viewModel.filterStartsWithNameCaseInsensitive(s.toString())
+                    DownloadManagerController.filterStartsWithNameCaseInsensitive(s.toString())
                 }
             })
 
         binding.chip0.setOnClickListener {
-            viewModel.filterList(DownloadStatusState.ALL.toString())
+            DownloadManagerController.filterList(DownloadStatusState.ALL.toString())
         }
         binding.chip1.setOnClickListener {
-            viewModel.filterList(DownloadStatusState.DOWNLOADING.toString())
+            DownloadManagerController.filterList(DownloadStatusState.DOWNLOADING.toString())
         }
         binding.chip2.setOnClickListener {
-            viewModel.filterList(DownloadStatusState.FAILED.toString())
+            DownloadManagerController.filterList(DownloadStatusState.FAILED.toString())
         }
         binding.chip3.setOnClickListener {
-            viewModel.filterList(DownloadStatusState.PAUSED.toString())
+            DownloadManagerController.filterList(DownloadStatusState.PAUSED.toString())
         }
         binding.chip4.setOnClickListener {
-            viewModel.filterList(DownloadStatusState.COMPLETED.toString())
+            DownloadManagerController.filterList(DownloadStatusState.COMPLETED.toString())
         }
         binding.chip5.setOnClickListener {
-            viewModel.filterList(DownloadStatusState.QUEUED.toString())
+            DownloadManagerController.filterList(DownloadStatusState.QUEUED.toString())
         }
     }
 }

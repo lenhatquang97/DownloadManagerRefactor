@@ -11,11 +11,16 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.quangln2.mydownloadmanager.controller.DownloadManagerController
+import com.quangln2.mydownloadmanager.controller.DownloadManagerController._filterList
+import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.ActivityMainBinding
 import com.quangln2.mydownloadmanager.ui.dialog.AddToDownloadDialog
@@ -32,10 +37,13 @@ class MainActivity : AppCompatActivity() {
         ViewModelFactory(DefaultDownloadRepository((application as DownloadManagerApplication).database.downloadDao()),this)
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
+
+        (application as DownloadManagerApplication).database.downloadDao().getAll().asLiveData()
+
+        DownloadManagerController.getDataFromDatabase()
 
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
@@ -66,13 +74,13 @@ class MainActivity : AppCompatActivity() {
 
         binding.navView.setNavigationItemSelectedListener {
             when(it.itemId){
-                R.id.all -> viewModel._filterList.postValue(viewModel.downloadList.value)
-                R.id.compressed -> viewModel.filterCategories("Compressed")
-                R.id.documents -> viewModel.filterCategories("Documents")
-                R.id.packages -> viewModel.filterCategories("Packages")
-                R.id.music -> viewModel.filterCategories("Music")
-                R.id.video -> viewModel.filterCategories("Video")
-                R.id.others -> viewModel.filterCategories("Others")
+                R.id.all -> _filterList.postValue(DownloadManagerController.downloadList.value)
+                R.id.compressed -> DownloadManagerController.filterCategories("Compressed")
+                R.id.documents -> DownloadManagerController.filterCategories("Documents")
+                R.id.packages -> DownloadManagerController.filterCategories("Packages")
+                R.id.music -> DownloadManagerController.filterCategories("Music")
+                R.id.video -> DownloadManagerController.filterCategories("Video")
+                R.id.others -> DownloadManagerController.filterCategories("Others")
             }
             binding.drawerLayout.closeDrawers()
             binding.fab.show()

@@ -138,7 +138,7 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
     }
 
 
-    override fun downloadAFile(file: StrucDownFile, context: Context): Flow<Int> = flow {
+    override fun downloadAFile(file: StrucDownFile, context: Context): Flow<StrucDownFile> = flow {
         val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
         connection.setRequestProperty("Range", "bytes=${file.bytesCopied}-")
         connection.doInput = true
@@ -156,7 +156,7 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
                     out.write(data,0,x)
                     file.bytesCopied += x
                     val percent = file.bytesCopied.toFloat() / file.size.toFloat() * 100.0
-                    emit(percent.toInt())
+                    emit(file)
                     if(file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED){
                         out.close()
                         break
@@ -172,7 +172,7 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
                 fos.write(data,0,x)
                 file.bytesCopied += x
                 val percent = file.bytesCopied.toFloat() / file.size.toFloat() * 100.0
-                emit(percent.toInt())
+                emit(file)
                 if(file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED){
                     break
                 }

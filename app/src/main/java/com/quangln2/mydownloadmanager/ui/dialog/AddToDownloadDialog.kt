@@ -4,10 +4,8 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
-import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.text.InputType
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -23,6 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.ViewModelFactory
+import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.database.DownloadDatabase
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
@@ -43,10 +42,10 @@ class AddToDownloadDialog: DialogFragment() {
     private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(database.downloadDao()), requireContext()) }
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
-        viewModel.fetchedFileInfo.observe(this) {
+        DownloadManagerController.fetchedFileInfo.observe(this) {
             file ->
             if(file != null && file.downloadLink != ConstantClass.FILE_NAME_DEFAULT && viewModel._isOpenDialog.value!!){
-                showDownloadAlertDialog(file)
+                showDownloadAlertDialog(requireContext(), file)
             }
             viewModel._isOpenDialog.value = false
         }
@@ -80,8 +79,8 @@ class AddToDownloadDialog: DialogFragment() {
                 val contentLengthValue = connection.contentLength
                 connection.disconnect()
                 if(contentLengthValue > 0){
-                    viewModel.addNewDownloadInfo(downloadLink, binding.downloadToTextField.editText?.text.toString())
-                    viewModel.fetchDownloadFileInfo()
+                    DownloadManagerController.addNewDownloadInfo(requireContext(), downloadLink, binding.downloadToTextField.editText?.text.toString())
+                    DownloadManagerController.fetchDownloadFileInfo(requireContext())
                     viewModel._isOpenDialog.value = true
                     closeKeyboard(binding.linkTextField)
                 } else {
@@ -109,14 +108,14 @@ class AddToDownloadDialog: DialogFragment() {
         return AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog).setView(binding.root).create()
     }
 
-    private fun showDownloadAlertDialog(file: StrucDownFile) {
+    private fun showDownloadAlertDialog(context: Context, file: StrucDownFile){
         val builder =
             MaterialAlertDialogBuilder(requireActivity(), R.style.AlertDialogShow)
                 .setTitle(file.fileName)
                 .setIcon(R.drawable.ic_baseline_arrow_downward_24)
                 .setMessage(ConstantClass.DOWNLOAD_MESSAGE + file.convertToSizeUnit())
                 .setPositiveButton(ConstantClass.POSITIVE_BUTTON) { _, _ ->
-                    viewModel.downloadAFile()
+                    DownloadManagerController.downloadAFile(context)
                     dismiss()
                 }
                 .setNegativeButton(ConstantClass.NEGATIVE_BUTTON) { _, _ ->

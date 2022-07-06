@@ -13,10 +13,18 @@ class ExternalUse() {
     companion object{
         var howManyFileDownloading = 0
 
+
         fun database(context: Context): DownloadDatabase{
             return DownloadDatabase.getDatabase(context)
         }
         fun getRepo(context: Context): DownloadRepository = ServiceLocator.provideDownloadRepository(database(context).downloadDao())
+
+        fun addNewDownloadInfo(context: Context): AddNewDownloadInfoUseCase {
+            return AddNewDownloadInfoUseCase(getRepo(context))
+        }
+        fun fetchDownloadInfo(context: Context): FetchDownloadInfoUseCase{
+            return FetchDownloadInfoUseCase(getRepo(context))
+        }
 
         fun writeToFileAPI29AboveUseCase(context: Context): WriteToFileAPI29AboveUseCase{
             return WriteToFileAPI29AboveUseCase(getRepo(context))
