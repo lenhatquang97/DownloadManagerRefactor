@@ -18,9 +18,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 object DownloadManagerController {
-    val downloadListSchema: LiveData<List<StrucDownFile>> by lazy {
-        (DownloadManagerApplication()).database.downloadDao().getAll().asLiveData()
-    }
+    var downloadListSchema: LiveData<List<StrucDownFile>>? = null
 
     private var _inputItem = MutableLiveData<StrucDownFile>().apply { value = ServiceLocator.initializeStrucDownFile() }
     val inputItem: LiveData<StrucDownFile> get() = _inputItem
@@ -28,7 +26,7 @@ object DownloadManagerController {
     private var _fetchedFileInfo = MutableLiveData<StrucDownFile>()
     val fetchedFileInfo : LiveData<StrucDownFile> get() = _fetchedFileInfo
 
-    private var _downloadList = MutableLiveData<MutableList<StrucDownFile>>().apply { value = mutableListOf() }
+    var _downloadList = MutableLiveData<MutableList<StrucDownFile>>().apply { value = mutableListOf() }
     val downloadList: LiveData<MutableList<StrucDownFile>> get() = _downloadList
 
     var _filterList = MutableLiveData<MutableList<StrucDownFile>>().apply { value = mutableListOf() }
@@ -43,7 +41,7 @@ object DownloadManagerController {
 
 
     fun getDataFromDatabase(){
-        downloadListSchema.value?.let{
+        downloadListSchema?.value?.let{
             _downloadList.value?.let { ls ->
                 if(ls.size != 0){
                     _downloadList.value = it.toMutableList()

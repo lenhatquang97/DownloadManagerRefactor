@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
-        (application as DownloadManagerApplication).database.downloadDao().getAll().asLiveData()
+        DownloadManagerController.downloadListSchema = (application as DownloadManagerApplication).database.downloadDao().getAll().asLiveData()
 
         DownloadManagerController.getDataFromDatabase()
 

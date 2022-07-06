@@ -77,8 +77,6 @@ class HomeFragment : Fragment() {
             ) {}
         }
 
-        (binding.downloadLists.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-
 
 
         binding.downloadLists.apply {
@@ -86,7 +84,14 @@ class HomeFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
         }
 
+        DownloadManagerController.downloadListSchema?.observe(viewLifecycleOwner) {
+            it?.let {
+                if (it.isNotEmpty() && DownloadManagerController._downloadList.value != null && DownloadManagerController._downloadList.value?.size == 0) {
+                    DownloadManagerController._downloadList.value = it.toMutableList()
+                }
+            }
 
+        }
 
 
 
@@ -94,7 +99,7 @@ class HomeFragment : Fragment() {
             it?.let {
                 if (it.isNotEmpty()) {
                     DownloadManagerController._filterList.value = it
-                    adapterVal.notifyItemInserted(it.size - 1)
+                    adapterVal.notifyItemInserted(it.size-1)
                 }
             }
         }

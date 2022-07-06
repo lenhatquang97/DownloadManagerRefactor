@@ -195,6 +195,8 @@ class DownloadListDiffCallback: DiffUtil.ItemCallback<StrucDownFile>() {
     }
 
     override fun areContentsTheSame(oldItem: StrucDownFile, newItem: StrucDownFile): Boolean {
-        return oldItem == newItem
+        return oldItem.id == newItem.id && oldItem.downloadState == newItem.downloadState
+                && oldItem.fileName == newItem.fileName && oldItem.size == newItem.size
+                && oldItem.bytesCopied == newItem.bytesCopied
     }
 }
