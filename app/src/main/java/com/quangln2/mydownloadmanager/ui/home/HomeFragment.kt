@@ -111,7 +111,7 @@ class HomeFragment : Fragment() {
                     return@observe
                 }
                 binding.downloadLists.visibility = View.VISIBLE
-                adapterVal.submitList(it)
+                adapterVal.submitList(it.toMutableList())
             }
         }
 

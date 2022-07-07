@@ -98,10 +98,10 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                             true
                         }
                         R.id.delete_permanently_option -> {
-                            val result = DownloadManagerController.deletePermanently(context, item)
-                            if(result){
-                                binding.textView.text = ""
+                            val onHandle = fun(flag: Boolean) {
+                                if(flag){ binding.textView.text = "" }
                             }
+                            DownloadManagerController.deletePermanently(context, item, onHandle)
                             true
                         }
                         else -> false
@@ -195,11 +195,6 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
         holder.bind(item, context)
     }
 
-    override fun submitList(list: MutableList<StrucDownFile>?) {
-        val ls = list?.toMutableList() ?: mutableListOf()
-        super.submitList(ls)
-    }
-
     fun updateProgress(file: StrucDownFile) {
         val index = currentList.indexOfFirst {it.id == file.id }
         val mutableList = currentList.toMutableList()
@@ -216,6 +211,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
 }
 class DownloadListDiffCallback: DiffUtil.ItemCallback<StrucDownFile>() {
     override fun areItemsTheSame(oldItem: StrucDownFile, newItem: StrucDownFile): Boolean {
+        println("areItemsTheSame " + oldItem.id == newItem.id )
         return oldItem.id == newItem.id
     }
 

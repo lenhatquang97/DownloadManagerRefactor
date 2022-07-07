@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 object DownloadManagerController {
     var downloadListSchema: LiveData<List<StrucDownFile>>? = null
@@ -71,7 +72,7 @@ object DownloadManagerController {
                 ExternalUse.writeToFileAPI29BelowUseCase(context)(file)
             }
 
-            val currentList = _downloadList.value
+            val currentList = downloadList.value
             if(currentList != null){
                 if(ExternalUse.howManyFileDownloading < 3){
                     currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
@@ -100,7 +101,7 @@ object DownloadManagerController {
         }
     }
     fun pause(id: String){
-        val currentList = _downloadList.value
+        val currentList = downloadList.value
         val index = currentList?.indexOfFirst { it.id == id }
         if(index != null && index != -1){
             val currentFile = currentList[index]
@@ -109,7 +110,7 @@ object DownloadManagerController {
         }
     }
     fun resume(context: Context, id: String){
-        val currentList = _downloadList.value
+        val currentList = downloadList.value
         val index = currentList?.indexOfFirst { it.id == id }
         if(index != null && index != -1){
             val currentFile = currentList[index]
@@ -180,8 +181,7 @@ object DownloadManagerController {
             _filterList.postValue(res)
         }
     }
-    fun deletePermanently(context: Context, file: StrucDownFile): Boolean{
-        var result = true
+    fun deletePermanently(context: Context, file: StrucDownFile, onHandle: (Boolean)-> Unit){
         val builder =
             MaterialAlertDialogBuilder(context, R.style.AlertDialogShow)
                 .setTitle(file.fileName)
@@ -193,18 +193,19 @@ object DownloadManagerController {
                         val res = downloadList.value?.filter { it.id != file.id }?.toMutableList()
                         _downloadList.postValue(res)
                         _filterList.postValue(res)
-                        result = true
+                        withContext(Dispatchers.Main){
+                            onHandle(true)
+                        }
                         a.dismiss()
 
                     }
 
                 }
                 .setNegativeButton(ConstantClass.NEGATIVE_BUTTON) { a, _ ->
-                    result = false
+                    onHandle(false)
                     a.dismiss()
                 }
         builder.show()
-        return result
     }
 
 }
