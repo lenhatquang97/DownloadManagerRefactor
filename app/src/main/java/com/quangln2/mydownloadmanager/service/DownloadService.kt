@@ -16,7 +16,7 @@ import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 
 
-class DownloadService(): Service() {
+class DownloadService : Service() {
     private val CHANNEL_ID = "download_notification"
 
     override fun onBind(intent: Intent?): IBinder? {

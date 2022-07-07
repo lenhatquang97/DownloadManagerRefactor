@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class DownloadManagerApplication(): Application() {
+class DownloadManagerApplication : Application() {
     val database by lazy{ DownloadDatabase.getDatabase(this)}
     val downloadRepository by lazy{ServiceLocator.provideDownloadRepository(database.downloadDao())}
     override fun onCreate() {

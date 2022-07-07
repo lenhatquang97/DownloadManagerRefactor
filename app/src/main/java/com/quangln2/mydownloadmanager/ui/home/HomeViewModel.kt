@@ -15,7 +15,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import java.util.*
 
-class HomeViewModel(
-): ViewModel() {
+class HomeViewModel : ViewModel() {
     var _isOpenDialog = MutableLiveData<Boolean>().apply { value = false }
 }
