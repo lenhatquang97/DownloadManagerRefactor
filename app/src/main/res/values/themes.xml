@@ -46,4 +46,8 @@
         <item name="android:colorForeground">@color/grey
         </item>
     </style>
+
+    <style name="MoreButtonFunction.PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:itemBackground">@color/white</item>
+    </style>
 </resources>

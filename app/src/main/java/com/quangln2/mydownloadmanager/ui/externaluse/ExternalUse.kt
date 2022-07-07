@@ -46,5 +46,11 @@ class ExternalUse {
         fun openDownloadFileUseCase(context: Context): OpenDownloadFileUseCase{
             return OpenDownloadFileUseCase(getRepo(context))
         }
+        fun deleteFromListUseCase(context: Context): DeleteFromListUseCase{
+            return DeleteFromListUseCase(getRepo(context))
+        }
+        fun deletePermanentlyUseCase(context: Context): DeletePermanentlyUseCase{
+            return DeletePermanentlyUseCase(getRepo(context))
+        }
     }
 }

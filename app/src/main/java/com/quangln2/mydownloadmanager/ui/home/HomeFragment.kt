@@ -100,7 +100,6 @@ class HomeFragment : Fragment() {
             it?.let {
                 if (it.isNotEmpty()) {
                     DownloadManagerController._filterList.value = it
-                    adapterVal.notifyItemInserted(it.size - 1)
                 }
             }
         }

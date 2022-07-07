@@ -83,7 +83,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        binding.fab.hide()
         return when (item.itemId) {
             R.id.action_settings -> {
                 if(navController.currentDestination?.id == R.id.FirstFragment){

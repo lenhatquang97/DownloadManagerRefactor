@@ -23,6 +23,9 @@ interface DownloadRepository {
 
     suspend fun insert(strucDownFile: StrucDownFile)
     suspend fun update(strucDownFile: StrucDownFile)
+    suspend fun deleteFromList(strucDownFile: StrucDownFile)
+    suspend fun deletePermanently(file: StrucDownFile, context: Context)
+
 
     fun getBytesFromExistingFile(file: StrucDownFile, context: Context): Long
 }

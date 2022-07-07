@@ -19,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -41,6 +42,40 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
         downloadDao.update(strucDownFile)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun deleteFromList(strucDownFile: StrucDownFile) {
+        downloadDao.delete(strucDownFile)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun deletePermanently(file: StrucDownFile, context: Context) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            val resolver = context.contentResolver
+            if(file.uri != null){
+                val rowsDeleted = resolver.delete(file.uri!!,null,null)
+                if(rowsDeleted <= 0){
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Toast.makeText(context, "File not found so we'll delete from list", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        } else {
+            val filePath = File(file.downloadTo)
+            if(filePath.exists()){
+                filePath.delete()
+            } else {
+                CoroutineScope(Dispatchers.Main).launch {
+                    Toast.makeText(context, "File not found so we'll delete from list", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        downloadDao.delete(file)
+    }
+
+
+
 
     override fun addNewDownloadInfo(url: String, downloadTo: String, file: StrucDownFile) {
         file.id = UUID.randomUUID().toString()
@@ -57,8 +92,6 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
         return type
     }
 
-
-    //TODO: Need to fix this bug
     override fun fetchDownloadInfo(file: StrucDownFile): StrucDownFile {
         val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
         connection.doInput = true

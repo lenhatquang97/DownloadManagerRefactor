@@ -4,7 +4,10 @@ import android.content.Context
 import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.ServiceLocator
+import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.listener.ProgressCallback
@@ -168,6 +171,40 @@ object DownloadManagerController {
             _filterList.postValue(newList.toMutableList())
 
         }
+    }
+    fun deleteFromList(context: Context, file: StrucDownFile){
+        CoroutineScope(Dispatchers.IO).launch {
+            ExternalUse.deleteFromListUseCase(context).invoke(file)
+            val res = downloadList.value?.filter { it.id != file.id }?.toMutableList()
+            _downloadList.postValue(res)
+            _filterList.postValue(res)
+        }
+    }
+    fun deletePermanently(context: Context, file: StrucDownFile): Boolean{
+        var result = true
+        val builder =
+            MaterialAlertDialogBuilder(context, R.style.AlertDialogShow)
+                .setTitle(file.fileName)
+                .setIcon(R.drawable.ic_baseline_delete_24)
+                .setMessage("Are you sure that you will delete this file? You cannot undo this action.")
+                .setPositiveButton(ConstantClass.POSITIVE_BUTTON) { a, _ ->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        ExternalUse.deletePermanentlyUseCase(context).invoke(file, context)
+                        val res = downloadList.value?.filter { it.id != file.id }?.toMutableList()
+                        _downloadList.postValue(res)
+                        _filterList.postValue(res)
+                        result = true
+                        a.dismiss()
+
+                    }
+
+                }
+                .setNegativeButton(ConstantClass.NEGATIVE_BUTTON) { a, _ ->
+                    result = false
+                    a.dismiss()
+                }
+        builder.show()
+        return result
     }
 
 }

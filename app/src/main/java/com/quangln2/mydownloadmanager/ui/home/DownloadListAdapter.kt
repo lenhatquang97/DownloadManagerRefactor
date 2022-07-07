@@ -1,9 +1,12 @@
 package com.quangln2.mydownloadmanager.ui.home
 
 import android.content.Context
+import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -83,6 +86,29 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
 
                 }
             }
+            binding.moreButton.setOnClickListener {
+                val wrapper = ContextThemeWrapper(context, R.style.MoreButtonFunction_PopupMenu)
+                val popup = PopupMenu(wrapper, binding.moreButton)
+                popup.inflate(R.menu.viewholder_more_menu)
+                popup.setOnMenuItemClickListener {
+                    when(it.itemId){
+                        R.id.delete_from_list_option -> {
+                            DownloadManagerController.deleteFromList(context, item)
+                            binding.textView.text = ""
+                            true
+                        }
+                        R.id.delete_permanently_option -> {
+                            val result = DownloadManagerController.deletePermanently(context, item)
+                            if(result){
+                                binding.textView.text = ""
+                            }
+                            true
+                        }
+                        else -> false
+                    }
+                }
+                popup.show()
+            }
 
         }
         fun bind(item: StrucDownFile, context: Context){
@@ -146,6 +172,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                 binding.progressBar.visibility = View.GONE
                 binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
                 binding.downloadStateButton.setImageResource(R.drawable.ic_open)
+                (eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),100)
 
                 CoroutineScope(Dispatchers.IO).launch {
                     ExternalUse.updateToListUseCase(context)(item)
@@ -153,6 +180,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                 }
             }
         }
+
     }
 
 

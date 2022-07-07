@@ -31,6 +31,7 @@
         <entry key="app/src/main/res/layout/settings_screen.xml" value="0.1" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.40467071533203125" />
         <entry key="app/src/main/res/menu/navigation_drawer.xml" value="0.16979166666666667" />
+        <entry key="app/src/main/res/menu/viewholder_more_menu.xml" value="0.1953125" />
         <entry key="app/src/main/res/xml/preferences.xml" value="0.2554347826086957" />
       </map>
     </option>
