@@ -1,7 +1,6 @@
 package com.quangln2.mydownloadmanager.ui.home
 
 import android.content.Context
-import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -140,7 +139,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                     }
                 }
                 binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
-                (eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),binding.progressBar.progress)
+                //(eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),binding.progressBar.progress)
             }
             binding.stopButton.setOnClickListener {
                 if(item.downloadState == DownloadStatusState.DOWNLOADING || item.downloadState == DownloadStatusState.PAUSED){
@@ -148,7 +147,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                     binding.progressBar.visibility = View.GONE
                     binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
                     binding.downloadStateButton.setImageResource(R.drawable.ic_retry)
-                    (eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),binding.progressBar.progress)
+                    //(eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),binding.progressBar.progress)
                 }
             }
             if(item.downloadState == DownloadStatusState.DOWNLOADING){
@@ -160,7 +159,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                 val result = LogicUtil.calculateDownloadSpeed(seconds, startBytes, endBytes)
                 if(seconds > 1 && result > 0){
                     binding.textView.text = String.format("%.2f MB/s", result) + " - " + item.convertToSizeUnit() + " - " + item.downloadState.toString()
-                    (eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),binding.progressBar.progress)
+                    //(eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),binding.progressBar.progress)
                     startBytes = endBytes
                     startTime = endTime
                 }
@@ -172,7 +171,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                 binding.progressBar.visibility = View.GONE
                 binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
                 binding.downloadStateButton.setImageResource(R.drawable.ic_open)
-                (eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),100)
+                //(eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),100)
 
                 CoroutineScope(Dispatchers.IO).launch {
                     ExternalUse.updateToListUseCase(context)(item)
@@ -211,7 +210,6 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
 }
 class DownloadListDiffCallback: DiffUtil.ItemCallback<StrucDownFile>() {
     override fun areItemsTheSame(oldItem: StrucDownFile, newItem: StrucDownFile): Boolean {
-        println("areItemsTheSame " + oldItem.id == newItem.id )
         return oldItem.id == newItem.id
     }
 

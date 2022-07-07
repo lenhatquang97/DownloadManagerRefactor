@@ -10,7 +10,6 @@ import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
-import com.quangln2.mydownloadmanager.listener.ProgressCallback
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

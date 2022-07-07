@@ -1,7 +1,6 @@
 package com.quangln2.mydownloadmanager.domain
 
 import android.content.Context
-import com.quangln2.mydownloadmanager.ServiceLocator.downloadRepository
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DownloadRepository
 

@@ -2,7 +2,6 @@ package com.quangln2.mydownloadmanager.data.repository
 
 import android.content.Context
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 interface DownloadRepository {

@@ -30,9 +30,6 @@ import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
 import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
-import java.net.HttpURLConnection
-import java.net.URL
-
 
 class AddToDownloadDialog: DialogFragment() {
     private lateinit var binding: AddDownloadDialogBinding

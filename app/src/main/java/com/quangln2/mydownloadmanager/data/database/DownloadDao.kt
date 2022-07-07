@@ -2,7 +2,6 @@ package com.quangln2.mydownloadmanager.data.database
 
 import androidx.room.*
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
-import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import kotlinx.coroutines.flow.Flow
 
 @Dao

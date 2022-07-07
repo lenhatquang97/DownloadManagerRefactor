@@ -8,10 +8,6 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.database.DownloadDatabase
-import com.quangln2.mydownloadmanager.data.repository.DownloadRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class DownloadManagerApplication : Application() {
     val database by lazy{ DownloadDatabase.getDatabase(this)}

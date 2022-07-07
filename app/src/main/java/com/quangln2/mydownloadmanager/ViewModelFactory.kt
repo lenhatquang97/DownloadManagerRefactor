@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.quangln2.mydownloadmanager.data.repository.DownloadRepository
-import com.quangln2.mydownloadmanager.domain.*
-import com.quangln2.mydownloadmanager.domain.AddNewDownloadInfoUseCase
 import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
 
 @Suppress("UNCHECKED_CAST")
