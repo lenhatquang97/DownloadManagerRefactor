@@ -18,6 +18,8 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
+import com.google.android.material.progressindicator.IndeterminateDrawable
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.ViewModelFactory
@@ -40,6 +42,7 @@ class AddToDownloadDialog: DialogFragment() {
     private val database by lazy{ DownloadDatabase.getDatabase(requireContext())}
     val downloadRepository by lazy{ ServiceLocator.provideDownloadRepository(database.downloadDao())}
     private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(database.downloadDao()), requireContext()) }
+
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         DownloadManagerController.fetchedFileInfo.observe(this) {
@@ -71,10 +74,14 @@ class AddToDownloadDialog: DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = AddDownloadDialogBinding.inflate(layoutInflater)
+        val spec = CircularProgressIndicatorSpec(requireContext(),null, 0,
+                com.google.android.material.R.style.Widget_Material3_CircularProgressIndicator_ExtraSmall)
+        val progressIndicatorDrawable = IndeterminateDrawable.createCircularDrawable(requireContext(), spec)
         binding.addNewDownloadFileButton.setOnClickListener {
             val downloadLink = binding.linkTextField.editText?.text.toString()
             val isValidURL = URLUtil.isValidUrl(downloadLink)
             if(isValidURL){
+                binding.addNewDownloadFileButton.icon = progressIndicatorDrawable
                 DownloadManagerController.addNewDownloadInfo(requireContext(), downloadLink, binding.downloadToTextField.editText?.text.toString())
                 DownloadManagerController.fetchDownloadFileInfo(requireContext())
                 viewModel._isOpenDialog.value = true
@@ -104,6 +111,7 @@ class AddToDownloadDialog: DialogFragment() {
     private fun showDownloadAlertDialog(context: Context, file: StrucDownFile){
         if(file.size == -1L){
             Toast.makeText(context, ConstantClass.INVALID_LINK, Toast.LENGTH_SHORT).show()
+            binding.addNewDownloadFileButton.icon = null
             return
         }
         val builder =
