@@ -80,7 +80,6 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
             val cursor = resolver.query(MediaStore.Downloads.EXTERNAL_CONTENT_URI, null, selection, selectionArgs, null)
             if(cursor != null && cursor.count > 0){
                 while(cursor.moveToNext()){
-                    println(cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE)))
                     return cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))
                 }
             }
@@ -88,7 +87,6 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
             val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName
             val fileOpen = File(filePath)
             if(fileOpen.exists()) {
-                println(fileOpen.length())
                 return fileOpen.length()
             }
         }
@@ -155,7 +153,6 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
                 while(x >= 0){
                     out.write(data,0,x)
                     file.bytesCopied += x
-                    val percent = file.bytesCopied.toFloat() / file.size.toFloat() * 100.0
                     emit(file)
                     if(file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED){
                         out.close()
@@ -171,7 +168,6 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
             while(x >= 0){
                 fos.write(data,0,x)
                 file.bytesCopied += x
-                val percent = file.bytesCopied.toFloat() / file.size.toFloat() * 100.0
                 emit(file)
                 if(file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED){
                     break

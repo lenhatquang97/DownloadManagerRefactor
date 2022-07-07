@@ -75,21 +75,14 @@ class AddToDownloadDialog: DialogFragment() {
             val downloadLink = binding.linkTextField.editText?.text.toString()
             val isValidURL = URLUtil.isValidUrl(downloadLink)
             if(isValidURL){
-                val connection = URL(downloadLink).openConnection() as HttpURLConnection
-                val contentLengthValue = connection.contentLength
-                connection.disconnect()
-                if(contentLengthValue > 0){
-                    DownloadManagerController.addNewDownloadInfo(requireContext(), downloadLink, binding.downloadToTextField.editText?.text.toString())
-                    DownloadManagerController.fetchDownloadFileInfo(requireContext())
-                    viewModel._isOpenDialog.value = true
-                    closeKeyboard(binding.linkTextField)
-                } else {
-                    Toast.makeText(requireContext(), ConstantClass.INVALID_LINK, Toast.LENGTH_SHORT).show()
-                }
-            } else {
+                DownloadManagerController.addNewDownloadInfo(requireContext(), downloadLink, binding.downloadToTextField.editText?.text.toString())
+                DownloadManagerController.fetchDownloadFileInfo(requireContext())
+                viewModel._isOpenDialog.value = true
+                closeKeyboard(binding.linkTextField)
+            }
+            else {
                 Toast.makeText(requireContext(), ConstantClass.INVALID_URL, Toast.LENGTH_SHORT).show()
             }
-
         }
         binding.cancelAddNewDownloadFileButton.setOnClickListener {
             dismiss()
@@ -109,6 +102,10 @@ class AddToDownloadDialog: DialogFragment() {
     }
 
     private fun showDownloadAlertDialog(context: Context, file: StrucDownFile){
+        if(file.size == -1L){
+            Toast.makeText(context, ConstantClass.INVALID_LINK, Toast.LENGTH_SHORT).show()
+            return
+        }
         val builder =
             MaterialAlertDialogBuilder(requireActivity(), R.style.AlertDialogShow)
                 .setTitle(file.fileName)

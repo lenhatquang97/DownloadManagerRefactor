@@ -16,10 +16,6 @@ import kotlinx.coroutines.flow.collect
 import java.util.*
 
 class HomeViewModel(
-    private val addNewDownloadInfoUseCase: AddNewDownloadInfoUseCase,
-    private val fetchDownloadInfoUseCase: FetchDownloadInfoUseCase,
-    private val context: Context
 ): ViewModel() {
     var _isOpenDialog = MutableLiveData<Boolean>().apply { value = false }
-    var callback: ProgressCallback? = null
 }

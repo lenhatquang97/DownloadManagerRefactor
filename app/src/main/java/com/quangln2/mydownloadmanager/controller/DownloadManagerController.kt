@@ -4,10 +4,7 @@ import android.content.Context
 import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
-import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.ServiceLocator
-import com.quangln2.mydownloadmanager.controller.DownloadManagerController._progressFile
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.listener.ProgressCallback
@@ -34,11 +31,6 @@ object DownloadManagerController {
 
     private var _progressFile = MutableLiveData<StrucDownFile>().apply { value = ServiceLocator.initializeStrucDownFile() }
     val progressFile: LiveData<StrucDownFile> get() = _progressFile
-
-
-    var progressCallback: MutableMap<String, ProgressCallback?> = mutableMapOf()
-
-
 
     fun getDataFromDatabase(){
         downloadListSchema?.value?.let{
@@ -92,14 +84,12 @@ object DownloadManagerController {
                     ExternalUse.insertToListUseCase(context)(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
                 } else {
                     ExternalUse.insertToListUseCase(context)(file.copy(downloadState = DownloadStatusState.QUEUED))
-
                 }
             }
             val addedFile = currentList?.last()
             if (addedFile != null) {
                 CoroutineScope(Dispatchers.Main).launch {
                     ExternalUse.downloadAFileUseCase(context)(addedFile, context).collect {
-                        println(it.id)
                         _progressFile.value = it
                     }
                 }
@@ -110,17 +100,16 @@ object DownloadManagerController {
         val currentList = _downloadList.value
         val index = currentList?.indexOfFirst { it.id == id }
         if(index != null && index != -1){
-            val currentFile = currentList.get(index)
+            val currentFile = currentList[index]
             currentFile.downloadState = DownloadStatusState.PAUSED
             _progressFile.value = currentFile
         }
-        println("Pause "+ _progressFile.value?.fileName)
     }
     fun resume(context: Context, id: String){
         val currentList = _downloadList.value
         val index = currentList?.indexOfFirst { it.id == id }
         if(index != null && index != -1){
-            val currentFile = currentList.get(index)
+            val currentFile = currentList[index]
             currentFile.downloadState = DownloadStatusState.DOWNLOADING
             CoroutineScope(Dispatchers.Main).launch {
                 ExternalUse.downloadAFileUseCase(context)(currentFile, context).collect {
@@ -130,6 +119,19 @@ object DownloadManagerController {
 
         }
     }
+
+    fun retry(context: Context, item: StrucDownFile){
+        ExternalUse.retryDownloadUseCase(context)(item, context)
+        CoroutineScope(Dispatchers.Main).launch {
+            ExternalUse.downloadAFileUseCase(context)(item, context).collect {
+                _progressFile.value = it
+            }
+        }
+    }
+    fun open(context: Context, item: StrucDownFile){
+        ExternalUse.openDownloadFileUseCase(context)(item,context)
+    }
+
 
     fun filterList(downloadStatusState: String){
         if(downloadStatusState == DownloadStatusState.ALL.toString()){

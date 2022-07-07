@@ -26,11 +26,11 @@ import com.quangln2.mydownloadmanager.listener.ProgressCallback
 import com.quangln2.mydownloadmanager.service.DownloadService
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import com.quangln2.mydownloadmanager.util.LogicUtil
+import kotlin.math.abs
 
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentFirstBinding
-
 
     private val viewModel: HomeViewModel by activityViewModels {
         ViewModelFactory(DefaultDownloadRepository((activity?.application as DownloadManagerApplication).database.downloadDao()),requireContext())
@@ -100,7 +100,7 @@ class HomeFragment : Fragment() {
             it?.let {
                 if (it.isNotEmpty()) {
                     DownloadManagerController._filterList.value = it
-                    adapterVal.notifyItemInserted(it.size-1)
+                    adapterVal.notifyItemInserted(it.size - 1)
                 }
             }
         }
@@ -113,13 +113,12 @@ class HomeFragment : Fragment() {
                 }
                 binding.downloadLists.visibility = View.VISIBLE
                 adapterVal.submitList(it)
-
             }
         }
 
         DownloadManagerController.progressFile.observe(viewLifecycleOwner){
             it?.let {
-                if(it != null && it.size != -1L){
+                if(it.size != -1L){
                     adapterVal.updateProgress(it)
                 }
 
