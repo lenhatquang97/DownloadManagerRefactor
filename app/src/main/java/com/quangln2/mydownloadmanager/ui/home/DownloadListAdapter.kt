@@ -71,6 +71,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         stopButton.visibility = View.VISIBLE
                         downloadStateButton.visibility = View.VISIBLE
                         downloadStateButton.setImageResource(R.drawable.ic_start)
+                        progressBar.progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
                     }
                 }
                 DownloadStatusState.FAILED -> {
@@ -120,6 +121,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                     }
                     DownloadStatusState.PAUSED -> {
                         DownloadManagerController.resume(context, item.id)
+                        binding.progressBar.progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
                     }
                     DownloadStatusState.COMPLETED -> {
@@ -139,6 +141,10 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                     }
                 }
                 binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                Thread.sleep(100)
+                CoroutineScope(Dispatchers.IO).launch {
+                    ExternalUse.updateToListUseCase(context)(item)
+                }
                 //(eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),binding.progressBar.progress)
             }
             binding.stopButton.setOnClickListener {

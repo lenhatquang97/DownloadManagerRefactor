@@ -1,4 +1,5 @@
 package com.quangln2.mydownloadmanager.data.repository
+
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -10,12 +11,14 @@ import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.annotation.WorkerThread
-import com.quangln2.mydownloadmanager.util.UIComponentUtil
-import kotlinx.coroutines.Dispatchers
+import androidx.core.content.FileProvider
+import com.quangln2.mydownloadmanager.BuildConfig
 import com.quangln2.mydownloadmanager.data.database.DownloadDao
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
+import com.quangln2.mydownloadmanager.util.UIComponentUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -188,7 +191,6 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
                     file.bytesCopied += x
                     emit(file)
                     if(file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED){
-                        out.close()
                         break
                     }
                     x = inp.read(data,0,1024)
@@ -250,7 +252,6 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
     }
     override fun queueDownload(file: StrucDownFile) {
         file.downloadState = DownloadStatusState.QUEUED
-
     }
 
     override suspend fun copyFile() {
@@ -265,9 +266,14 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
         } else {
             val file = File(item.downloadTo)
             if(file.exists()){
-                val uri = Uri.fromFile(file)
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    BuildConfig.APPLICATION_ID.toString() + ".provider",
+                    file
+                )
                 intent.setDataAndType(uri, item.mimeType)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
         }
         if (intent.resolveActivity(context.packageManager) == null) {

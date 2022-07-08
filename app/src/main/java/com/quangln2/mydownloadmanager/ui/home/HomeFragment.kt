@@ -2,6 +2,7 @@ package com.quangln2.mydownloadmanager.ui.home
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,10 +10,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.quangln2.mydownloadmanager.DownloadManagerApplication
+import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
@@ -35,6 +39,7 @@ class HomeFragment : Fragment() {
     private val viewModel: HomeViewModel by activityViewModels {
         ViewModelFactory(DefaultDownloadRepository((activity?.application as DownloadManagerApplication).database.downloadDao()),requireContext())
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -99,7 +104,12 @@ class HomeFragment : Fragment() {
         DownloadManagerController.downloadList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
+                    binding.downloadLists.visibility = View.VISIBLE
+                    binding.emptyDataParent.visibility = View.GONE
                     DownloadManagerController._filterList.value = it
+                } else {
+                    binding.emptyDataParent.visibility = View.VISIBLE
+                    binding.downloadLists.visibility = View.GONE
                 }
             }
         }
@@ -131,23 +141,69 @@ class HomeFragment : Fragment() {
                     DownloadManagerController.filterStartsWithNameCaseInsensitive(s.toString())
                 }
             })
-
         binding.chip0.setOnClickListener {
+            binding.chip0.chipIcon = ContextCompat.getDrawable(requireContext(),
+                R.drawable.ic_baseline_check_circle_outline_24)
+            binding.chip1.chipIcon = null
+            binding.chip2.chipIcon = null
+            binding.chip3.chipIcon = null
+            binding.chip4.chipIcon = null
+            binding.chip5.chipIcon = null
+
             DownloadManagerController.filterList(DownloadStatusState.ALL.toString())
         }
         binding.chip1.setOnClickListener {
+            binding.chip0.chipIcon = null
+            binding.chip1.chipIcon = ContextCompat.getDrawable(requireContext(),
+                R.drawable.ic_baseline_check_circle_outline_24)
+            binding.chip2.chipIcon = null
+            binding.chip3.chipIcon = null
+            binding.chip4.chipIcon = null
+            binding.chip5.chipIcon = null
+
             DownloadManagerController.filterList(DownloadStatusState.DOWNLOADING.toString())
         }
         binding.chip2.setOnClickListener {
+            binding.chip0.chipIcon = null
+            binding.chip1.chipIcon = null
+            binding.chip2.chipIcon = ContextCompat.getDrawable(requireContext(),
+                R.drawable.ic_baseline_check_circle_outline_24)
+            binding.chip3.chipIcon = null
+            binding.chip4.chipIcon = null
+            binding.chip5.chipIcon = null
+
             DownloadManagerController.filterList(DownloadStatusState.FAILED.toString())
         }
         binding.chip3.setOnClickListener {
+            binding.chip0.chipIcon = null
+            binding.chip1.chipIcon = null
+            binding.chip2.chipIcon = null
+            binding.chip3.chipIcon = ContextCompat.getDrawable(requireContext(),
+                R.drawable.ic_baseline_check_circle_outline_24)
+            binding.chip4.chipIcon = null
+            binding.chip5.chipIcon = null
+
             DownloadManagerController.filterList(DownloadStatusState.PAUSED.toString())
         }
         binding.chip4.setOnClickListener {
+            binding.chip0.chipIcon = null
+            binding.chip1.chipIcon = null
+            binding.chip2.chipIcon = null
+            binding.chip3.chipIcon = null
+            binding.chip4.chipIcon = ContextCompat.getDrawable(requireContext(),
+                R.drawable.ic_baseline_check_circle_outline_24)
+            binding.chip5.chipIcon = null
+
             DownloadManagerController.filterList(DownloadStatusState.COMPLETED.toString())
         }
         binding.chip5.setOnClickListener {
+            binding.chip0.chipIcon = null
+            binding.chip1.chipIcon = null
+            binding.chip2.chipIcon = null
+            binding.chip3.chipIcon = null
+            binding.chip4.chipIcon = null
+            binding.chip5.chipIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_check_circle_outline_24)
+
             DownloadManagerController.filterList(DownloadStatusState.QUEUED.toString())
         }
     }

@@ -30,6 +30,7 @@ import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
 import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
+import com.quangln2.mydownloadmanager.util.UIComponentUtil.Companion.getRealPath
 
 class AddToDownloadDialog: DialogFragment() {
     private lateinit var binding: AddDownloadDialogBinding
@@ -135,28 +136,6 @@ class AddToDownloadDialog: DialogFragment() {
     private fun getFilePath(){
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         resultLauncher.launch(intent)
-    }
-    private fun getRealPath(treeUri: DocumentFile?): String {
-        if (treeUri == null) return ""
-        val path1: String = treeUri.uri.path!!
-        if (path1.startsWith("/tree/")) {
-            val path2 = path1.removeRange(0, "/tree/".length)
-            if (path2.startsWith("primary:")) {
-                val primary = path2.removeRange(0, "primary:".length)
-                if (primary.contains(':')) {
-                    val storeName = "/storage/emulated/0/"
-                    val last = path2.split(':').last()
-                    return storeName + last
-                }
-            } else {
-                if (path2.contains(':')) {
-                    val path3 = path2.split(':').first()
-                    val last = path2.split(':').last()
-                    return "/$path3/$last"
-                }
-            }
-        }
-        return path1
     }
 
 

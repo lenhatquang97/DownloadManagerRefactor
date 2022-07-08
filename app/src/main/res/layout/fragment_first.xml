@@ -49,9 +49,11 @@
             android:layout_height="wrap_content"
             android:scrollbars="none">
             <com.google.android.material.chip.ChipGroup
+                android:id="@+id/stateGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:chipSpacingVertical="20dp"
+                app:singleSelection="true"
                 android:paddingTop="16dp"
                 >
 
@@ -61,9 +63,10 @@
                     android:id="@+id/chip0"
                     android:text="All"
                     android:textColor="@color/white"
-                    app:chipBackgroundColor="@color/black"
+                    app:chipIcon="@drawable/ic_baseline_check_circle_outline_24"
+                    app:chipBackgroundColor="@color/all"
                     app:chipCornerRadius="28dp"
-                    app:chipStrokeColor="@color/blue"
+                    app:chipStrokeColor="@color/all"
                     app:chipMinHeight="36dp"
                     />
 
@@ -72,8 +75,8 @@
                     android:layout_width="wrap_content"
                     android:id="@+id/chip1"
                     android:text="Downloading"
-                    android:textColor="@color/white"
                     app:chipBackgroundColor="@color/blue"
+                    android:textColor="@color/white"
                     app:chipCornerRadius="28dp"
                     app:chipStrokeColor="@color/blue"
                     app:chipMinHeight="36dp"
@@ -83,8 +86,8 @@
                     android:layout_width="wrap_content"
                     android:id="@+id/chip2"
                     android:text="Failed"
-                    android:textColor="@color/white"
                     app:chipBackgroundColor="@color/failed"
+                    android:textColor="@color/white"
                     app:chipCornerRadius="28dp"
                     app:chipStrokeColor="@color/failed"
                     app:chipMinHeight="36dp"
@@ -94,8 +97,8 @@
                     android:layout_width="wrap_content"
                     android:id="@+id/chip3"
                     android:text="Paused"
-                    android:textColor="@color/white"
                     app:chipBackgroundColor="@color/paused"
+                    android:textColor="@color/white"
                     app:chipCornerRadius="28dp"
                     app:chipStrokeColor="@color/paused"
                     app:chipMinHeight="36dp"
@@ -105,8 +108,8 @@
                     android:layout_width="wrap_content"
                     android:id="@+id/chip4"
                     android:text="Success"
-                    android:textColor="@color/white"
                     app:chipBackgroundColor="@color/success"
+                    android:textColor="@color/white"
                     app:chipCornerRadius="28dp"
                     app:chipStrokeColor="@color/success"
                     app:chipMinHeight="36dp"
@@ -116,8 +119,8 @@
                     android:layout_width="wrap_content"
                     android:id="@+id/chip5"
                     android:text="Queued"
-                    android:textColor="@color/white"
                     app:chipBackgroundColor="@color/grey"
+                    android:textColor="@color/white"
                     app:chipCornerRadius="28dp"
                     app:chipStrokeColor="@color/grey"
                     app:chipMinHeight="36dp"
@@ -133,10 +136,20 @@
             android:layout_height="0dp"
             android:layout_marginBottom="24dp"
             android:nestedScrollingEnabled="false"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/chipGroup"
             app:layout_constraintVertical_bias="0.05"
             tools:layout_editor_absoluteX="16dp" />
+        <include
+            android:id="@+id/empty_data_parent"
+            layout="@layout/empty_dataset"
+            android:layout_width="match_parent"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chipGroup"
+            android:layout_height="0dp"
+            android:layout_gravity="center" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -113,6 +113,7 @@ object DownloadManagerController {
         val index = currentList?.indexOfFirst { it.id == id }
         if(index != null && index != -1){
             val currentFile = currentList[index]
+            currentFile.bytesCopied = ExternalUse.getBytesFromExistingFileUseCase(context)(currentFile, context)
             currentFile.downloadState = DownloadStatusState.DOWNLOADING
             CoroutineScope(Dispatchers.Main).launch {
                 ExternalUse.downloadAFileUseCase(context)(currentFile, context).collect {

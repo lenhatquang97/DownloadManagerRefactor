@@ -24,6 +24,7 @@
         <entry key="app/src/main/res/layout/add_download_dialog.xml" value="0.2515923566878981" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.18854166666666666" />
         <entry key="app/src/main/res/layout/download_item.xml" value="0.2688705444335937" />
+        <entry key="app/src/main/res/layout/empty_dataset.xml" value="0.3985564682509873" />
         <entry key="app/src/main/res/layout/fragment_first.xml" value="0.2244918823242187" />
         <entry key="app/src/main/res/layout/fragment_second.xml" value="0.2857746925674567" />
         <entry key="app/src/main/res/layout/header_navigation_drawer.xml" value="0.1" />

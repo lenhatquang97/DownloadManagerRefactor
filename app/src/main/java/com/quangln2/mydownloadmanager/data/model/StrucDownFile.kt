@@ -14,8 +14,8 @@ data class StrucDownFile (
     @ColumnInfo(name="kind_of") var kindOf: String,
     @ColumnInfo(name="size") var size: Long,
 
-    @Ignore var bytesCopied: Long,
-
+    @ColumnInfo(name="bytes_copied") var bytesCopied: Long,
+    //@Ignore var bytesCopied: Long,
     @ColumnInfo(name="download_state") var downloadState: DownloadStatusState,
     @ColumnInfo(name="mime_type") var mimeType: String,
     @ColumnInfo(name="file_name") var fileName: String,

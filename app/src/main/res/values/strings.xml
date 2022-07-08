@@ -43,4 +43,7 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    <string name="no_files_download_yet">No files download yet</string>
+    <string name="no_download_dataset_description">Your downloaded files in will be shown here!!!</string>
+    <string name="no_download_img_description">Download Image</string>
 </resources>
