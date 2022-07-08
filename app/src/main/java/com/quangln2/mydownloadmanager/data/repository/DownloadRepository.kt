@@ -27,4 +27,5 @@ interface DownloadRepository {
 
 
     fun getBytesFromExistingFile(file: StrucDownFile, context: Context): Long
+    fun isFileExisting(file: StrucDownFile, context: Context): Boolean
 }

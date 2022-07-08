@@ -77,6 +77,23 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
         downloadDao.delete(file)
     }
 
+    override fun isFileExisting(file: StrucDownFile, context: Context): Boolean{
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            val filePath = File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName)
+            if(!filePath.exists()){
+                Toast.makeText(context, "File not found", Toast.LENGTH_SHORT).show()
+                return false
+            }
+        } else {
+            val filePath = File(file.downloadTo)
+            if(!filePath.exists()){
+                Toast.makeText(context, "File not found", Toast.LENGTH_SHORT).show()
+                return false
+            }
+        }
+        return true
+    }
+
 
 
 
@@ -152,6 +169,7 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
                 }
                 contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
                 file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                println(file.uri)
             }
         }
 

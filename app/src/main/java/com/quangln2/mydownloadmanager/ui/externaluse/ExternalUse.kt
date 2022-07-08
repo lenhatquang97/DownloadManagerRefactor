@@ -52,5 +52,8 @@ class ExternalUse {
         fun deletePermanentlyUseCase(context: Context): DeletePermanentlyUseCase{
             return DeletePermanentlyUseCase(getRepo(context))
         }
+        fun isFileExistingUseCase(context: Context): IsFileExistingUseCase{
+            return IsFileExistingUseCase(getRepo(context))
+        }
     }
 }

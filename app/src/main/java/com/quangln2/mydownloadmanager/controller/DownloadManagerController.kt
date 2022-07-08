@@ -109,18 +109,24 @@ object DownloadManagerController {
         }
     }
     fun resume(context: Context, id: String){
+
         val currentList = downloadList.value
         val index = currentList?.indexOfFirst { it.id == id }
         if(index != null && index != -1){
             val currentFile = currentList[index]
-            currentFile.bytesCopied = ExternalUse.getBytesFromExistingFileUseCase(context)(currentFile, context)
-            currentFile.downloadState = DownloadStatusState.DOWNLOADING
-            CoroutineScope(Dispatchers.Main).launch {
-                ExternalUse.downloadAFileUseCase(context)(currentFile, context).collect {
-                    _progressFile.value = it
+            val doesFileExist = ExternalUse.isFileExistingUseCase(context).invoke(currentFile, context)
+            if(doesFileExist){
+                currentFile.bytesCopied = ExternalUse.getBytesFromExistingFileUseCase(context)(currentFile, context)
+                currentFile.downloadState = DownloadStatusState.DOWNLOADING
+                CoroutineScope(Dispatchers.Main).launch {
+                    ExternalUse.downloadAFileUseCase(context)(currentFile, context).collect {
+                        _progressFile.value = it
+                    }
                 }
+            } else {
+                currentFile.downloadState = DownloadStatusState.FAILED
+                _progressFile.value = currentFile
             }
-
         }
     }
 
@@ -133,44 +139,59 @@ object DownloadManagerController {
         }
     }
     fun open(context: Context, item: StrucDownFile){
-        ExternalUse.openDownloadFileUseCase(context)(item,context)
+        val doesFileExist = ExternalUse.isFileExistingUseCase(context).invoke(item, context)
+        if(doesFileExist){
+            ExternalUse.openDownloadFileUseCase(context)(item,context)
+        }
+
     }
-
-
     fun filterList(downloadStatusState: String){
         if(downloadStatusState == DownloadStatusState.ALL.toString()){
-            _filterList.postValue(downloadList.value)
+            CoroutineScope(Dispatchers.IO).launch {
+                _filterList.postValue(downloadList.value?.toMutableList())
+            }
             return
         }
         val currentList = _downloadList.value
         if(currentList != null){
-            val newList = currentList.filter { it.downloadState.toString() == downloadStatusState }
-            _filterList.postValue(newList.toMutableList())
+            CoroutineScope(Dispatchers.IO).launch {
+                val newList = currentList.filter { it.downloadState.toString() == downloadStatusState }
+                _filterList.postValue(newList.toMutableList())
+            }
+
         }
     }
 
     fun filterCategories(categories: String){
         val currentList = _downloadList.value
         if(categories == "All"){
-            _filterList.postValue(currentList)
+            CoroutineScope(Dispatchers.IO).launch {
+                _filterList.postValue(currentList?.toMutableList())
+            }
             return
         }
         if(currentList != null){
-            val newList = currentList.filter { it.kindOf == categories }
-            _filterList.postValue(newList.toMutableList())
+            CoroutineScope(Dispatchers.IO).launch {
+                val newList = currentList.filter { it.kindOf == categories }
+                _filterList.postValue(newList.toMutableList())
+            }
+
         }
 
     }
     fun filterStartsWithNameCaseInsensitive(name: String){
         val currentList = _downloadList.value
         if(name == ""){
-            _filterList.postValue(currentList)
+            CoroutineScope(Dispatchers.IO).launch {
+                _filterList.postValue(currentList?.toMutableList())
+            }
             return
         }
         if(currentList != null){
-            val newList = currentList.filter { it.fileName.lowercase().startsWith(name.lowercase()) }
-            _filterList.postValue(newList.toMutableList())
-
+            CoroutineScope(Dispatchers.IO).launch {
+                val newList = currentList.filter { it.fileName.lowercase().startsWith(name.lowercase()) }
+                _filterList.postValue(newList.toMutableList())
+            }
         }
     }
     fun deleteFromList(context: Context, file: StrucDownFile){
