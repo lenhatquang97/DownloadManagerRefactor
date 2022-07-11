@@ -133,7 +133,7 @@ class HomeFragment : Fragment() {
                 }
                 binding.downloadLists.visibility = View.VISIBLE
                 adapterVal.submitList(it.toMutableList())
-                //To handle case that recyclerview does not rendering again
+                //To handle case that RecyclerView does not render again
                 if(binding.chip0.chipIcon != null){
                     viewModel.filterList(DownloadStatusState.ALL.toString())
                 }
