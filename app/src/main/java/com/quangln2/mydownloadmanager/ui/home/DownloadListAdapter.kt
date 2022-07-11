@@ -91,21 +91,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                 val popup = PopupMenu(wrapper, binding.moreButton)
                 popup.inflate(R.menu.viewholder_more_menu)
                 popup.setOnMenuItemClickListener {
-                    when(it.itemId){
-                        R.id.delete_from_list_option -> {
-                            DownloadManagerController.deleteFromList(context, item)
-                            binding.textView.text = ""
-                            true
-                        }
-                        R.id.delete_permanently_option -> {
-                            val onHandle = fun(flag: Boolean) {
-                                if(flag){ binding.textView.text = "" }
-                            }
-                            DownloadManagerController.deletePermanently(context, item, onHandle)
-                            true
-                        }
-                        else -> false
-                    }
+                    eventListener?.onHandleDelete(it, binding, item, context) ?: false
                 }
                 popup.show()
             }

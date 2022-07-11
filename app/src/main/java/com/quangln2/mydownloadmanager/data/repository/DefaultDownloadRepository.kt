@@ -3,7 +3,6 @@ package com.quangln2.mydownloadmanager.data.repository
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
@@ -28,7 +27,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.SecureRandom
 import java.util.*
+import javax.net.ssl.*
 
 
 class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadRepository {
@@ -94,9 +95,6 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
         return true
     }
 
-
-
-
     override fun addNewDownloadInfo(url: String, downloadTo: String, file: StrucDownFile) {
         file.id = UUID.randomUUID().toString()
         file.downloadLink = url
@@ -116,14 +114,20 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
         val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
         connection.doInput = true
         connection.doOutput = true
-        file.fileName = URLUtil.guessFileName(file.downloadLink, null, connection.contentType)
-        file.mimeType = if(connection.contentType == null) getMimeType(file.downloadLink) else connection.contentType
-        file.size = connection.contentLength.toLong()
-        file.kindOf = UIComponentUtil.defineTypeOfCategoriesBasedOnFileName(file.mimeType)
-        connection.disconnect()
+        connection.requestMethod = "GET"
+        try{
+            val responseCode = connection.responseCode
+            if(responseCode == 200){
+                file.fileName = URLUtil.guessFileName(file.downloadLink, null, connection.contentType)
+                file.mimeType = if(connection.contentType == null) getMimeType(file.downloadLink) else connection.contentType
+                file.size = connection.contentLength.toLong()
+                file.kindOf = UIComponentUtil.defineTypeOfCategoriesBasedOnFileName(file.mimeType)
+                connection.disconnect()
+            }
+        } catch (e: Exception){
+            //SSL Error
+        }
         return file
-
-
     }
     override fun getBytesFromExistingFile(file: StrucDownFile, context: Context): Long {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){

@@ -7,6 +7,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -68,13 +69,23 @@ class HomeFragment : Fragment() {
                 requireContext().startForegroundService(intent)
             }
 
-
-
-            override fun downloadAFileWithProgressBar(
-                binding: DownloadItemBinding,
-                item: StrucDownFile,
-                context: Context
-            ) {}
+            override fun onHandleDelete(menuItem: MenuItem, binding: DownloadItemBinding, item: StrucDownFile, context: Context): Boolean{
+                return when(menuItem.itemId){
+                    R.id.delete_from_list_option -> {
+                        viewModel.deleteFromList(context, item)
+                        binding.textView.text = ""
+                        true
+                    }
+                    R.id.delete_permanently_option -> {
+                        val onHandle = fun(flag: Boolean) {
+                            if(flag){ binding.textView.text = "" }
+                        }
+                        viewModel.deletePermanently(context, item, onHandle)
+                        true
+                    }
+                    else -> false
+                }
+            }
         }
 
 
@@ -100,7 +111,7 @@ class HomeFragment : Fragment() {
                 if (it.isNotEmpty()) {
                     binding.downloadLists.visibility = View.VISIBLE
                     binding.emptyDataParent.visibility = View.GONE
-                    DownloadManagerController._filterList.value = it
+                    viewModel._filterList.value = it
                 } else {
                     binding.emptyDataParent.visibility = View.VISIBLE
                     binding.downloadLists.visibility = View.GONE
@@ -108,7 +119,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        DownloadManagerController.filterList.observe(viewLifecycleOwner) {
+        viewModel.filterList.observe(viewLifecycleOwner) {
             it?.let {
                 if(it.isEmpty()){
                     binding.downloadLists.visibility = View.INVISIBLE
@@ -132,11 +143,11 @@ class HomeFragment : Fragment() {
                 override fun afterTextChanged(s: Editable?) {}
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    DownloadManagerController.filterStartsWithNameCaseInsensitive(s.toString())
+                    viewModel.filterStartsWithNameCaseInsensitive(s.toString())
                 }
             })
         binding.chip0.setOnClickListener {
-            DownloadManagerController.filterList(DownloadStatusState.ALL.toString())
+            viewModel.filterList(DownloadStatusState.ALL.toString())
 
             binding.chip0.chipIcon = ContextCompat.getDrawable(requireContext(),
                 R.drawable.ic_baseline_check_circle_outline_24)
@@ -147,7 +158,7 @@ class HomeFragment : Fragment() {
             binding.chip5.chipIcon = null
         }
         binding.chip1.setOnClickListener {
-            DownloadManagerController.filterList(DownloadStatusState.DOWNLOADING.toString())
+            viewModel.filterList(DownloadStatusState.DOWNLOADING.toString())
 
             binding.chip0.chipIcon = null
             binding.chip1.chipIcon = ContextCompat.getDrawable(requireContext(),
@@ -158,7 +169,7 @@ class HomeFragment : Fragment() {
             binding.chip5.chipIcon = null
         }
         binding.chip2.setOnClickListener {
-            DownloadManagerController.filterList(DownloadStatusState.FAILED.toString())
+            viewModel.filterList(DownloadStatusState.FAILED.toString())
 
             binding.chip0.chipIcon = null
             binding.chip1.chipIcon = null
@@ -169,7 +180,7 @@ class HomeFragment : Fragment() {
             binding.chip5.chipIcon = null
         }
         binding.chip3.setOnClickListener {
-            DownloadManagerController.filterList(DownloadStatusState.PAUSED.toString())
+            viewModel.filterList(DownloadStatusState.PAUSED.toString())
 
             binding.chip0.chipIcon = null
             binding.chip1.chipIcon = null
@@ -182,7 +193,7 @@ class HomeFragment : Fragment() {
 
         }
         binding.chip4.setOnClickListener {
-            DownloadManagerController.filterList(DownloadStatusState.COMPLETED.toString())
+            viewModel.filterList(DownloadStatusState.COMPLETED.toString())
 
             binding.chip0.chipIcon = null
             binding.chip1.chipIcon = null
@@ -195,7 +206,7 @@ class HomeFragment : Fragment() {
 
         }
         binding.chip5.setOnClickListener {
-            DownloadManagerController.filterList(DownloadStatusState.QUEUED.toString())
+            viewModel.filterList(DownloadStatusState.QUEUED.toString())
 
             binding.chip0.chipIcon = null
             binding.chip1.chipIcon = null
