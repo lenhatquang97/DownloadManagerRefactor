@@ -27,6 +27,9 @@ import com.quangln2.mydownloadmanager.listener.EventListener
 import com.quangln2.mydownloadmanager.service.DownloadService
 import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import com.quangln2.mydownloadmanager.util.LogicUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
@@ -52,12 +55,6 @@ class HomeFragment : Fragment() {
 
         val adapterVal = DownloadListAdapter(context!!)
         adapterVal.eventListener = object : EventListener{
-            override fun onFirstSetup(item: StrucDownFile) {
-                if(context != null){
-                    item.bytesCopied = ExternalUse.getBytesFromExistingFileUseCase(context!!)(item,context!!)
-                }
-            }
-
             override fun onOpenNotification(item: StrucDownFile, content: String, progress: Int) {
                 val intent = Intent(context, DownloadService::class.java)
                 intent.putExtra("fileName", LogicUtil.cutFileName(item.fileName))
@@ -68,7 +65,6 @@ class HomeFragment : Fragment() {
                 }
                 requireContext().startForegroundService(intent)
             }
-
             override fun onHandleDelete(menuItem: MenuItem, binding: DownloadItemBinding, item: StrucDownFile, context: Context): Boolean{
                 return when(menuItem.itemId){
                     R.id.delete_from_list_option -> {
@@ -86,8 +82,18 @@ class HomeFragment : Fragment() {
                     else -> false
                 }
             }
+            override fun onDownloadSuccess(binding: DownloadItemBinding, item: StrucDownFile, context: Context) {
+                item.downloadState = DownloadStatusState.COMPLETED
+                binding.stopButton.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
+                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                binding.downloadStateButton.setImageResource(R.drawable.ic_open)
+                CoroutineScope(Dispatchers.IO).launch {
+                    ExternalUse.updateToListUseCase(context)(item)
+                    ExternalUse.howManyFileDownloading -= 1
+                }
+            }
         }
-
 
         binding.downloadLists.apply {
             adapter = adapterVal
@@ -127,6 +133,10 @@ class HomeFragment : Fragment() {
                 }
                 binding.downloadLists.visibility = View.VISIBLE
                 adapterVal.submitList(it.toMutableList())
+                //To handle case that recyclerview does not rendering again
+                if(binding.chip0.chipIcon != null){
+                    viewModel.filterList(DownloadStatusState.ALL.toString())
+                }
             }
         }
 
@@ -135,9 +145,9 @@ class HomeFragment : Fragment() {
                 if(it.size != -1L){
                     adapterVal.updateProgress(it)
                 }
+
             }
         }
-
 
         binding.searchField.editText?.addTextChangedListener( object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {}

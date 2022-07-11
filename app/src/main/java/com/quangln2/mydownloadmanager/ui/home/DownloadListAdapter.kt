@@ -82,9 +82,7 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         downloadStateButton.setImageResource(R.drawable.ic_retry)
                     }
                 }
-                else -> {
-
-                }
+                else -> {}
             }
             binding.moreButton.setOnClickListener {
                 val wrapper = ContextThemeWrapper(context, R.style.MoreButtonFunction_PopupMenu)
@@ -95,7 +93,6 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                 }
                 popup.show()
             }
-
         }
         fun bind(item: StrucDownFile, context: Context){
             initialSetup(item)
@@ -122,16 +119,12 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         DownloadManagerController.retry(context, item)
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
                     }
-                    else -> {
-
-                    }
+                    else -> {}
                 }
-                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
-                Thread.sleep(100)
                 CoroutineScope(Dispatchers.IO).launch {
                     ExternalUse.updateToListUseCase(context)(item)
                 }
-                //(eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),binding.progressBar.progress)
+                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
             }
             binding.stopButton.setOnClickListener {
                 if(item.downloadState == DownloadStatusState.DOWNLOADING || item.downloadState == DownloadStatusState.PAUSED){
@@ -139,7 +132,6 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                     binding.progressBar.visibility = View.GONE
                     binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
                     binding.downloadStateButton.setImageResource(R.drawable.ic_retry)
-                    //(eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),binding.progressBar.progress)
                 }
             }
             if(item.downloadState == DownloadStatusState.DOWNLOADING){
@@ -151,24 +143,17 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                 val result = LogicUtil.calculateDownloadSpeed(seconds, startBytes, endBytes)
                 if(seconds > 1 && result > 0){
                     binding.textView.text = String.format("%.2f MB/s", result) + " - " + item.convertToSizeUnit() + " - " + item.downloadState.toString()
-                    //(eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),binding.progressBar.progress)
                     startBytes = endBytes
                     startTime = endTime
                 }
             }
+            if(item.downloadState == DownloadStatusState.FAILED){
+                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
+            }
+
 
             if (binding.progressBar.progress == 100) {
-                item.downloadState = DownloadStatusState.COMPLETED
-                binding.stopButton.visibility = View.GONE
-                binding.progressBar.visibility = View.GONE
-                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
-                binding.downloadStateButton.setImageResource(R.drawable.ic_open)
-                //(eventListener as EventListener).onOpenNotification(item,binding.textView.text.toString(),100)
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    ExternalUse.updateToListUseCase(context)(item)
-                    ExternalUse.howManyFileDownloading -= 1
-                }
+                eventListener?.onDownloadSuccess(binding, item, context)
             }
         }
 

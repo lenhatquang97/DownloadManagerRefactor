@@ -27,6 +27,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLConnection
 import java.security.SecureRandom
 import java.util.*
 import javax.net.ssl.*
@@ -192,47 +193,53 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
 
 
     }
-
-
     override fun downloadAFile(file: StrucDownFile, context: Context): Flow<StrucDownFile> = flow {
-        val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
-        connection.setRequestProperty("Range", "bytes=${file.bytesCopied}-")
-        connection.doInput = true
-        connection.doOutput = true
-        val inp = BufferedInputStream(connection.inputStream)
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-            if(file.uri == null){
-                return@flow
-            }
-            val out = context.contentResolver.openOutputStream(file.uri!!,"wa")
-            if (out != null) {
+        try{
+            val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
+            connection.setRequestProperty("Range", "bytes=${file.bytesCopied}-")
+            connection.doInput = true
+            connection.doOutput = true
+            val inp = BufferedInputStream(connection.inputStream)
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                if(file.uri == null){
+                    return@flow
+                }
+                val out = context.contentResolver.openOutputStream(file.uri!!,"wa")
+                if (out != null) {
+                    val data = ByteArray(1024)
+                    var x = inp.read(data,0,1024)
+                    while(x >= 0){
+                        out.write(data,0,x)
+                        file.bytesCopied += x
+                        emit(file)
+                        if(file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED){
+                            out.close()
+                            connection.disconnect()
+                            break
+                        }
+                        x = inp.read(data,0,1024)
+                    }
+                }
+            } else {
+                val fos = if (file.bytesCopied == 0L) FileOutputStream(file.downloadTo) else FileOutputStream(file.downloadTo, true)
                 val data = ByteArray(1024)
                 var x = inp.read(data,0,1024)
                 while(x >= 0){
-                    out.write(data,0,x)
+                    fos.write(data,0,x)
                     file.bytesCopied += x
                     emit(file)
                     if(file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED){
+                        fos.close()
+                        connection.disconnect()
                         break
                     }
                     x = inp.read(data,0,1024)
                 }
             }
-        } else {
-            val fos = if (file.bytesCopied == 0L) FileOutputStream(file.downloadTo) else FileOutputStream(file.downloadTo, true)
-            val data = ByteArray(1024)
-            var x = inp.read(data,0,1024)
-            while(x >= 0){
-                fos.write(data,0,x)
-                file.bytesCopied += x
-                emit(file)
-                if(file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED){
-                    break
-                }
-                x = inp.read(data,0,1024)
-            }
+        } catch(e: Exception){
+            emit(file.copy(downloadState = DownloadStatusState.FAILED))
         }
-        connection.disconnect()
+
     }.flowOn(Dispatchers.IO)
 
 
@@ -279,6 +286,8 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
     override suspend fun copyFile() {
 
     }
+
+
 
     override fun openDownloadFile(item: StrucDownFile, context: Context) {
         val intent = Intent(Intent.ACTION_VIEW)

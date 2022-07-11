@@ -92,7 +92,6 @@ object DownloadManagerController {
         }
     }
     fun resume(context: Context, id: String){
-
         val currentList = downloadList.value
         val index = currentList?.indexOfFirst { it.id == id }
         if(index != null && index != -1){
