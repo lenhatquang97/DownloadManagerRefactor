@@ -80,8 +80,8 @@ class AddToDownloadDialog: DialogFragment() {
             val isValidURL = URLUtil.isValidUrl(downloadLink)
             if(isValidURL){
                 binding.addNewDownloadFileButton.icon = progressIndicatorDrawable
-                DownloadManagerController.addNewDownloadInfo(requireContext(), downloadLink, binding.downloadToTextField.editText?.text.toString())
-                DownloadManagerController.fetchDownloadFileInfo(requireContext())
+                viewModel.addNewDownloadInfo(requireContext(), downloadLink, binding.downloadToTextField.editText?.text.toString())
+                viewModel.fetchDownloadFileInfo(requireContext())
                 viewModel._isOpenDialog.value = true
 
                 closeKeyboard(binding.linkTextField)
@@ -119,7 +119,7 @@ class AddToDownloadDialog: DialogFragment() {
                 .setIcon(R.drawable.ic_baseline_arrow_downward_24)
                 .setMessage(ConstantClass.DOWNLOAD_MESSAGE + file.convertToSizeUnit())
                 .setPositiveButton(ConstantClass.POSITIVE_BUTTON) { _, _ ->
-                    DownloadManagerController.downloadAFile(context)
+                    viewModel.downloadAFile(context)
                     dismiss()
                 }
                 .setNegativeButton(ConstantClass.NEGATIVE_BUTTON) { _, _ ->

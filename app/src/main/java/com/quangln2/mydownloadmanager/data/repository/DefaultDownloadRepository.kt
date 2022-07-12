@@ -15,7 +15,7 @@ import com.quangln2.mydownloadmanager.BuildConfig
 import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.data.database.DownloadDao
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
-import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
+import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.util.UIComponentUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,10 +28,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLConnection
-import java.security.SecureRandom
 import java.util.*
-import javax.net.ssl.*
 
 
 class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadRepository {

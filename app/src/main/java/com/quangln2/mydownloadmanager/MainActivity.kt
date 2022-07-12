@@ -8,11 +8,9 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.asLiveData
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -31,14 +29,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val navController by lazy { findNavController(R.id.nav_host_fragment_content_main) }
     private val viewModel: HomeViewModel by viewModels {
-        ViewModelFactory(DefaultDownloadRepository((application as DownloadManagerApplication).database.downloadDao()),applicationContext)
+        ViewModelFactory(DefaultDownloadRepository(DownloadManagerApplication.database.downloadDao()),applicationContext)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
-        DownloadManagerController.downloadListSchema = (application as DownloadManagerApplication).database.downloadDao().getAll().asLiveData()
+        DownloadManagerController.downloadListSchema = DownloadManagerApplication.database.downloadDao().getAll().asLiveData()
         viewModel.getDataFromDatabase()
 
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()

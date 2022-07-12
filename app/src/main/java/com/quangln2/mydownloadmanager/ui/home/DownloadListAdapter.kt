@@ -11,18 +11,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.quangln2.mydownloadmanager.R
-import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.databinding.DownloadItemBinding
 import com.quangln2.mydownloadmanager.listener.EventListener
-import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import com.quangln2.mydownloadmanager.util.LogicUtil
 import com.quangln2.mydownloadmanager.util.LogicUtil.Companion.cutFileName
 import com.quangln2.mydownloadmanager.util.UIComponentUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFile, DownloadListAdapter.DownloadItemViewHolder>(
@@ -99,11 +94,11 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
             binding.downloadStateButton.setOnClickListener {
                 when(item.downloadState){
                     DownloadStatusState.DOWNLOADING -> {
-                        DownloadManagerController.pause(item.id)
+                        eventListener?.onPause()
                         binding.downloadStateButton.setImageResource(R.drawable.ic_start)
                     }
                     DownloadStatusState.PAUSED -> {
-                        DownloadManagerController.resume(context, item.id)
+                        eventListener?.onResume()
                         binding.progressBar.progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
                     }
@@ -111,19 +106,17 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         item.downloadState = DownloadStatusState.COMPLETED
                         binding.stopButton.visibility = View.GONE
                         binding.downloadStateButton.setImageResource(R.drawable.ic_open)
-                        DownloadManagerController.open(context, item)
+                        eventListener?.onOpen()
                     }
                     DownloadStatusState.FAILED -> {
                         binding.progressBar.progress = 0
                         binding.progressBar.visibility = View.VISIBLE
-                        DownloadManagerController.retry(context, item)
+                        eventListener?.onRetry()
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
                     }
                     else -> {}
                 }
-                CoroutineScope(Dispatchers.IO).launch {
-                    ExternalUse.updateToListUseCase(context)(item)
-                }
+
                 binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
             }
             binding.stopButton.setOnClickListener {

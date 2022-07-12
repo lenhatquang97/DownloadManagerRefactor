@@ -9,12 +9,12 @@ import android.os.Bundle
 import android.os.IBinder
 import android.text.Editable
 import android.text.TextWatcher
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -24,18 +24,14 @@ import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
-import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.DownloadItemBinding
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
 import com.quangln2.mydownloadmanager.listener.EventListener
 import com.quangln2.mydownloadmanager.service.DownloadService
-import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import com.quangln2.mydownloadmanager.util.LogicUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
@@ -43,7 +39,7 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentFirstBinding
 
     private val viewModel: HomeViewModel by activityViewModels {
-        ViewModelFactory(DefaultDownloadRepository((activity?.application as DownloadManagerApplication).database.downloadDao()),requireContext())
+        ViewModelFactory(DefaultDownloadRepository(DownloadManagerApplication.database.downloadDao()),requireContext())
     }
 
     var downloadService: DownloadService? = null
@@ -105,8 +101,29 @@ class HomeFragment : Fragment() {
                 binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
                 binding.downloadStateButton.setImageResource(R.drawable.ic_open)
                 CoroutineScope(Dispatchers.IO).launch {
-                    ExternalUse.updateToListUseCase(context)(item)
-                    ExternalUse.howManyFileDownloading -= 1
+                    DownloadManagerApplication.downloadRepository.update(item)
+                }
+            }
+
+            override fun onPause() {
+                viewModel.pause(DownloadManagerController.progressFile.value?.id!!)
+            }
+
+            override fun onResume() {
+                viewModel.resume(requireContext(), DownloadManagerController.progressFile.value?.id!!)
+            }
+
+            override fun onOpen() {
+                viewModel.open(requireContext(), DownloadManagerController.progressFile.value!!)
+            }
+
+            override fun onRetry() {
+                viewModel.retry(requireContext(), DownloadManagerController.progressFile.value!!)
+            }
+
+            override fun onUpdateToDatabase() {
+                CoroutineScope(Dispatchers.IO).launch {
+                    viewModel.update(DownloadManagerController.progressFile.value!!)
                 }
             }
         }

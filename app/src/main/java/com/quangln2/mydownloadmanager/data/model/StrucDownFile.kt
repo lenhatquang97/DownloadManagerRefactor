@@ -1,7 +1,9 @@
 package com.quangln2.mydownloadmanager.data.model
 
 import android.net.Uri
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 

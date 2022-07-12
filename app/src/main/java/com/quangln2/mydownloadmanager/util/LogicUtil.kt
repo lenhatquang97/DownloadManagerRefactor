@@ -3,7 +3,6 @@ package com.quangln2.mydownloadmanager.util
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 
 
