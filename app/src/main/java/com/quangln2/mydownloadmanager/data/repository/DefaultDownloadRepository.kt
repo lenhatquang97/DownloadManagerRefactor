@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.content.FileProvider
 import com.quangln2.mydownloadmanager.BuildConfig
+import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.data.database.DownloadDao
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.*
@@ -101,6 +102,7 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
         file.downloadLink = url
         file.downloadTo = downloadTo
         file.bytesCopied = 0
+        println(file.downloadLink)
     }
     private fun getMimeType(url: String?): String {
         var type = "*/*"
@@ -124,11 +126,20 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
                 file.size = connection.contentLength.toLong()
                 file.kindOf = UIComponentUtil.defineTypeOfCategoriesBasedOnFileName(file.mimeType)
                 connection.disconnect()
+                return file
+            } else{
+                val initFile = ServiceLocator.initializeStrucDownFile()
+                file.fileName = initFile.fileName
+                file.size = initFile.size
+                return initFile
             }
         } catch (e: Exception){
-            //SSL Error
+            val initFile = ServiceLocator.initializeStrucDownFile()
+            file.fileName = initFile.fileName
+            file.size = initFile.size
+            return initFile
         }
-        return file
+
     }
     override fun getBytesFromExistingFile(file: StrucDownFile, context: Context): Long {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){

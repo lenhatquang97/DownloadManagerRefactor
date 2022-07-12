@@ -83,6 +83,7 @@ class AddToDownloadDialog: DialogFragment() {
                 DownloadManagerController.addNewDownloadInfo(requireContext(), downloadLink, binding.downloadToTextField.editText?.text.toString())
                 DownloadManagerController.fetchDownloadFileInfo(requireContext())
                 viewModel._isOpenDialog.value = true
+
                 closeKeyboard(binding.linkTextField)
             }
             else {
