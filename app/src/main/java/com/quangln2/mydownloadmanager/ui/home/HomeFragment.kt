@@ -1,8 +1,12 @@
 package com.quangln2.mydownloadmanager.ui.home
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
+import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.fragment.app.Fragment
@@ -20,6 +24,7 @@ import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
+import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.DownloadItemBinding
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
@@ -29,6 +34,8 @@ import com.quangln2.mydownloadmanager.ui.externaluse.ExternalUse
 import com.quangln2.mydownloadmanager.util.LogicUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
@@ -39,6 +46,25 @@ class HomeFragment : Fragment() {
         ViewModelFactory(DefaultDownloadRepository((activity?.application as DownloadManagerApplication).database.downloadDao()),requireContext())
     }
 
+    var downloadService: DownloadService? = null
+    var isBound = false
+    private val connection = object : ServiceConnection{
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as DownloadService.MyLocalBinder
+            downloadService = binder.getService()
+            isBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isBound = false
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val intent = Intent(requireContext(), DownloadService::class.java)
+        requireContext().bindService(intent, connection, Context.BIND_AUTO_CREATE)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,19 +78,9 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         val adapterVal = DownloadListAdapter(context!!)
         adapterVal.eventListener = object : EventListener{
-            override fun onOpenNotification(item: StrucDownFile, content: String, progress: Int) {
-                val intent = Intent(context, DownloadService::class.java)
-                intent.putExtra("fileName", LogicUtil.cutFileName(item.fileName))
-                intent.putExtra("content", content)
-                intent.putExtra("id", item.id.hashCode())
-                if(progress != -1){
-                    intent.putExtra("progress", progress)
-                }
-                requireContext().startForegroundService(intent)
-            }
+
             override fun onHandleDelete(menuItem: MenuItem, binding: DownloadItemBinding, item: StrucDownFile, context: Context): Boolean{
                 return when(menuItem.itemId){
                     R.id.delete_from_list_option -> {
@@ -144,8 +160,13 @@ class HomeFragment : Fragment() {
             it?.let {
                 if(it.size != -1L){
                     adapterVal.updateProgress(it)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
+                        if(progress % 5 == 0){
+                            onOpenNotification(it)
+                        }
+                    }
                 }
-
             }
         }
 
@@ -156,6 +177,9 @@ class HomeFragment : Fragment() {
                     viewModel.filterStartsWithNameCaseInsensitive(s.toString())
                 }
             })
+
+
+
         binding.chip0.setOnClickListener {
             viewModel.filterList(DownloadStatusState.ALL.toString())
 
@@ -225,7 +249,29 @@ class HomeFragment : Fragment() {
             binding.chip4.chipIcon = null
             binding.chip5.chipIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_check_circle_outline_24)
 
-
         }
     }
+    private fun onOpenNotification(item: StrucDownFile) {
+        val intent = Intent(context, DownloadService::class.java)
+        val progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100).toInt()
+
+        intent.putExtra("fileName", LogicUtil.cutFileName(item.fileName))
+        intent.putExtra("content", item.downloadState.toString())
+        intent.putExtra("id", item.id.hashCode())
+        if(progress != -1) intent.putExtra("progress", progress)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            requireContext().startForegroundService(intent)
+        } else {
+            requireContext().startService(intent)
+        }
+    }
+    override fun onStop() {
+        super.onStop()
+        if (isBound) {
+            requireContext().unbindService(connection)
+            isBound = false
+        }
+    }
+
 }

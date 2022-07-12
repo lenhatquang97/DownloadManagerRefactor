@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         DownloadManagerController.downloadListSchema = (application as DownloadManagerApplication).database.downloadDao().getAll().asLiveData()
-
         viewModel.getDataFromDatabase()
 
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()

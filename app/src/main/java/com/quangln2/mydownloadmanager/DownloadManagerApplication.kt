@@ -6,10 +6,16 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.core.content.ContextCompat
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.database.DownloadDatabase
 
 class DownloadManagerApplication : Application() {
+    companion object{
+        val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+    }
     val database by lazy{ DownloadDatabase.getDatabase(this)}
     val downloadRepository by lazy{ServiceLocator.provideDownloadRepository(database.downloadDao())}
     override fun onCreate() {

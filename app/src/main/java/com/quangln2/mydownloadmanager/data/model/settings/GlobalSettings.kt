@@ -1,25 +1,58 @@
 package com.quangln2.mydownloadmanager.data.model.settings
 
+import android.content.Context
 import android.os.Build
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.quangln2.mydownloadmanager.DownloadManagerApplication.Companion.dataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 object GlobalSettings {
-    var isVibrated = false
-    var showOnLockScreen = false
-    var showPopUpMessage = false
-    var folderPath = "/storage/emulated/0/Download"
-
-    fun changeFolderPath(path: String){
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
-            folderPath = path
+    //Vibration
+    private val IS_VIBRATED = booleanPreferencesKey("isVibrated")
+    val getVibrated : (Context) -> Flow<Boolean> = {
+        it.dataStore.data.map {
+            it[IS_VIBRATED] ?: false
         }
     }
-    fun openCloseLockScreen(){
-        showOnLockScreen = !showOnLockScreen
+    suspend fun setVibrated(context: Context, isVibrated: Boolean) {
+        context.dataStore.edit {
+            it[IS_VIBRATED] = isVibrated
+        }
     }
-    fun openCloseVibrated(){
-        isVibrated = !isVibrated
+
+    //Show on lock screen
+    private val SHOW_ON_LOCK_SCREEN = booleanPreferencesKey("showOnLockScreen")
+    val getShowOnLockScreen : (Context) -> Flow<Boolean> = {
+        it.dataStore.data.map {
+            it[SHOW_ON_LOCK_SCREEN] ?: false
+        }
     }
-    fun openClosePopUpMessage(){
-        showPopUpMessage = !showPopUpMessage
+    suspend fun setShowOnLockScreen(context: Context, isShown: Boolean) {
+        context.dataStore.edit {
+            it[SHOW_ON_LOCK_SCREEN] = isShown
+        }
     }
+
+    //Pop up message
+    private val POP_UP_MESSAGE = booleanPreferencesKey("popUpMessage")
+    val getPopUpMessage : (Context) -> Flow<Boolean> = {
+        it.dataStore.data.map {
+            it[POP_UP_MESSAGE] ?: false
+        }
+    }
+    suspend fun setPopUpMessage(context: Context, isPopped: Boolean) {
+        context.dataStore.edit {
+            it[POP_UP_MESSAGE] = isPopped
+        }
+    }
+
+
+
+
+
+
 }
