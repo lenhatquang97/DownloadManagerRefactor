@@ -39,7 +39,7 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentFirstBinding
 
     private val viewModel: HomeViewModel by activityViewModels {
-        ViewModelFactory(DefaultDownloadRepository(DownloadManagerApplication.database.downloadDao()),requireContext())
+        ViewModelFactory(DefaultDownloadRepository(DownloadManagerApplication.database.downloadDao()))
     }
 
     var downloadService: DownloadService? = null
@@ -80,7 +80,7 @@ class HomeFragment : Fragment() {
             override fun onHandleDelete(menuItem: MenuItem, binding: DownloadItemBinding, item: StrucDownFile, context: Context): Boolean{
                 return when(menuItem.itemId){
                     R.id.delete_from_list_option -> {
-                        viewModel.deleteFromList(context, item)
+                        viewModel.deleteFromList(item)
                         binding.textView.text = ""
                         true
                     }

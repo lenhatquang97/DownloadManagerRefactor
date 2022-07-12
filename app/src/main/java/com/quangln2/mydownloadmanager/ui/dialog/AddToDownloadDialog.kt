@@ -39,7 +39,7 @@ class AddToDownloadDialog: DialogFragment() {
 
     private val database by lazy{ DownloadDatabase.getDatabase(requireContext())}
     val downloadRepository by lazy{ ServiceLocator.provideDownloadRepository(database.downloadDao())}
-    private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(database.downloadDao()), requireContext()) }
+    private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(database.downloadDao())) }
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -80,8 +80,8 @@ class AddToDownloadDialog: DialogFragment() {
             val isValidURL = URLUtil.isValidUrl(downloadLink)
             if(isValidURL){
                 binding.addNewDownloadFileButton.icon = progressIndicatorDrawable
-                viewModel.addNewDownloadInfo(requireContext(), downloadLink, binding.downloadToTextField.editText?.text.toString())
-                viewModel.fetchDownloadFileInfo(requireContext())
+                viewModel.addNewDownloadInfo(downloadLink, binding.downloadToTextField.editText?.text.toString())
+                viewModel.fetchDownloadFileInfo()
                 viewModel._isOpenDialog.value = true
 
                 closeKeyboard(binding.linkTextField)

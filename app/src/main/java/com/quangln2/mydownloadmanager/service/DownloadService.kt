@@ -11,17 +11,14 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.quangln2.mydownloadmanager.MainActivity
 import com.quangln2.mydownloadmanager.R
-import com.quangln2.mydownloadmanager.ServiceLocator
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.util.LogicUtil
 
 
 class DownloadService : Service() {
     private val CHANNEL_ID = "download_notification"
     private val binder = MyLocalBinder()
-    private var file: StrucDownFile = ServiceLocator.initializeStrucDownFile()
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         return binder
     }
     inner class MyLocalBinder : Binder() {
@@ -61,16 +58,19 @@ class DownloadService : Service() {
                     .setGroup(CHANNEL_ID)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 val manager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                if(progress == -1){
+            when (progress) {
+                -1 -> {
                     manager.notify(id, builder.build())
-                } else if(progress == 100){
+                }
+                100 -> {
                     builder.setContentIntent(resultPendingIntent)
                     manager.notify(id, builder.build())
                 }
-                else {
+                else -> {
                     builder.setProgress(100, progress, false)
                     manager.notify(id, builder.build())
                 }
+            }
 
         }
         return START_NOT_STICKY

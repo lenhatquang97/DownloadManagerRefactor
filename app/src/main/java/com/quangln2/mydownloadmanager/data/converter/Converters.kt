@@ -7,12 +7,12 @@ import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusSt
 class Converters {
     @TypeConverter
     fun convertDownloadState(value: String): DownloadStatusState {
-        when(value){
-            DownloadStatusState.DOWNLOADING.toString() -> return DownloadStatusState.DOWNLOADING
-            DownloadStatusState.PAUSED.toString() -> return DownloadStatusState.PAUSED
-            DownloadStatusState.COMPLETED.toString() -> return DownloadStatusState.COMPLETED
-            DownloadStatusState.FAILED.toString() -> return DownloadStatusState.FAILED
-            else -> return DownloadStatusState.QUEUED
+        return when(value){
+            DownloadStatusState.DOWNLOADING.toString() -> DownloadStatusState.DOWNLOADING
+            DownloadStatusState.PAUSED.toString() -> DownloadStatusState.PAUSED
+            DownloadStatusState.COMPLETED.toString() -> DownloadStatusState.COMPLETED
+            DownloadStatusState.FAILED.toString() -> DownloadStatusState.FAILED
+            else -> DownloadStatusState.QUEUED
         }
     }
 

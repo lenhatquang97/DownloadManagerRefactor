@@ -117,18 +117,18 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
         connection.requestMethod = "GET"
         try{
             val responseCode = connection.responseCode
-            if(responseCode == 200){
+            return if(responseCode == 200){
                 file.fileName = URLUtil.guessFileName(file.downloadLink, null, connection.contentType)
                 file.mimeType = if(connection.contentType == null) getMimeType(file.downloadLink) else connection.contentType
                 file.size = connection.contentLength.toLong()
                 file.kindOf = UIComponentUtil.defineTypeOfCategoriesBasedOnFileName(file.mimeType)
                 connection.disconnect()
-                return file
+                file
             } else{
                 val initFile = ServiceLocator.initializeStrucDownFile()
                 file.fileName = initFile.fileName
                 file.size = initFile.size
-                return initFile
+                initFile
             }
         } catch (e: Exception){
             val initFile = ServiceLocator.initializeStrucDownFile()
@@ -307,7 +307,7 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
             if(file.exists()){
                 val uri = FileProvider.getUriForFile(
                     context,
-                    BuildConfig.APPLICATION_ID.toString() + ".provider",
+                    BuildConfig.APPLICATION_ID + ".provider",
                     file
                 )
                 intent.setDataAndType(uri, item.mimeType)

@@ -1,6 +1,5 @@
 package com.quangln2.mydownloadmanager
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.quangln2.mydownloadmanager.data.repository.DownloadRepository
@@ -9,8 +8,7 @@ import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory constructor(
-    private val downloadRepository: DownloadRepository,
-    private val context: Context
+    private val downloadRepository: DownloadRepository
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>) =
         with(modelClass) {

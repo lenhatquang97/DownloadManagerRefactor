@@ -99,7 +99,7 @@ class HomeViewModel(
             }
         }
     }
-    fun deleteFromList(context: Context, file: StrucDownFile){
+    fun deleteFromList(file: StrucDownFile){
         CoroutineScope(Dispatchers.IO).launch {
 
             deleteFromListUseCase(file)
@@ -135,13 +135,13 @@ class HomeViewModel(
     }
 
 
-    fun addNewDownloadInfo(context: Context, url: String, downloadTo: String){
+    fun addNewDownloadInfo(url: String, downloadTo: String){
         if(DownloadManagerController._inputItem.value != null){
             addNewDownloadInfo(url, downloadTo, DownloadManagerController._inputItem.value!!)
         }
     }
 
-    fun fetchDownloadFileInfo(context: Context){
+    fun fetchDownloadFileInfo(){
         val file = DownloadManagerController.inputItem.value
         CoroutineScope(Dispatchers.IO).launch{
             if(file != null){
