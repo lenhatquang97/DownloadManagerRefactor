@@ -16,8 +16,9 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.recyclerview.widget.RecyclerView.ItemAnimator
 import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.ViewModelFactory
@@ -33,6 +34,7 @@ import com.quangln2.mydownloadmanager.util.LogicUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
 
 class HomeFragment : Fragment() {
 
@@ -128,11 +130,16 @@ class HomeFragment : Fragment() {
             }
         }
 
+        val animator: ItemAnimator = binding.downloadLists.itemAnimator!! // your recycler view here
+        if (animator is DefaultItemAnimator) {
+            (animator as DefaultItemAnimator).supportsChangeAnimations = false
+        }
+
         binding.downloadLists.apply {
             adapter = adapterVal
             layoutManager = LinearLayoutManager(context)
         }
-        (binding.downloadLists.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+//        (binding.downloadLists.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         DownloadManagerController.downloadListSchema?.observe(viewLifecycleOwner) {
             it?.let {
@@ -148,12 +155,8 @@ class HomeFragment : Fragment() {
         DownloadManagerController.downloadList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
-                    binding.downloadLists.visibility = View.VISIBLE
-                    binding.emptyDataParent.visibility = View.GONE
+                    binding.chip0.performClick()
                     viewModel._filterList.value = it
-                } else {
-                    binding.emptyDataParent.visibility = View.VISIBLE
-                    binding.downloadLists.visibility = View.GONE
                 }
             }
         }
@@ -162,14 +165,17 @@ class HomeFragment : Fragment() {
             it?.let {
                 if(it.isEmpty()){
                     binding.downloadLists.visibility = View.INVISIBLE
+                    binding.emptyDataParent.visibility = View.VISIBLE
                     return@observe
+                } else {
+                    binding.downloadLists.visibility = View.VISIBLE
+                    binding.emptyDataParent.visibility = View.GONE
+                    adapterVal.submitList(it.toMutableList())
+                    if(binding.chip0.chipIcon != null){
+                        viewModel.filterList(DownloadStatusState.ALL.toString())
+                    }
                 }
-                binding.downloadLists.visibility = View.VISIBLE
-                adapterVal.submitList(it.toMutableList())
-                //To handle case that RecyclerView does not render again
-                if(binding.chip0.chipIcon != null){
-                    viewModel.filterList(DownloadStatusState.ALL.toString())
-                }
+
             }
         }
 
@@ -179,9 +185,12 @@ class HomeFragment : Fragment() {
                     adapterVal.updateProgress(it)
                     CoroutineScope(Dispatchers.IO).launch {
                         val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
-                        if(progress % 5 == 0){
-                            onOpenNotification(it)
+                        println(progress)
+                        if(progress == 100) {
+                            it.downloadState = DownloadStatusState.COMPLETED
+                            DownloadManagerApplication.downloadRepository.update(it)
                         }
+                        onOpenNotification(it)
                     }
                 }
             }
@@ -275,7 +284,7 @@ class HomeFragment : Fragment() {
         intent.putExtra("fileName", LogicUtil.cutFileName(item.fileName))
         intent.putExtra("content", item.downloadState.toString())
         intent.putExtra("id", item.id.hashCode())
-        if(progress != -1) intent.putExtra("progress", progress)
+        if(progress != -1 && progress != 100) intent.putExtra("progress", progress)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             requireContext().startForegroundService(intent)

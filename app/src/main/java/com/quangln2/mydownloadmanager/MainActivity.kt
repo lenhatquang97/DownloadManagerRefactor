@@ -66,6 +66,21 @@ class MainActivity : AppCompatActivity() {
             setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24)
         }
 
+//        viewModel.filterList.observe(this) {
+//            if(it.isNotEmpty()){
+//                when (binding.navView.checkedItem?.itemId) {
+//                    R.id.all -> viewModel.filterCategories("All")
+//                    R.id.compressed -> viewModel.filterCategories("Compressed")
+//                    R.id.documents -> viewModel.filterCategories("Documents")
+//                    R.id.packages -> viewModel.filterCategories("Packages")
+//                    R.id.music -> viewModel.filterCategories("Music")
+//                    R.id.video -> viewModel.filterCategories("Video")
+//                    R.id.others -> viewModel.filterCategories("Others")
+//                }
+//            }
+//        }
+
+
         binding.navView.setNavigationItemSelectedListener {
             when(it.itemId){
                 R.id.all -> viewModel.filterCategories("All")

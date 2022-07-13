@@ -19,9 +19,7 @@ import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusSt
 import com.quangln2.mydownloadmanager.util.UIComponentUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.BufferedInputStream
 import java.io.File
@@ -248,7 +246,7 @@ class DefaultDownloadRepository(private val downloadDao: DownloadDao): DownloadR
             emit(file.copy(downloadState = DownloadStatusState.FAILED))
         }
 
-    }.flowOn(Dispatchers.IO)
+    }.debounce(50).flowOn(Dispatchers.IO)
 
 
     override fun resumeDownload(file: StrucDownFile) {

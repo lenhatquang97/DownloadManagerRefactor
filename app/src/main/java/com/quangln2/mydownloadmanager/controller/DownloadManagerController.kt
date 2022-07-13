@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
 
 object DownloadManagerController {
     var downloadListSchema: LiveData<List<StrucDownFile>>? = null

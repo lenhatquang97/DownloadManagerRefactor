@@ -144,8 +144,8 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                 binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
             }
 
-
-            if (binding.progressBar.progress == 100) {
+            val progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100).toInt()
+            if (progress == 100) {
                 eventListener?.onDownloadSuccess(binding, item, context)
             }
         }
