@@ -36,7 +36,9 @@ import com.quangln2.mydownloadmanager.service.DownloadService
 import com.quangln2.mydownloadmanager.util.LogicUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class HomeFragment : Fragment() {
@@ -108,11 +110,14 @@ class HomeFragment : Fragment() {
                 CoroutineScope(Dispatchers.IO).launch {
                     DownloadManagerApplication.downloadRepository.update(item)
                     onOpenNotification(item)
+                    withContext(Dispatchers.Main){
+                        GlobalSettings.getVibrated(context).collect {
+                            if(it) viewModel.vibratePhone(context)
+                        }
+                    }
                 }
-                val isVibrated = GlobalSettings.getVibrated(context).value
-                if(isVibrated != null && isVibrated == true){
-                    viewModel.vibratePhone(context)
-                }
+
+
             }
 
             override fun onPause() {

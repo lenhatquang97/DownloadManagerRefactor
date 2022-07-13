@@ -254,7 +254,7 @@ class HomeViewModel(
             @Suppress("DEPRECATION")
             context.getSystemService(VIBRATOR_SERVICE) as Vibrator
         }
-        vib?.let {
+        vib.let {
             if (Build.VERSION.SDK_INT >= 26) {
                 it.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
             } else {

@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asLiveData
 import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
 import com.quangln2.mydownloadmanager.databinding.FragmentSecondBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 /**
@@ -25,7 +27,11 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.popUpMessagesSwitch.apply {
-            isChecked = GlobalSettings.getPopUpMessage(requireContext()).value!!
+            CoroutineScope(Dispatchers.Main).launch {
+                GlobalSettings.getPopUpMessage(requireContext()).collect {
+                    isChecked = it
+                }
+            }
             setOnClickListener {
                 CoroutineScope(Dispatchers.IO).launch {
                     GlobalSettings.setPopUpMessage(requireContext(), isChecked)
@@ -34,7 +40,11 @@ class SettingsFragment : Fragment() {
         }
 
         binding.showValueSwitch.apply {
-            isChecked = GlobalSettings.getShowOnLockScreen(requireContext()).value!!
+            CoroutineScope(Dispatchers.Main).launch {
+                GlobalSettings.getShowOnLockScreen(requireContext()).collect {
+                    isChecked = it
+                }
+            }
             setOnClickListener {
                 CoroutineScope(Dispatchers.IO).launch {
                     GlobalSettings.setShowOnLockScreen(requireContext(), isChecked)
@@ -43,10 +53,14 @@ class SettingsFragment : Fragment() {
         }
 
         binding.vibrationSwitch.apply {
-            isChecked = GlobalSettings.getVibrated(requireContext()).value!!
+            CoroutineScope(Dispatchers.Main).launch {
+                GlobalSettings.getVibrated(requireContext()).collect {
+                    isChecked = it
+                }
+            }
             setOnClickListener {
                 CoroutineScope(Dispatchers.IO).launch {
-                    GlobalSettings.setVibrated(requireContext(), isChecked)
+                    GlobalSettings.setVibrated(requireContext(), !isChecked)
                 }
             }
         }
