@@ -1,28 +1,16 @@
-package com.quangln2.mydownloadmanager.data.repository
+package com.quangln2.mydownloadmanager.data.datasource
 
 import android.content.Context
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import kotlinx.coroutines.flow.Flow
 
-interface DownloadRepository {
+interface RemoteDataSource {
     fun addNewDownloadInfo(url: String, downloadTo: String, file: StrucDownFile)
     fun fetchDownloadInfo(file: StrucDownFile): StrucDownFile
-    fun writeToFileAPI29Above(file: StrucDownFile, context: Context)
-    fun writeToFileAPI29Below(file: StrucDownFile)
     fun downloadAFile(file: StrucDownFile, context: Context): Flow<StrucDownFile>
-
     fun resumeDownload(file: StrucDownFile)
     fun pauseDownload(file: StrucDownFile)
     fun stopDownload(file: StrucDownFile)
     fun retryDownload(file: StrucDownFile, context: Context)
     fun queueDownload(file: StrucDownFile)
-
-    suspend fun copyFile()
-    fun openDownloadFile(item: StrucDownFile, context: Context)
-
-    suspend fun insert(strucDownFile: StrucDownFile)
-    suspend fun update(strucDownFile: StrucDownFile)
-    suspend fun deleteFromList(strucDownFile: StrucDownFile)
-    suspend fun deletePermanently(file: StrucDownFile, context: Context)
-
 }

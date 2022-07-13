@@ -23,8 +23,11 @@ import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
+import com.quangln2.mydownloadmanager.data.datasource.LocalDataSourceImpl
+import com.quangln2.mydownloadmanager.data.datasource.RemoteDataSourceImpl
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
+import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.DownloadItemBinding
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
@@ -41,7 +44,7 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentFirstBinding
 
     private val viewModel: HomeViewModel by activityViewModels {
-        ViewModelFactory(DefaultDownloadRepository(DownloadManagerApplication.database.downloadDao()))
+        ViewModelFactory(DefaultDownloadRepository(DownloadManagerApplication.database.downloadDao(), LocalDataSourceImpl(), RemoteDataSourceImpl()))
     }
 
     var downloadService: DownloadService? = null
@@ -104,6 +107,11 @@ class HomeFragment : Fragment() {
                 binding.downloadStateButton.setImageResource(R.drawable.ic_open)
                 CoroutineScope(Dispatchers.IO).launch {
                     DownloadManagerApplication.downloadRepository.update(item)
+                    onOpenNotification(item)
+                }
+                val isVibrated = GlobalSettings.getVibrated(context).value
+                if(isVibrated != null && isVibrated == true){
+                    viewModel.vibratePhone(context)
                 }
             }
 
@@ -132,7 +140,7 @@ class HomeFragment : Fragment() {
 
         val animator: ItemAnimator = binding.downloadLists.itemAnimator!! // your recycler view here
         if (animator is DefaultItemAnimator) {
-            (animator as DefaultItemAnimator).supportsChangeAnimations = false
+            animator.supportsChangeAnimations = false
         }
 
         binding.downloadLists.apply {
@@ -166,15 +174,12 @@ class HomeFragment : Fragment() {
                 if(it.isEmpty()){
                     binding.downloadLists.visibility = View.INVISIBLE
                     binding.emptyDataParent.visibility = View.VISIBLE
-                    return@observe
                 } else {
                     binding.downloadLists.visibility = View.VISIBLE
                     binding.emptyDataParent.visibility = View.GONE
                     adapterVal.submitList(it.toMutableList())
-                    if(binding.chip0.chipIcon != null){
-                        viewModel.filterList(DownloadStatusState.ALL.toString())
-                    }
                 }
+                return@observe
 
             }
         }

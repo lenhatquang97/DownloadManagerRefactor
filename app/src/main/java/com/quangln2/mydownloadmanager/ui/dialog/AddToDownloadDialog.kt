@@ -26,6 +26,8 @@ import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.database.DownloadDatabase
+import com.quangln2.mydownloadmanager.data.datasource.LocalDataSourceImpl
+import com.quangln2.mydownloadmanager.data.datasource.RemoteDataSourceImpl
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
@@ -39,7 +41,7 @@ class AddToDownloadDialog: DialogFragment() {
 
     private val database by lazy{ DownloadDatabase.getDatabase(requireContext())}
     val downloadRepository by lazy{ ServiceLocator.provideDownloadRepository(database.downloadDao())}
-    private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(database.downloadDao())) }
+    private val viewModel: HomeViewModel by activityViewModels { ViewModelFactory(DefaultDownloadRepository(database.downloadDao(), LocalDataSourceImpl(), RemoteDataSourceImpl())) }
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)

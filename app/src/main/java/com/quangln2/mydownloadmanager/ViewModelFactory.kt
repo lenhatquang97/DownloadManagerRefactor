@@ -24,8 +24,6 @@ class ViewModelFactory constructor(
                         InsertToListUseCase(downloadRepository),
                         DownloadAFileUseCase(downloadRepository),
                         RetryDownloadUseCase(downloadRepository),
-                        IsFileExistingUseCase(downloadRepository),
-                        GetBytesFromExistingFileUseCase(downloadRepository),
                         OpenDownloadFileUseCase(downloadRepository),
                         UpdateToListUseCase(downloadRepository)
                     )

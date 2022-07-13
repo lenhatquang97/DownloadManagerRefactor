@@ -10,7 +10,6 @@ import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
 import com.quangln2.mydownloadmanager.databinding.FragmentSecondBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 /**
@@ -26,11 +25,7 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.popUpMessagesSwitch.apply {
-            CoroutineScope(Dispatchers.Main).launch {
-                GlobalSettings.getPopUpMessage(requireContext()).collect {
-                    isChecked = it
-                }
-            }
+            isChecked = GlobalSettings.getPopUpMessage(requireContext()).value!!
             setOnClickListener {
                 CoroutineScope(Dispatchers.IO).launch {
                     GlobalSettings.setPopUpMessage(requireContext(), isChecked)
@@ -39,11 +34,7 @@ class SettingsFragment : Fragment() {
         }
 
         binding.showValueSwitch.apply {
-            CoroutineScope(Dispatchers.Main).launch {
-                GlobalSettings.getShowOnLockScreen(requireContext()).collect {
-                    isChecked = it
-                }
-            }
+            isChecked = GlobalSettings.getShowOnLockScreen(requireContext()).value!!
             setOnClickListener {
                 CoroutineScope(Dispatchers.IO).launch {
                     GlobalSettings.setShowOnLockScreen(requireContext(), isChecked)
@@ -52,11 +43,7 @@ class SettingsFragment : Fragment() {
         }
 
         binding.vibrationSwitch.apply {
-            CoroutineScope(Dispatchers.Main).launch {
-                GlobalSettings.getVibrated(requireContext()).collect {
-                    isChecked = it
-                }
-            }
+            isChecked = GlobalSettings.getVibrated(requireContext()).value!!
             setOnClickListener {
                 CoroutineScope(Dispatchers.IO).launch {
                     GlobalSettings.setVibrated(requireContext(), isChecked)
