@@ -112,7 +112,7 @@ class HomeFragment : Fragment() {
                     onOpenNotification(item)
                     withContext(Dispatchers.Main){
                         GlobalSettings.getVibrated(context).collect {
-                            if(it) viewModel.vibratePhone(context)
+                            if (it) viewModel.vibratePhone(context)
                         }
                     }
                 }
