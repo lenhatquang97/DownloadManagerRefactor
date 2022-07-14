@@ -26,7 +26,6 @@ import com.quangln2.mydownloadmanager.ui.dialog.AddToDownloadDialog
 import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private val navController by lazy { findNavController(R.id.nav_host_fragment_content_main) }

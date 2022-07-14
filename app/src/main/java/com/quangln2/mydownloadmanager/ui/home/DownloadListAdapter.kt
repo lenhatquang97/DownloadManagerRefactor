@@ -20,20 +20,24 @@ import com.quangln2.mydownloadmanager.util.LogicUtil.Companion.cutFileName
 import com.quangln2.mydownloadmanager.util.UIComponentUtil
 import java.util.concurrent.Executors
 
-class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFile, DownloadListAdapter.DownloadItemViewHolder>(
-    AsyncDifferConfig.Builder(DownloadListDiffCallback()).setBackgroundThreadExecutor(Executors.newSingleThreadExecutor())
-        .build()
-) {
+class DownloadListAdapter(private var context: Context) :
+    ListAdapter<StrucDownFile, DownloadListAdapter.DownloadItemViewHolder>(
+        AsyncDifferConfig.Builder(DownloadListDiffCallback())
+            .setBackgroundThreadExecutor(Executors.newSingleThreadExecutor())
+            .build()
+    ) {
     var eventListener: EventListener? = null
 
-    inner class DownloadItemViewHolder constructor(private val binding: DownloadItemBinding): RecyclerView.ViewHolder(binding.root){
+    inner class DownloadItemViewHolder constructor(private val binding: DownloadItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         private var startTime = System.currentTimeMillis()
         private var endTime: Long = 0L
         private var startBytes = 0L
         private var endBytes: Long = 0L
-        private fun initialSetup(item: StrucDownFile){
+        private fun initialSetup(item: StrucDownFile) {
             binding.heading.text = cutFileName(item.fileName)
-            binding.textView.text = if(binding.textView.text.isNullOrEmpty()) item.convertToSizeUnit() + " - " + item.downloadState.toString() else binding.textView.text.toString()
+            binding.textView.text =
+                if (binding.textView.text.isNullOrEmpty()) item.convertToSizeUnit() + " - " + item.downloadState.toString() else binding.textView.text.toString()
             binding.progressBar.progress = 0
             binding.roundCategory.setImageResource(UIComponentUtil.defineIcon(item.kindOf))
             when (item.downloadState) {
@@ -66,7 +70,8 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         stopButton.visibility = View.VISIBLE
                         downloadStateButton.visibility = View.VISIBLE
                         downloadStateButton.setImageResource(R.drawable.ic_start)
-                        progressBar.progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
+                        progressBar.progress =
+                            (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
                     }
                 }
                 DownloadStatusState.FAILED -> {
@@ -89,17 +94,19 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                 popup.show()
             }
         }
-        fun bind(item: StrucDownFile, context: Context){
+
+        fun bind(item: StrucDownFile, context: Context) {
             initialSetup(item)
             binding.downloadStateButton.setOnClickListener {
-                when(item.downloadState){
+                when (item.downloadState) {
                     DownloadStatusState.DOWNLOADING -> {
                         eventListener?.onPause(item)
                         binding.downloadStateButton.setImageResource(R.drawable.ic_start)
                     }
                     DownloadStatusState.PAUSED -> {
                         eventListener?.onResume(item)
-                        binding.progressBar.progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
+                        binding.progressBar.progress =
+                            (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
                     }
                     DownloadStatusState.COMPLETED -> {
@@ -117,31 +124,38 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                     else -> {}
                 }
 
-                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                binding.textView.text =
+                    item.convertToSizeUnit() + " - " + item.downloadState.toString()
             }
             binding.stopButton.setOnClickListener {
-                if(item.downloadState == DownloadStatusState.DOWNLOADING || item.downloadState == DownloadStatusState.PAUSED){
+                if (item.downloadState == DownloadStatusState.DOWNLOADING || item.downloadState == DownloadStatusState.PAUSED) {
                     item.downloadState = DownloadStatusState.FAILED
                     binding.progressBar.visibility = View.GONE
-                    binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                    binding.textView.text =
+                        item.convertToSizeUnit() + " - " + item.downloadState.toString()
                     binding.downloadStateButton.setImageResource(R.drawable.ic_retry)
                 }
             }
-            if(item.downloadState == DownloadStatusState.DOWNLOADING){
+            if (item.downloadState == DownloadStatusState.DOWNLOADING) {
                 binding.heading.text = cutFileName(item.fileName)
-                binding.progressBar.progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
+                binding.progressBar.progress =
+                    (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
                 endTime = System.currentTimeMillis()
                 endBytes = item.bytesCopied
                 val seconds = ((endTime.toDouble() - startTime.toDouble()) / 1000.0)
                 val result = LogicUtil.calculateDownloadSpeed(seconds, startBytes, endBytes)
-                if(seconds > 1 && result > 0){
-                    binding.textView.text = String.format("%.2f MB/s", result) + " - " + item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                if (seconds > 1 && result > 0) {
+                    binding.textView.text = String.format(
+                        "%.2f MB/s",
+                        result
+                    ) + " - " + item.convertToSizeUnit() + " - " + item.downloadState.toString()
                     startBytes = endBytes
                     startTime = endTime
                 }
             }
-            if(item.downloadState == DownloadStatusState.FAILED){
-                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
+            if (item.downloadState == DownloadStatusState.FAILED) {
+                binding.textView.text =
+                    item.convertToSizeUnit() + " - " + item.downloadState.toString()
             }
 
             val progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100).toInt()
@@ -153,7 +167,10 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
     }
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadListAdapter.DownloadItemViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): DownloadListAdapter.DownloadItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = DownloadItemBinding.inflate(layoutInflater, parent, false)
         return this.DownloadItemViewHolder(binding)
@@ -165,9 +182,9 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
     }
 
     fun updateProgress(file: StrucDownFile) {
-        val index = currentList.indexOfFirst {it.id == file.id }
+        val index = currentList.indexOfFirst { it.id == file.id }
         val mutableList = currentList.toMutableList()
-        if(index == -1){
+        if (index == -1) {
             return
         }
         mutableList[index] = file
@@ -178,7 +195,8 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
 
 
 }
-class DownloadListDiffCallback: DiffUtil.ItemCallback<StrucDownFile>() {
+
+class DownloadListDiffCallback : DiffUtil.ItemCallback<StrucDownFile>() {
     override fun areItemsTheSame(oldItem: StrucDownFile, newItem: StrucDownFile): Boolean {
         return oldItem.id == newItem.id
     }

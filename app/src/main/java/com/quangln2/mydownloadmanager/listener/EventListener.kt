@@ -6,7 +6,13 @@ import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.databinding.DownloadItemBinding
 
 interface EventListener {
-    fun onHandleDelete(menuItem: MenuItem, binding: DownloadItemBinding, item: StrucDownFile, context: Context): Boolean
+    fun onHandleDelete(
+        menuItem: MenuItem,
+        binding: DownloadItemBinding,
+        item: StrucDownFile,
+        context: Context
+    ): Boolean
+
     fun onDownloadSuccess(binding: DownloadItemBinding, item: StrucDownFile, context: Context)
     fun onPause(item: StrucDownFile)
     fun onResume(item: StrucDownFile)

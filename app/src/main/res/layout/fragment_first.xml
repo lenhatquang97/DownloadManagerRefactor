@@ -2,129 +2,130 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
             name="viewModel"
             type="com.quangln2.mydownloadmanager.ui.home.HomeViewModel" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.home.HomeFragment"
-        android:padding="16dp">
+        android:padding="16dp"
+        tools:context=".ui.home.HomeFragment">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/searchField"
-            app:boxCornerRadiusBottomEnd="28dp"
-            app:boxCornerRadiusTopEnd="28dp"
-            app:boxCornerRadiusBottomStart="28dp"
-            app:boxCornerRadiusTopStart="28dp"
-            app:boxBackgroundColor="@color/blue"
-            app:boxStrokeColor="@color/white"
-            app:boxStrokeWidth="0dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
-            app:startIconDrawable="@drawable/ic_baseline_search_24"
-            app:startIconTint="@color/white"
+            android:textColorHint="@color/white"
+            app:boxBackgroundColor="@color/blue"
+            app:boxCornerRadiusBottomEnd="28dp"
+            app:boxCornerRadiusBottomStart="28dp"
+            app:boxCornerRadiusTopEnd="28dp"
+            app:boxCornerRadiusTopStart="28dp"
+            app:boxStrokeColor="@color/white"
+            app:boxStrokeWidth="0dp"
+            app:hintEnabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:hintEnabled="false"
-            android:textColorHint="@color/white"
-            >
+            app:startIconDrawable="@drawable/ic_baseline_search_24"
+            app:startIconTint="@color/white">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:singleLine="true"
                 android:hint="Search"
-                android:textColorHint="@color/white"
-                />
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <HorizontalScrollView
-            app:layout_constraintTop_toBottomOf="@id/searchField"
             android:id="@+id/chipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="none">
+            android:scrollbars="none"
+            app:layout_constraintTop_toBottomOf="@id/searchField">
+
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/stateGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:chipSpacingVertical="20dp"
-                app:singleSelection="true"
                 android:paddingTop="16dp"
-                >
+                app:chipSpacingVertical="20dp"
+                app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
-                    android:layout_height="match_parent"
-                    android:layout_width="wrap_content"
                     android:id="@+id/chip0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
                     android:text="All"
                     android:textColor="@color/white"
-                    app:chipIcon="@drawable/ic_baseline_check_circle_outline_24"
                     app:chipBackgroundColor="@color/all"
                     app:chipCornerRadius="28dp"
-                    app:chipStrokeColor="@color/all"
+                    app:chipIcon="@drawable/ic_baseline_check_circle_outline_24"
                     app:chipMinHeight="36dp"
-                    />
+                    app:chipStrokeColor="@color/all" />
 
                 <com.google.android.material.chip.Chip
-                    android:layout_height="match_parent"
-                    android:layout_width="wrap_content"
                     android:id="@+id/chip1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
                     android:text="Downloading"
+                    android:textColor="@color/white"
                     app:chipBackgroundColor="@color/blue"
-                    android:textColor="@color/white"
                     app:chipCornerRadius="28dp"
-                    app:chipStrokeColor="@color/blue"
                     app:chipMinHeight="36dp"
-                    />
+                    app:chipStrokeColor="@color/blue" />
+
                 <com.google.android.material.chip.Chip
-                    android:layout_height="match_parent"
-                    android:layout_width="wrap_content"
                     android:id="@+id/chip2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
                     android:text="Failed"
+                    android:textColor="@color/white"
                     app:chipBackgroundColor="@color/failed"
-                    android:textColor="@color/white"
                     app:chipCornerRadius="28dp"
-                    app:chipStrokeColor="@color/failed"
                     app:chipMinHeight="36dp"
-                    />
+                    app:chipStrokeColor="@color/failed" />
+
                 <com.google.android.material.chip.Chip
-                    android:layout_height="match_parent"
-                    android:layout_width="wrap_content"
                     android:id="@+id/chip3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
                     android:text="Paused"
+                    android:textColor="@color/white"
                     app:chipBackgroundColor="@color/paused"
-                    android:textColor="@color/white"
                     app:chipCornerRadius="28dp"
-                    app:chipStrokeColor="@color/paused"
                     app:chipMinHeight="36dp"
-                    />
+                    app:chipStrokeColor="@color/paused" />
+
                 <com.google.android.material.chip.Chip
-                    android:layout_height="match_parent"
-                    android:layout_width="wrap_content"
                     android:id="@+id/chip4"
-                    android:text="Success"
-                    app:chipBackgroundColor="@color/success"
-                    android:textColor="@color/white"
-                    app:chipCornerRadius="28dp"
-                    app:chipStrokeColor="@color/success"
-                    app:chipMinHeight="36dp"
-                    />
-                <com.google.android.material.chip.Chip
-                    android:layout_height="match_parent"
                     android:layout_width="wrap_content"
-                    android:id="@+id/chip5"
-                    android:text="Queued"
-                    app:chipBackgroundColor="@color/grey"
+                    android:layout_height="match_parent"
+                    android:text="Success"
                     android:textColor="@color/white"
+                    app:chipBackgroundColor="@color/success"
                     app:chipCornerRadius="28dp"
-                    app:chipStrokeColor="@color/grey"
                     app:chipMinHeight="36dp"
-                    />
+                    app:chipStrokeColor="@color/success" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Queued"
+                    android:textColor="@color/white"
+                    app:chipBackgroundColor="@color/grey"
+                    app:chipCornerRadius="28dp"
+                    app:chipMinHeight="36dp"
+                    app:chipStrokeColor="@color/grey" />
 
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>
@@ -141,15 +142,16 @@
             app:layout_constraintTop_toBottomOf="@+id/chipGroup"
             app:layout_constraintVertical_bias="0.05"
             tools:layout_editor_absoluteX="16dp" />
+
         <include
             android:id="@+id/empty_data_parent"
             layout="@layout/empty_dataset"
             android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/chipGroup"
-            android:layout_height="0dp"
-            android:layout_gravity="center" />
+            app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

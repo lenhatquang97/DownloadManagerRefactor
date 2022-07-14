@@ -10,8 +10,9 @@ import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 
 @Database(entities = [StrucDownFile::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
-abstract class DownloadDatabase: RoomDatabase() {
+abstract class DownloadDatabase : RoomDatabase() {
     abstract fun downloadDao(): DownloadDao
+
     companion object {
         // Singleton prevents multiple instances of database opening at the
         // same time.
@@ -21,10 +22,12 @@ abstract class DownloadDatabase: RoomDatabase() {
         fun getDatabase(context: Context): DownloadDatabase {
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
-            if(INSTANCE == null){
-                synchronized(this){
-                    INSTANCE = Room.databaseBuilder(context,
-                        DownloadDatabase::class.java, "download_database.db")
+            if (INSTANCE == null) {
+                synchronized(this) {
+                    INSTANCE = Room.databaseBuilder(
+                        context,
+                        DownloadDatabase::class.java, "download_database.db"
+                    )
                         .build()
                 }
             }

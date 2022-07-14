@@ -27,7 +27,8 @@ class LocalDataSourceImpl : LocalDataSource {
             val resolver = context.contentResolver
             if (file.uri != null) {
                 val rowsDeleted = resolver.delete(
-                    Uri.parse(file.uri!!), null, null)
+                    Uri.parse(file.uri!!), null, null
+                )
                 if (rowsDeleted <= 0) {
                     CoroutineScope(Dispatchers.Main).launch {
                         Toast.makeText(
@@ -85,7 +86,8 @@ class LocalDataSourceImpl : LocalDataSource {
                         file.fileName + "_" + UUID.randomUUID().toString().substring(0, 4)
                 }
                 contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
-                file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues).toString()
+                file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                    .toString()
             }
         }
 

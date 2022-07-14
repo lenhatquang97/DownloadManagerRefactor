@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
+
         <variable
             name="viewModel"
             type="com.quangln2.mydownloadmanager.ui.home.HomeViewModel" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-        android:padding="24dp"
-        >
+        android:padding="24dp">
+
         <TextView
             android:id="@+id/addNewDownloadFileTitle"
             android:layout_width="wrap_content"
@@ -20,48 +23,54 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/linkTextField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/linkTextField"
             android:layout_marginTop="20dp"
             android:hint="Link"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/addNewDownloadFileTitle">
+
             <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:inputType="textMultiLine"
                 android:lines="8"
-                android:minLines="4"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:minLines="4" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/downloadToTextField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/downloadToTextField"
-            android:hint="Download to:"
             android:layout_marginTop="10dp"
+            android:hint="Download to:"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/linkTextField">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/endIcon"
-                android:drawableEnd="@drawable/ic_baseline_folder_24"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                android:drawableEnd="@drawable/ic_baseline_folder_24" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/addNewDownloadFileButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="4dp"
             android:background="@android:color/transparent"
             android:text="OK"
             android:textColor="@color/blue"
-            android:layout_marginTop="16dp"
-            android:layout_marginRight="4dp"
             app:layout_constraintEnd_toStartOf="@id/cancelAddNewDownloadFileButton"
             app:layout_constraintTop_toBottomOf="@id/downloadToTextField"
 
             />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/cancelAddNewDownloadFileButton"
             android:layout_width="wrap_content"

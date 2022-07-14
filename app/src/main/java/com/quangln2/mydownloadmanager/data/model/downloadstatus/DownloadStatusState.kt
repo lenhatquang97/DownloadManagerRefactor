@@ -1,37 +1,37 @@
 package com.quangln2.mydownloadmanager.data.model.downloadstatus
 
-enum class DownloadStatusState  {
-    ALL{
+enum class DownloadStatusState {
+    ALL {
         override fun toString(): String {
             return "All"
         }
     },
-    DOWNLOADING{
+    DOWNLOADING {
         override fun toString(): String {
             return "Downloading"
         }
     },
-    PAUSED{
+    PAUSED {
         override fun toString(): String {
             return "Paused"
         }
     },
-    COMPLETED{
+    COMPLETED {
         override fun toString(): String {
             return "Completed"
         }
     },
-    FAILED{
+    FAILED {
         override fun toString(): String {
             return "Failed"
         }
     },
-    QUEUED{
+    QUEUED {
         override fun toString(): String {
             return "Queued"
         }
     },
-    MIDDLE{
+    MIDDLE {
         override fun toString(): String {
             return "Middle"
         }

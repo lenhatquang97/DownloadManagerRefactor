@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    >
+    xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
             name="viewModel"
             type="com.quangln2.mydownloadmanager.ui.home.HomeViewModel" />
     </data>
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -36,30 +37,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                app:layout_constraintTop_toBottomOf="@+id/notificationTitle"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/notificationTitle" />
+
             <TextView
                 android:id="@+id/popUpMessages"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:text="Pop-up messages"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider3"
-                android:layout_marginTop="12dp"
-                />
+                app:layout_constraintTop_toBottomOf="@id/divider3" />
 
             <TextView
                 android:id="@+id/popUpMessagesValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="After finishing"
-                android:textColor="@color/grey"
                 android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/grey"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/popUpMessages"
-                />
+                app:layout_constraintTop_toBottomOf="@id/popUpMessages" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/popUpMessagesSwitch"
@@ -76,29 +76,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:layout_constraintTop_toBottomOf="@+id/popUpMessagesValue"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/popUpMessagesValue" />
+
             <TextView
                 android:id="@+id/show"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:text="Show"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider4"
-                android:layout_marginTop="12dp"
-                />
+                app:layout_constraintTop_toBottomOf="@id/divider4" />
+
             <TextView
                 android:id="@+id/showValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="on lock screen"
-                android:textColor="@color/grey"
                 android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/grey"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/show"
-                />
+                app:layout_constraintTop_toBottomOf="@id/show" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/showValueSwitch"
@@ -116,30 +116,29 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
-                app:layout_constraintTop_toBottomOf="@+id/showValue"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/showValue" />
 
             <TextView
                 android:id="@+id/vibration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:text="Vibration"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider5"
-                android:layout_marginTop="12dp"
-                />
+                app:layout_constraintTop_toBottomOf="@id/divider5" />
+
             <TextView
                 android:id="@+id/vibrationValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="To show success"
-                android:textColor="@color/grey"
                 android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/grey"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/vibration"
-                />
+                app:layout_constraintTop_toBottomOf="@id/vibration" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/vibrationSwitch"

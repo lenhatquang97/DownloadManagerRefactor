@@ -10,13 +10,15 @@ import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 object ServiceLocator {
     var downloadRepository: DefaultDownloadRepository? = null
     fun provideDownloadRepository(database: DownloadDao): DefaultDownloadRepository {
-        synchronized(this){
+        synchronized(this) {
             return downloadRepository ?: downloadRepository ?: createDownloadRepository(database)
         }
     }
+
     private fun createDownloadRepository(database: DownloadDao): DefaultDownloadRepository {
         return DefaultDownloadRepository(database, LocalDataSourceImpl(), RemoteDataSourceImpl())
     }
+
     fun initializeStrucDownFile(): StrucDownFile {
         return StrucDownFile(
             "",

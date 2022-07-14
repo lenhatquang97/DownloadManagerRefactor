@@ -44,12 +44,18 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentFirstBinding
 
     private val viewModel: HomeViewModel by activityViewModels {
-        ViewModelFactory(DefaultDownloadRepository(DownloadManagerApplication.database.downloadDao(), LocalDataSourceImpl(), RemoteDataSourceImpl()))
+        ViewModelFactory(
+            DefaultDownloadRepository(
+                DownloadManagerApplication.database.downloadDao(),
+                LocalDataSourceImpl(),
+                RemoteDataSourceImpl()
+            )
+        )
     }
 
     var downloadService: DownloadService? = null
     var isBound = false
-    private val connection = object : ServiceConnection{
+    private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as DownloadService.MyLocalBinder
             downloadService = binder.getService()
@@ -71,7 +77,7 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentFirstBinding.inflate(inflater, container,false)
+        binding = FragmentFirstBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = this
         return binding.root
     }
@@ -80,10 +86,15 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapterVal = DownloadListAdapter(context!!)
-        adapterVal.eventListener = object : EventListener{
+        adapterVal.eventListener = object : EventListener {
 
-            override fun onHandleDelete(menuItem: MenuItem, binding: DownloadItemBinding, item: StrucDownFile, context: Context): Boolean{
-                return when(menuItem.itemId){
+            override fun onHandleDelete(
+                menuItem: MenuItem,
+                binding: DownloadItemBinding,
+                item: StrucDownFile,
+                context: Context
+            ): Boolean {
+                return when (menuItem.itemId) {
                     R.id.delete_from_list_option -> {
                         viewModel.deleteFromList(item)
                         binding.textView.text = ""
@@ -91,7 +102,9 @@ class HomeFragment : Fragment() {
                     }
                     R.id.delete_permanently_option -> {
                         val onHandle = fun(flag: Boolean) {
-                            if(flag){ binding.textView.text = "" }
+                            if (flag) {
+                                binding.textView.text = ""
+                            }
                         }
                         viewModel.deletePermanently(context, item, onHandle)
                         true
@@ -99,15 +112,21 @@ class HomeFragment : Fragment() {
                     else -> false
                 }
             }
-            override fun onDownloadSuccess(binding: DownloadItemBinding, item: StrucDownFile, context: Context) {
+
+            override fun onDownloadSuccess(
+                binding: DownloadItemBinding,
+                item: StrucDownFile,
+                context: Context
+            ) {
                 item.downloadState = DownloadStatusState.COMPLETED
                 binding.stopButton.visibility = View.GONE
                 binding.progressBar.visibility = View.GONE
-                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                binding.textView.text =
+                    item.convertToSizeUnit() + " - " + item.downloadState.toString()
                 binding.downloadStateButton.setImageResource(R.drawable.ic_open)
                 CoroutineScope(Dispatchers.IO).launch {
                     DownloadManagerApplication.downloadRepository.update(item)
-                    withContext(Dispatchers.Main){
+                    withContext(Dispatchers.Main) {
                         GlobalSettings.getVibrated(context).collect {
                             if (it) viewModel.vibratePhone(context)
                         }
@@ -170,7 +189,7 @@ class HomeFragment : Fragment() {
 
         viewModel.filterList.observe(viewLifecycleOwner) {
             it?.let {
-                if(it.isEmpty()){
+                if (it.isEmpty()) {
                     binding.downloadLists.visibility = View.INVISIBLE
                     binding.emptyDataParent.visibility = View.VISIBLE
                 } else {
@@ -183,13 +202,13 @@ class HomeFragment : Fragment() {
             }
         }
 
-        DownloadManagerController.progressFile.observe(viewLifecycleOwner){
+        DownloadManagerController.progressFile.observe(viewLifecycleOwner) {
             it?.let {
-                if(it.size != -1L){
+                if (it.size != -1L) {
                     adapterVal.updateProgress(it)
                     CoroutineScope(Dispatchers.IO).launch {
                         val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
-                        if(progress == 100) {
+                        if (progress == 100) {
                             it.downloadState = DownloadStatusState.COMPLETED
                             DownloadManagerApplication.downloadRepository.update(it)
                         }
@@ -198,21 +217,23 @@ class HomeFragment : Fragment() {
             }
         }
 
-        binding.searchField.editText?.addTextChangedListener( object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {}
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    viewModel.filterStartsWithNameCaseInsensitive(s.toString())
-                }
-            })
+        binding.searchField.editText?.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.filterStartsWithNameCaseInsensitive(s.toString())
+            }
+        })
 
 
 
         binding.chip0.setOnClickListener {
             viewModel.filterList(DownloadStatusState.ALL.toString())
 
-            binding.chip0.chipIcon = ContextCompat.getDrawable(requireContext(),
-                R.drawable.ic_baseline_check_circle_outline_24)
+            binding.chip0.chipIcon = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_baseline_check_circle_outline_24
+            )
             binding.chip1.chipIcon = null
             binding.chip2.chipIcon = null
             binding.chip3.chipIcon = null
@@ -223,8 +244,10 @@ class HomeFragment : Fragment() {
             viewModel.filterList(DownloadStatusState.DOWNLOADING.toString())
 
             binding.chip0.chipIcon = null
-            binding.chip1.chipIcon = ContextCompat.getDrawable(requireContext(),
-                R.drawable.ic_baseline_check_circle_outline_24)
+            binding.chip1.chipIcon = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_baseline_check_circle_outline_24
+            )
             binding.chip2.chipIcon = null
             binding.chip3.chipIcon = null
             binding.chip4.chipIcon = null
@@ -235,8 +258,10 @@ class HomeFragment : Fragment() {
 
             binding.chip0.chipIcon = null
             binding.chip1.chipIcon = null
-            binding.chip2.chipIcon = ContextCompat.getDrawable(requireContext(),
-                R.drawable.ic_baseline_check_circle_outline_24)
+            binding.chip2.chipIcon = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_baseline_check_circle_outline_24
+            )
             binding.chip3.chipIcon = null
             binding.chip4.chipIcon = null
             binding.chip5.chipIcon = null
@@ -247,8 +272,10 @@ class HomeFragment : Fragment() {
             binding.chip0.chipIcon = null
             binding.chip1.chipIcon = null
             binding.chip2.chipIcon = null
-            binding.chip3.chipIcon = ContextCompat.getDrawable(requireContext(),
-                R.drawable.ic_baseline_check_circle_outline_24)
+            binding.chip3.chipIcon = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_baseline_check_circle_outline_24
+            )
             binding.chip4.chipIcon = null
             binding.chip5.chipIcon = null
 
@@ -261,8 +288,10 @@ class HomeFragment : Fragment() {
             binding.chip1.chipIcon = null
             binding.chip2.chipIcon = null
             binding.chip3.chipIcon = null
-            binding.chip4.chipIcon = ContextCompat.getDrawable(requireContext(),
-                R.drawable.ic_baseline_check_circle_outline_24)
+            binding.chip4.chipIcon = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_baseline_check_circle_outline_24
+            )
             binding.chip5.chipIcon = null
 
 
@@ -275,10 +304,14 @@ class HomeFragment : Fragment() {
             binding.chip2.chipIcon = null
             binding.chip3.chipIcon = null
             binding.chip4.chipIcon = null
-            binding.chip5.chipIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_check_circle_outline_24)
+            binding.chip5.chipIcon = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_baseline_check_circle_outline_24
+            )
 
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         if (isBound) {

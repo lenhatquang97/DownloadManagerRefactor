@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="16dp"
-        android:paddingRight="16dp"
-        >
+        android:paddingRight="16dp">
+
         <ImageView
             android:id="@+id/round_category"
             android:layout_width="wrap_content"
@@ -14,10 +15,9 @@
             android:background="@drawable/circle_shape"
             android:padding="8dp"
             android:src="@drawable/ic_article"
-            app:tint="@color/white"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="@id/round_category"
-            />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/white" />
 
         <TextView
             android:id="@+id/heading"
@@ -44,16 +44,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_pause"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/stop_button"/>
+            app:layout_constraintRight_toLeftOf="@id/stop_button"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/stop_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_stop"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/more_button"/>
+            app:layout_constraintRight_toLeftOf="@id/more_button"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <ImageView
@@ -61,8 +61,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_more_vert_24"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/black" />
 
         <ProgressBar
@@ -70,16 +70,15 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@+id/materialDivider"
-            app:layout_constraintTop_toBottomOf="@+id/textView"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:progress="90"
             android:layout_marginLeft="56dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="15dp"
             android:paddingBottom="5dp"
+            android:progress="90"
             android:progressTint="@color/blue"
-            />
+            app:layout_constraintBottom_toTopOf="@+id/materialDivider"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
 
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/materialDivider"

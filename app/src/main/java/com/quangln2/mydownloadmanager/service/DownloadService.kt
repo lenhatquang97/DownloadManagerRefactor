@@ -95,7 +95,7 @@ class DownloadService : Service() {
     }
 
     private fun downloadAFileWithCreating(file: StrucDownFile, context: Context) {
-        if(file.uri == null && file.downloadTo.isEmpty()){
+        if (file.uri == null && file.downloadTo.isEmpty()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 WriteToFileAPI29AboveUseCase(DownloadManagerApplication.downloadRepository)(
                     file,
@@ -121,13 +121,13 @@ class DownloadService : Service() {
         } else {
             val currentList = DownloadManagerController.downloadList.value
             val index = currentList?.indexOfFirst { it.id == file.id }
-            if(index != null && index != -1) {
+            if (index != null && index != -1) {
                 currentList[index] = file.copy()
             }
         }
         val currentList = DownloadManagerController.downloadList.value
         val index = currentList?.indexOfFirst { it.id == file.id }
-        if(index != null && index != -1) {
+        if (index != null && index != -1) {
             CoroutineScope(Dispatchers.Main).launch {
                 DownloadAFileUseCase(DownloadManagerApplication.downloadRepository)(
                     currentList[index],

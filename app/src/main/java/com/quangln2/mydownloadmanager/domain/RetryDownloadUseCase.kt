@@ -5,5 +5,6 @@ import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 
 class RetryDownloadUseCase(private val downloadRepository: DefaultDownloadRepository) {
-    operator fun invoke(file: StrucDownFile, context: Context) = downloadRepository.retryDownload(file, context)
+    operator fun invoke(file: StrucDownFile, context: Context) =
+        downloadRepository.retryDownload(file, context)
 }

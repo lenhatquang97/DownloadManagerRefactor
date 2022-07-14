@@ -1,7 +1,7 @@
 package com.quangln2.mydownloadmanager.data.constants
 
 class ConstantClass {
-    companion object{
+    companion object {
         const val KB = 1024L
         const val MB = 1048576L
         const val GB = 1073741824L

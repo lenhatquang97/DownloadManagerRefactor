@@ -8,16 +8,19 @@ import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 object DownloadManagerController {
     var downloadListSchema: LiveData<List<StrucDownFile>>? = null
 
-    var _inputItem = MutableLiveData<StrucDownFile>().apply { value = ServiceLocator.initializeStrucDownFile() }
+    var _inputItem =
+        MutableLiveData<StrucDownFile>().apply { value = ServiceLocator.initializeStrucDownFile() }
     val inputItem: LiveData<StrucDownFile> get() = _inputItem
 
     var _fetchedFileInfo = MutableLiveData<StrucDownFile>()
-    val fetchedFileInfo : LiveData<StrucDownFile> get() = _fetchedFileInfo
+    val fetchedFileInfo: LiveData<StrucDownFile> get() = _fetchedFileInfo
 
-    var _downloadList = MutableLiveData<MutableList<StrucDownFile>>().apply { value = mutableListOf() }
+    var _downloadList =
+        MutableLiveData<MutableList<StrucDownFile>>().apply { value = mutableListOf() }
     val downloadList: LiveData<MutableList<StrucDownFile>> get() = _downloadList
 
-    var _progressFile = MutableLiveData<StrucDownFile>().apply { value = ServiceLocator.initializeStrucDownFile() }
+    var _progressFile =
+        MutableLiveData<StrucDownFile>().apply { value = ServiceLocator.initializeStrucDownFile() }
     val progressFile: LiveData<StrucDownFile> get() = _progressFile
 
 

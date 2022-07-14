@@ -157,7 +157,8 @@ class RemoteDataSourceImpl : RemoteDataSource {
                 put(MediaStore.MediaColumns.MIME_TYPE, getMimeType(file.downloadLink))
                 put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
             }
-            file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues).toString()
+            file.uri =
+                resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues).toString()
         } else {
             val filePath = File(file.downloadTo)
             if (filePath.exists()) {

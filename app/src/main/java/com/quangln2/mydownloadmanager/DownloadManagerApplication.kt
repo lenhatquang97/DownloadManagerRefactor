@@ -13,17 +13,19 @@ import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.database.DownloadDatabase
 
 class DownloadManagerApplication : Application() {
-    init{
+    init {
         instance = this
     }
-    companion object{
+
+    companion object {
         private var instance: DownloadManagerApplication? = null
-        private fun applicationContext() : Context {
+        private fun applicationContext(): Context {
             return instance!!.applicationContext
         }
+
         val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-        val database by lazy{ DownloadDatabase.getDatabase(applicationContext()) }
-        val downloadRepository by lazy{ServiceLocator.provideDownloadRepository(database.downloadDao())}
+        val database by lazy { DownloadDatabase.getDatabase(applicationContext()) }
+        val downloadRepository by lazy { ServiceLocator.provideDownloadRepository(database.downloadDao()) }
     }
 
     override fun onCreate() {
