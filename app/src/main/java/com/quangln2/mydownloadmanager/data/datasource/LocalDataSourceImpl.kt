@@ -3,6 +3,7 @@ package com.quangln2.mydownloadmanager.data.datasource
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
@@ -25,7 +26,8 @@ class LocalDataSourceImpl : LocalDataSource {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val resolver = context.contentResolver
             if (file.uri != null) {
-                val rowsDeleted = resolver.delete(file.uri!!, null, null)
+                val rowsDeleted = resolver.delete(
+                    Uri.parse(file.uri!!), null, null)
                 if (rowsDeleted <= 0) {
                     CoroutineScope(Dispatchers.Main).launch {
                         Toast.makeText(
@@ -83,7 +85,7 @@ class LocalDataSourceImpl : LocalDataSource {
                         file.fileName + "_" + UUID.randomUUID().toString().substring(0, 4)
                 }
                 contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
-                file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues).toString()
             }
         }
 
@@ -114,7 +116,7 @@ class LocalDataSourceImpl : LocalDataSource {
     override fun openDownloadFile(item: StrucDownFile, context: Context) {
         val intent = Intent(Intent.ACTION_VIEW)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            intent.setDataAndType(item.uri, item.mimeType)
+            intent.setDataAndType(Uri.parse(item.uri), item.mimeType)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         } else {
             val file = File(item.downloadTo)

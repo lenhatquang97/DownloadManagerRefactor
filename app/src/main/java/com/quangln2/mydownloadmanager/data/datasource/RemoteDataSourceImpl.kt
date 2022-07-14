@@ -2,6 +2,7 @@ package com.quangln2.mydownloadmanager.data.datasource
 
 import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
@@ -83,7 +84,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
                 if (file.uri == null) {
                     return@flow
                 }
-                val out = context.contentResolver.openOutputStream(file.uri!!, "wa")
+                val out = context.contentResolver.openOutputStream(Uri.parse(file.uri), "wa")
                 if (out != null) {
                     val data = ByteArray(1024)
                     var x = inp.read(data, 0, 1024)
@@ -98,7 +99,10 @@ class RemoteDataSourceImpl : RemoteDataSource {
                         }
                         x = inp.read(data, 0, 1024)
                     }
+                    out.close()
+                    connection.disconnect()
                 }
+
             } else {
                 val fos =
                     if (file.bytesCopied == 0L) FileOutputStream(file.downloadTo) else FileOutputStream(
@@ -118,6 +122,8 @@ class RemoteDataSourceImpl : RemoteDataSource {
                     }
                     x = inp.read(data, 0, 1024)
                 }
+                fos.close()
+                connection.disconnect()
             }
         } catch (e: Exception) {
             emit(file.copy(downloadState = DownloadStatusState.FAILED))
@@ -143,7 +149,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val resolver = context.contentResolver
             if (file.uri != null) {
-                resolver.delete(file.uri!!, null, null)
+                resolver.delete(Uri.parse(file.uri), null, null)
             }
 
             val contentValues = ContentValues().apply {
@@ -151,12 +157,13 @@ class RemoteDataSourceImpl : RemoteDataSource {
                 put(MediaStore.MediaColumns.MIME_TYPE, getMimeType(file.downloadLink))
                 put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
             }
-            file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues).toString()
         } else {
             val filePath = File(file.downloadTo)
             if (filePath.exists()) {
                 filePath.delete()
             }
+            file.downloadTo = ""
             file.uri = null
         }
         file.bytesCopied = 0

@@ -2,6 +2,7 @@ package com.quangln2.mydownloadmanager.ui.home
 
 import android.content.Context
 import android.content.Context.VIBRATOR_SERVICE
+import android.content.Intent
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -16,10 +17,10 @@ import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.domain.*
+import com.quangln2.mydownloadmanager.service.DownloadService
 import com.quangln2.mydownloadmanager.util.DownloadUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -28,10 +29,6 @@ class HomeViewModel(
     val deleteFromListUseCase: DeleteFromListUseCase,
     val addNewDownloadInfo: AddNewDownloadInfoUseCase,
     val fetchDownloadInfo: FetchDownloadInfoUseCase,
-    val writeToFileAPI29AboveUseCase: WriteToFileAPI29AboveUseCase,
-    val writeToFileAPI29BelowUseCase: WriteToFileAPI29BelowUseCase,
-    val insertToListUseCase: InsertToListUseCase,
-    val downloadAFileUseCase: DownloadAFileUseCase,
     val retryDownloadUseCase: RetryDownloadUseCase,
     val openDownloadFileUseCase: OpenDownloadFileUseCase,
     val updateToListUseCase: UpdateToListUseCase
@@ -109,7 +106,6 @@ class HomeViewModel(
 
     fun deleteFromList(file: StrucDownFile) {
         CoroutineScope(Dispatchers.IO).launch {
-
             deleteFromListUseCase(file)
             val res = DownloadManagerController.downloadList.value?.filter { it.id != file.id }
                 ?.toMutableList()
@@ -163,35 +159,6 @@ class HomeViewModel(
         }
     }
 
-    fun downloadAFile(context: Context) {
-        val file = DownloadManagerController._fetchedFileInfo.value
-        if (file != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                writeToFileAPI29AboveUseCase(file, context)
-            } else {
-                writeToFileAPI29BelowUseCase(file)
-            }
-
-            val currentList = DownloadManagerController.downloadList.value
-            if (currentList != null) {
-                currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
-                DownloadManagerController._downloadList.postValue(currentList)
-
-            }
-            CoroutineScope(Dispatchers.IO).launch {
-                insertToListUseCase(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
-            }
-            val addedFile = currentList?.last()
-            if (addedFile != null) {
-                CoroutineScope(Dispatchers.Main).launch {
-                    downloadAFileUseCase(addedFile, context).collect {
-                        DownloadManagerController._progressFile.value = it
-                    }
-                }
-            }
-        }
-    }
-
     fun pause(id: String) {
         val currentList = DownloadManagerController.downloadList.value
         val index = currentList?.indexOfFirst { it.id == id }
@@ -209,27 +176,20 @@ class HomeViewModel(
             val currentFile = currentList[index]
             val doesFileExist = DownloadUtil.isFileExisting(currentFile, context)
             if (doesFileExist) {
-                currentFile.bytesCopied = DownloadUtil.getBytesFromExistingFile(currentFile, context)
+                currentFile.bytesCopied =
+                    DownloadUtil.getBytesFromExistingFile(currentFile, context)
                 currentFile.downloadState = DownloadStatusState.DOWNLOADING
-                CoroutineScope(Dispatchers.Main).launch {
-                    downloadAFileUseCase(currentFile, context).collect {
-                        DownloadManagerController._progressFile.value = it
-                    }
-                }
             } else {
                 currentFile.downloadState = DownloadStatusState.FAILED
                 DownloadManagerController._progressFile.value = currentFile
             }
+            sendToDownloadService(context, currentFile)
         }
     }
 
     fun retry(context: Context, item: StrucDownFile) {
         retryDownloadUseCase(item, context)
-        CoroutineScope(Dispatchers.Main).launch {
-            downloadAFileUseCase(item, context).collect {
-                DownloadManagerController._progressFile.value = it
-            }
-        }
+        sendToDownloadService(context, item)
     }
 
     fun open(context: Context, item: StrucDownFile) {
@@ -263,6 +223,12 @@ class HomeViewModel(
             }
         }
 
+    }
+
+    private fun sendToDownloadService(context: Context, currentFile: StrucDownFile) {
+        val intent = Intent(context, DownloadService::class.java)
+        intent.putExtra("item", currentFile)
+        context.startService(intent)
     }
 
 

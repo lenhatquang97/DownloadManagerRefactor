@@ -19,10 +19,6 @@ class ViewModelFactory constructor(
                         DeleteFromListUseCase(downloadRepository),
                         AddNewDownloadInfoUseCase(downloadRepository),
                         FetchDownloadInfoUseCase(downloadRepository),
-                        WriteToFileAPI29AboveUseCase(downloadRepository),
-                        WriteToFileAPI29BelowUseCase(downloadRepository),
-                        InsertToListUseCase(downloadRepository),
-                        DownloadAFileUseCase(downloadRepository),
                         RetryDownloadUseCase(downloadRepository),
                         OpenDownloadFileUseCase(downloadRepository),
                         UpdateToListUseCase(downloadRepository)

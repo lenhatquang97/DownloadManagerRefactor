@@ -31,22 +31,35 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val navController by lazy { findNavController(R.id.nav_host_fragment_content_main) }
     private val viewModel: HomeViewModel by viewModels {
-        ViewModelFactory(DefaultDownloadRepository(DownloadManagerApplication.database.downloadDao(), LocalDataSourceImpl(), RemoteDataSourceImpl()))
+        ViewModelFactory(
+            DefaultDownloadRepository(
+                DownloadManagerApplication.database.downloadDao(),
+                LocalDataSourceImpl(),
+                RemoteDataSourceImpl()
+            )
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
-        DownloadManagerController.downloadListSchema = DownloadManagerApplication.database.downloadDao().getAll().asLiveData()
-        viewModel.getDataFromDatabase()
+        DownloadManagerController.downloadListSchema =
+            DownloadManagerApplication.database.downloadDao().getAll().asLiveData()
 
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
 
-        val permissionCheck = ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
+        val permissionCheck = ContextCompat.checkSelfPermission(
+            applicationContext,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                1
+            )
         }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -70,7 +83,7 @@ class MainActivity : AppCompatActivity() {
 
 
         binding.navView.setNavigationItemSelectedListener {
-            when(it.itemId){
+            when (it.itemId) {
                 R.id.all -> viewModel.filterCategories("All")
                 R.id.compressed -> viewModel.filterCategories("Compressed")
                 R.id.documents -> viewModel.filterCategories("Documents")
@@ -93,7 +106,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> {
-                if(navController.currentDestination?.id == R.id.FirstFragment){
+                if (navController.currentDestination?.id == R.id.FirstFragment) {
                     navController.navigate(R.id.action_FirstFragment_to_SecondFragment)
                 }
                 true

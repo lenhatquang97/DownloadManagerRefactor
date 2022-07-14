@@ -4,7 +4,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.text.Editable
@@ -33,7 +32,6 @@ import com.quangln2.mydownloadmanager.databinding.DownloadItemBinding
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
 import com.quangln2.mydownloadmanager.listener.EventListener
 import com.quangln2.mydownloadmanager.service.DownloadService
-import com.quangln2.mydownloadmanager.util.LogicUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -109,36 +107,33 @@ class HomeFragment : Fragment() {
                 binding.downloadStateButton.setImageResource(R.drawable.ic_open)
                 CoroutineScope(Dispatchers.IO).launch {
                     DownloadManagerApplication.downloadRepository.update(item)
-                    onOpenNotification(item)
                     withContext(Dispatchers.Main){
                         GlobalSettings.getVibrated(context).collect {
                             if (it) viewModel.vibratePhone(context)
                         }
                     }
                 }
-
-
             }
 
-            override fun onPause() {
-                viewModel.pause(DownloadManagerController.progressFile.value?.id!!)
+            override fun onPause(item: StrucDownFile) {
+                viewModel.pause(item.id)
             }
 
-            override fun onResume() {
-                viewModel.resume(requireContext(), DownloadManagerController.progressFile.value?.id!!)
+            override fun onResume(item: StrucDownFile) {
+                viewModel.resume(requireContext(), item.id)
             }
 
-            override fun onOpen() {
-                viewModel.open(requireContext(), DownloadManagerController.progressFile.value!!)
+            override fun onOpen(item: StrucDownFile) {
+                viewModel.open(requireContext(), item)
             }
 
-            override fun onRetry() {
-                viewModel.retry(requireContext(), DownloadManagerController.progressFile.value!!)
+            override fun onRetry(item: StrucDownFile) {
+                viewModel.retry(requireContext(), item)
             }
 
-            override fun onUpdateToDatabase() {
+            override fun onUpdateToDatabase(item: StrucDownFile) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    viewModel.update(DownloadManagerController.progressFile.value!!)
+                    viewModel.update(item)
                 }
             }
         }
@@ -152,7 +147,6 @@ class HomeFragment : Fragment() {
             adapter = adapterVal
             layoutManager = LinearLayoutManager(context)
         }
-//        (binding.downloadLists.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         DownloadManagerController.downloadListSchema?.observe(viewLifecycleOwner) {
             it?.let {
@@ -195,12 +189,10 @@ class HomeFragment : Fragment() {
                     adapterVal.updateProgress(it)
                     CoroutineScope(Dispatchers.IO).launch {
                         val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
-                        println(progress)
                         if(progress == 100) {
                             it.downloadState = DownloadStatusState.COMPLETED
                             DownloadManagerApplication.downloadRepository.update(it)
                         }
-                        onOpenNotification(it)
                     }
                 }
             }
@@ -287,25 +279,11 @@ class HomeFragment : Fragment() {
 
         }
     }
-    private fun onOpenNotification(item: StrucDownFile) {
-        val intent = Intent(context, DownloadService::class.java)
-        val progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100).toInt()
-
-        intent.putExtra("fileName", LogicUtil.cutFileName(item.fileName))
-        intent.putExtra("content", item.downloadState.toString())
-        intent.putExtra("id", item.id.hashCode())
-        if(progress != -1 && progress != 100) intent.putExtra("progress", progress)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            requireContext().startForegroundService(intent)
-        } else {
-            requireContext().startService(intent)
-        }
-    }
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroy() {
+        super.onDestroy()
         if (isBound) {
             requireContext().unbindService(connection)
+            requireContext().stopService(Intent(requireContext(), DownloadService::class.java))
             isBound = false
         }
     }

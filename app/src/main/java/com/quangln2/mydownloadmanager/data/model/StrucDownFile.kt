@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
+import java.io.Serializable
 
 @Entity(tableName ="download_list")
 data class StrucDownFile (
@@ -22,8 +23,9 @@ data class StrucDownFile (
     @ColumnInfo(name="mime_type") var mimeType: String,
     @ColumnInfo(name="file_name") var fileName: String,
 
-    @ColumnInfo(name="uri") var uri: Uri? = null,
-){
+
+    @ColumnInfo(name="uri") var uri: String?,
+): Serializable {
     constructor():
             this("", "", "", "", -1, 0, DownloadStatusState.DOWNLOADING, "", "", null)
 

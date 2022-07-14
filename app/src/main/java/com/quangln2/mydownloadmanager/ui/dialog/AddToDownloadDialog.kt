@@ -31,6 +31,7 @@ import com.quangln2.mydownloadmanager.data.datasource.RemoteDataSourceImpl
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
+import com.quangln2.mydownloadmanager.service.DownloadService
 import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
 import com.quangln2.mydownloadmanager.util.UIComponentUtil.Companion.getRealPath
 
@@ -121,7 +122,9 @@ class AddToDownloadDialog: DialogFragment() {
                 .setIcon(R.drawable.ic_baseline_arrow_downward_24)
                 .setMessage(ConstantClass.DOWNLOAD_MESSAGE + file.convertToSizeUnit())
                 .setPositiveButton(ConstantClass.POSITIVE_BUTTON) { _, _ ->
-                    viewModel.downloadAFile(context)
+                    val intent = Intent(context, DownloadService::class.java)
+                    intent.putExtra("item", file)
+                    context.startService(intent)
                     dismiss()
                 }
                 .setNegativeButton(ConstantClass.NEGATIVE_BUTTON) { _, _ ->

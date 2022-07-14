@@ -94,11 +94,11 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
             binding.downloadStateButton.setOnClickListener {
                 when(item.downloadState){
                     DownloadStatusState.DOWNLOADING -> {
-                        eventListener?.onPause()
+                        eventListener?.onPause(item)
                         binding.downloadStateButton.setImageResource(R.drawable.ic_start)
                     }
                     DownloadStatusState.PAUSED -> {
-                        eventListener?.onResume()
+                        eventListener?.onResume(item)
                         binding.progressBar.progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
                     }
@@ -106,12 +106,12 @@ class DownloadListAdapter(private var context: Context): ListAdapter<StrucDownFi
                         item.downloadState = DownloadStatusState.COMPLETED
                         binding.stopButton.visibility = View.GONE
                         binding.downloadStateButton.setImageResource(R.drawable.ic_open)
-                        eventListener?.onOpen()
+                        eventListener?.onOpen(item)
                     }
                     DownloadStatusState.FAILED -> {
                         binding.progressBar.progress = 0
                         binding.progressBar.visibility = View.VISIBLE
-                        eventListener?.onRetry()
+                        eventListener?.onRetry(item)
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
                     }
                     else -> {}
