@@ -316,7 +316,11 @@ class HomeFragment : Fragment() {
         super.onDestroy()
         if (isBound) {
             requireContext().unbindService(connection)
-            requireContext().stopService(Intent(requireContext(), DownloadService::class.java))
+            val currentList = DownloadManagerController._downloadList.value
+            val res = currentList?.find { it.downloadState == DownloadStatusState.DOWNLOADING }
+            if(res != null) {
+                requireContext().stopService(Intent(requireContext(), DownloadService::class.java))
+            }
             isBound = false
         }
     }

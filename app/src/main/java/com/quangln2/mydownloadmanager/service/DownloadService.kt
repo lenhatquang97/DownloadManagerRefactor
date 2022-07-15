@@ -80,6 +80,7 @@ class DownloadService : Service() {
         manager.notify(item.id.hashCode(), builder.build())
         if (progress == 100) {
             manager.cancel(item.id.hashCode())
+            stopSelf()
             return
         }
     }
