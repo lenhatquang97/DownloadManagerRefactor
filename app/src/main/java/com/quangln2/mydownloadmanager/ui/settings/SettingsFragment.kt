@@ -60,7 +60,7 @@ class SettingsFragment : Fragment() {
             }
             setOnClickListener {
                 CoroutineScope(Dispatchers.IO).launch {
-                    GlobalSettings.setVibrated(requireContext(), !isChecked)
+                    GlobalSettings.setVibrated(requireContext(), isChecked)
                 }
             }
         }

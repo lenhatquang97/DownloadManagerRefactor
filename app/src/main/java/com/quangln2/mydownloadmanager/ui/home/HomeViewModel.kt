@@ -40,16 +40,6 @@ class HomeViewModel(
         MutableLiveData<MutableList<StrucDownFile>>().apply { value = mutableListOf() }
     val filterList: LiveData<MutableList<StrucDownFile>> get() = _filterList
 
-    fun getDataFromDatabase() {
-        DownloadManagerController.downloadListSchema?.value?.let {
-            DownloadManagerController._downloadList.value?.let { ls ->
-                if (ls.size != 0) {
-                    DownloadManagerController._downloadList.value = it.toMutableList()
-                    _filterList.value = it.toMutableList()
-                }
-            }
-        }
-    }
 
     fun filterList(downloadStatusState: String) {
         if (downloadStatusState == DownloadStatusState.ALL.toString()) {

@@ -22,6 +22,8 @@ import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
+import com.quangln2.mydownloadmanager.controller.DownloadManagerController.progressFile
+import com.quangln2.mydownloadmanager.controller.DownloadManagerController.downloadList
 import com.quangln2.mydownloadmanager.data.datasource.LocalDataSourceImpl
 import com.quangln2.mydownloadmanager.data.datasource.RemoteDataSourceImpl
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
@@ -178,7 +180,7 @@ class HomeFragment : Fragment() {
 
 
 
-        DownloadManagerController.downloadList.observe(viewLifecycleOwner) {
+        downloadList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
                     binding.chip0.performClick()
@@ -202,7 +204,8 @@ class HomeFragment : Fragment() {
             }
         }
 
-        DownloadManagerController.progressFile.observe(viewLifecycleOwner) {
+
+        progressFile.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.size != -1L) {
                     adapterVal.updateProgress(it)
@@ -222,6 +225,7 @@ class HomeFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 viewModel.filterStartsWithNameCaseInsensitive(s.toString())
+
             }
         })
 
