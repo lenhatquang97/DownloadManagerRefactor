@@ -85,7 +85,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapterVal = DownloadListAdapter(context!!)
+        val adapterVal = DownloadListAdapter(requireContext())
         adapterVal.eventListener = object : EventListener {
 
             override fun onHandleDelete(

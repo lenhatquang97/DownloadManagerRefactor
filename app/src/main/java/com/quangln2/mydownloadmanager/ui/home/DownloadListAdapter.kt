@@ -119,6 +119,7 @@ class DownloadListAdapter(private var context: Context) :
                         binding.progressBar.progress = 0
                         binding.progressBar.visibility = View.VISIBLE
                         eventListener?.onRetry(item)
+                        item.downloadState = DownloadStatusState.DOWNLOADING
                         binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
                     }
                     else -> {}
@@ -126,6 +127,7 @@ class DownloadListAdapter(private var context: Context) :
 
                 binding.textView.text =
                     item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                eventListener?.onUpdateToDatabase(item)
             }
             binding.stopButton.setOnClickListener {
                 if (item.downloadState == DownloadStatusState.DOWNLOADING || item.downloadState == DownloadStatusState.PAUSED) {
@@ -144,7 +146,7 @@ class DownloadListAdapter(private var context: Context) :
                 endBytes = item.bytesCopied
                 val seconds = ((endTime.toDouble() - startTime.toDouble()) / 1000.0)
                 val result = LogicUtil.calculateDownloadSpeed(seconds, startBytes, endBytes)
-                if (seconds > 1 && result > 0) {
+                if (seconds > 0.8 && result > 0) {
                     binding.textView.text = String.format(
                         "%.2f MB/s",
                         result

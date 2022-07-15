@@ -25,13 +25,11 @@ class DownloadUtil {
                 val filePath =
                     File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName)
                 if (!filePath.exists()) {
-                    Toast.makeText(context, "File not found", Toast.LENGTH_SHORT).show()
                     return false
                 }
             } else {
                 val filePath = File(file.downloadTo)
                 if (!filePath.exists()) {
-                    Toast.makeText(context, "File not found", Toast.LENGTH_SHORT).show()
                     return false
                 }
             }
@@ -51,10 +49,13 @@ class DownloadUtil {
                     null
                 )
                 if (cursor != null && cursor.count > 0) {
-                    while (cursor.moveToNext()) {
-                        return cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))
+                    while (cursor.moveToNext() && cursor.getColumnIndex(MediaStore.MediaColumns.SIZE) != -1) {
+                        val result = cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))
+                        cursor.close()
+                        return result
                     }
                 }
+
             } else {
                 val filePath =
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName

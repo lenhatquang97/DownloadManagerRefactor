@@ -18,4 +18,5 @@ interface DownloadDao {
     @Delete
     fun delete(strucDownFile: StrucDownFile)
 
+
 }

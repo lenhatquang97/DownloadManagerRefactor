@@ -6,7 +6,10 @@ import com.quangln2.mydownloadmanager.data.database.DownloadDao
 import com.quangln2.mydownloadmanager.data.datasource.LocalDataSource
 import com.quangln2.mydownloadmanager.data.datasource.RemoteDataSource
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 
 class DefaultDownloadRepository(
@@ -57,8 +60,10 @@ class DefaultDownloadRepository(
     fun resumeDownload(file: StrucDownFile) = remoteDataSource.resumeDownload(file)
     fun pauseDownload(file: StrucDownFile) = remoteDataSource.pauseDownload(file)
     fun stopDownload(file: StrucDownFile) = remoteDataSource.stopDownload(file)
-    fun retryDownload(file: StrucDownFile, context: Context) =
+    fun retryDownload(file: StrucDownFile, context: Context){
         remoteDataSource.retryDownload(file, context)
+    }
+
 
     fun queueDownload(file: StrucDownFile) = remoteDataSource.queueDownload(file)
     suspend fun copyFile() = localDataSource.copyFile()

@@ -126,6 +126,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
                 connection.disconnect()
             }
         } catch (e: Exception) {
+            println(e)
             emit(file.copy(downloadState = DownloadStatusState.FAILED))
         }
 
@@ -168,7 +169,6 @@ class RemoteDataSourceImpl : RemoteDataSource {
             file.uri = null
         }
         file.bytesCopied = 0
-        file.downloadState = DownloadStatusState.DOWNLOADING
     }
 
     override fun queueDownload(file: StrucDownFile) {

@@ -89,6 +89,7 @@ class LocalDataSourceImpl : LocalDataSource {
                 file.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
                     .toString()
             }
+            cursor?.close()
         }
 
     }

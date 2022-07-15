@@ -17,10 +17,8 @@ import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
-import com.quangln2.mydownloadmanager.domain.DownloadAFileUseCase
-import com.quangln2.mydownloadmanager.domain.InsertToListUseCase
-import com.quangln2.mydownloadmanager.domain.WriteToFileAPI29AboveUseCase
-import com.quangln2.mydownloadmanager.domain.WriteToFileAPI29BelowUseCase
+import com.quangln2.mydownloadmanager.domain.*
+import com.quangln2.mydownloadmanager.util.DownloadUtil
 import com.quangln2.mydownloadmanager.util.LogicUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -94,7 +92,7 @@ class DownloadService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun downloadAFileWithCreating(file: StrucDownFile, context: Context) {
+    private fun createFileAgain(file: StrucDownFile, context: Context) {
         if (file.uri == null && file.downloadTo.isEmpty()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 WriteToFileAPI29AboveUseCase(DownloadManagerApplication.downloadRepository)(
@@ -104,26 +102,41 @@ class DownloadService : Service() {
             } else {
                 WriteToFileAPI29BelowUseCase(DownloadManagerApplication.downloadRepository)(file)
             }
+        }
+    }
 
-            val currentList = DownloadManagerController.downloadList.value
-            if (currentList != null) {
-                currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
-                DownloadManagerController._downloadList.postValue(currentList)
-
-            }
-            CoroutineScope(Dispatchers.IO).launch {
-                InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
-                    file.copy(
-                        downloadState = DownloadStatusState.DOWNLOADING
-                    )
+    private fun addToDownloadList(file: StrucDownFile) {
+        val currentList = DownloadManagerController.downloadList.value
+        if (currentList != null) {
+            currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
+            DownloadManagerController._downloadList.postValue(currentList)
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
+                file.copy(
+                    downloadState = DownloadStatusState.DOWNLOADING
                 )
-            }
-        } else {
+            )
+        }
+    }
+
+    private fun downloadAFileWithCreating(file: StrucDownFile, context: Context) {
+        if (file.downloadState == DownloadStatusState.FAILED) {
+            createFileAgain(file, context)
             val currentList = DownloadManagerController.downloadList.value
             val index = currentList?.indexOfFirst { it.id == file.id }
             if (index != null && index != -1) {
-                currentList[index] = file.copy()
+                currentList[index] = file.copy(downloadState = DownloadStatusState.DOWNLOADING)
+                DownloadManagerController._downloadList.postValue(currentList)
             }
+            CoroutineScope(Dispatchers.IO).launch {
+                UpdateToListUseCase(DownloadManagerApplication.downloadRepository)(
+                    file.copy()
+                )
+            }
+        } else if (!DownloadUtil.isFileExisting(file, context)) {
+            createFileAgain(file, context)
+            addToDownloadList(file)
         }
         val currentList = DownloadManagerController.downloadList.value
         val index = currentList?.indexOfFirst { it.id == file.id }

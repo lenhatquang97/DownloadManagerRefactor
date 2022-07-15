@@ -1,10 +1,12 @@
 package com.quangln2.mydownloadmanager
 
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -49,18 +51,6 @@ class MainActivity : AppCompatActivity() {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
 
-        val permissionCheck = ContextCompat.checkSelfPermission(
-            applicationContext,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                1
-            )
-        }
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         setSupportActionBar(binding.toolbar)
@@ -68,10 +58,37 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            val permissionCheck = ContextCompat.checkSelfPermission(
+                applicationContext,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    1
+                )
+            }
+        }
 
         binding.fab.setOnClickListener {
-            val dialog = AddToDownloadDialog()
-            dialog.show(supportFragmentManager, "AddToDownloadDialog")
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                if (doesHaveWriteExternalPermission()) {
+                    val dialog = AddToDownloadDialog()
+                    dialog.show(supportFragmentManager, "AddToDownloadDialog")
+                } else {
+                    Toast.makeText(
+                        applicationContext,
+                        "You must grant permission to use this feature!!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+            } else {
+                val dialog = AddToDownloadDialog()
+                dialog.show(supportFragmentManager, "AddToDownloadDialog")
+            }
+
         }
 
 
@@ -95,6 +112,14 @@ class MainActivity : AppCompatActivity() {
             binding.fab.show()
             true
         }
+    }
+
+    private fun doesHaveWriteExternalPermission(): Boolean {
+        val permissionCheck = ContextCompat.checkSelfPermission(
+            applicationContext,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+        return permissionCheck == PackageManager.PERMISSION_GRANTED
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
