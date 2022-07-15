@@ -41,6 +41,9 @@ class HomeViewModel(
     val filterList: LiveData<MutableList<StrucDownFile>> get() = _filterList
 
 
+    var textSearch = MutableLiveData<String>().apply { value = "" }
+
+
     fun filterList(downloadStatusState: String) {
         if (downloadStatusState == DownloadStatusState.ALL.toString()) {
             CoroutineScope(Dispatchers.IO).launch {

@@ -171,7 +171,8 @@ class HomeFragment : Fragment() {
 
         DownloadManagerController.downloadListSchema?.observe(viewLifecycleOwner) {
             it?.let {
-                if (it.isNotEmpty() && DownloadManagerController._downloadList.value != null && DownloadManagerController._downloadList.value?.size == 0) {
+                if (it.isNotEmpty() && DownloadManagerController._downloadList.value != null &&
+                    DownloadManagerController._downloadList.value?.size == 0) {
                     DownloadManagerController._downloadList.value = it.toMutableList()
                 }
             }
@@ -197,7 +198,12 @@ class HomeFragment : Fragment() {
                 } else {
                     binding.downloadLists.visibility = View.VISIBLE
                     binding.emptyDataParent.visibility = View.GONE
-                    adapterVal.submitList(it.toMutableList())
+                    if(viewModel.textSearch.value != null){
+                        val result = it.filter { itr -> itr.fileName.lowercase().contains(
+                            viewModel.textSearch.value!!.lowercase()) }
+                        adapterVal.submitList(result.toMutableList())
+                    }
+
                 }
                 return@observe
 
@@ -225,7 +231,7 @@ class HomeFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 viewModel.filterStartsWithNameCaseInsensitive(s.toString())
-
+                viewModel.textSearch.value = s.toString()
             }
         })
 
