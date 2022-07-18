@@ -136,6 +136,7 @@ class DownloadListAdapter(private var context: Context) :
                     binding.textView.text =
                         item.convertToSizeUnit() + " - " + item.downloadState.toString()
                     binding.downloadStateButton.setImageResource(R.drawable.ic_retry)
+                    eventListener?.onStop(item)
                 }
             }
             if (item.downloadState == DownloadStatusState.DOWNLOADING) {

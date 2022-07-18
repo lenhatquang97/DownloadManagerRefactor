@@ -3,12 +3,12 @@ package com.quangln2.mydownloadmanager.data.model.settings
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
 import com.quangln2.mydownloadmanager.DownloadManagerApplication.Companion.dataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 object GlobalSettings {
-    //Vibration
     private val IS_VIBRATED = booleanPreferencesKey("isVibrated")
     val getVibrated: (Context) -> Flow<Boolean> = { it ->
         it.dataStore.data.map {
@@ -22,33 +22,20 @@ object GlobalSettings {
         }
     }
 
-    //Show on lock screen
-    private val SHOW_ON_LOCK_SCREEN = booleanPreferencesKey("showOnLockScreen")
-    val getShowOnLockScreen: (Context) -> Flow<Boolean> = { it ->
+    var numsOfMaxDownloadThreadExported = 1
+
+    private val MAXIMUM_DOWNLOAD_THREAD = floatPreferencesKey("maximumDownloadThread")
+    val getMaximumDownloadThread: (Context) -> Flow<Float> = { it ->
         it.dataStore.data.map {
-            it[SHOW_ON_LOCK_SCREEN] ?: false
+            it[MAXIMUM_DOWNLOAD_THREAD] ?: 1.0f
         }
     }
-
-    suspend fun setShowOnLockScreen(context: Context, isShown: Boolean) {
+    suspend fun setMaximumDownloadThread(context: Context, maximumDownloadThread: Float) {
         context.dataStore.edit {
-            it[SHOW_ON_LOCK_SCREEN] = isShown
+            it[MAXIMUM_DOWNLOAD_THREAD] = maximumDownloadThread
         }
     }
 
-    //Pop up message
-    private val POP_UP_MESSAGE = booleanPreferencesKey("popUpMessage")
-    val getPopUpMessage: (Context) -> Flow<Boolean> = { it ->
-        it.dataStore.data.map {
-            it[POP_UP_MESSAGE] ?: false
-        }
-    }
-
-    suspend fun setPopUpMessage(context: Context, isPopped: Boolean) {
-        context.dataStore.edit {
-            it[POP_UP_MESSAGE] = isPopped
-        }
-    }
 
 
 }

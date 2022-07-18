@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/FirstFragment"
         android:name="com.quangln2.mydownloadmanager.ui.home.HomeFragment"
-        android:label="DownloadManager"
+        android:label="Download Manager"
         tools:layout="@layout/fragment_first">
 
         <action

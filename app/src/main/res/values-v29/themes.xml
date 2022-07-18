@@ -58,4 +58,12 @@
     <style name="checkedChip" parent="@style/Widget.MaterialComponents.Chip.Filter">
         <item name="checkedIcon">@drawable/ic_baseline_check_white</item>
     </style>
+
+    <style name="mySlider" parent="@style/Widget.MaterialComponents.Slider">
+        <item name="labelStyle">@style/myTooltip</item>
+    </style>
+    <style name="myTooltip" parent="Widget.MaterialComponents.Tooltip">
+        <!-- background color of the Tooltip -->
+        <item name="backgroundTint">@color/blue</item>
+    </style>
 </resources>

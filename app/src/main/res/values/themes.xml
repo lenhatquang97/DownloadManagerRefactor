@@ -59,4 +59,14 @@
     <style name="MoreButtonFunction.PopupMenu" parent="Widget.AppCompat.PopupMenu">
         <item name="android:itemBackground">@color/white</item>
     </style>
+
+
+    <style name="mySlider" parent="@style/Widget.MaterialComponents.Slider">
+        <item name="labelStyle">@style/myTooltip</item>
+    </style>
+    <style name="myTooltip" parent="Widget.MaterialComponents.Tooltip">
+        <!-- background color of the Tooltip -->
+        <item name="backgroundTint">@color/blue</item>
+    </style>
+
 </resources>

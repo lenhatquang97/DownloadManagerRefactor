@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asLiveData
 import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
 import com.quangln2.mydownloadmanager.databinding.FragmentSecondBinding
 import kotlinx.coroutines.CoroutineScope
@@ -26,31 +27,6 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.popUpMessagesSwitch.apply {
-            CoroutineScope(Dispatchers.Main).launch {
-                GlobalSettings.getPopUpMessage(requireContext()).collect {
-                    isChecked = it
-                }
-            }
-            setOnClickListener {
-                CoroutineScope(Dispatchers.IO).launch {
-                    GlobalSettings.setPopUpMessage(requireContext(), isChecked)
-                }
-            }
-        }
-
-        binding.showValueSwitch.apply {
-            CoroutineScope(Dispatchers.Main).launch {
-                GlobalSettings.getShowOnLockScreen(requireContext()).collect {
-                    isChecked = it
-                }
-            }
-            setOnClickListener {
-                CoroutineScope(Dispatchers.IO).launch {
-                    GlobalSettings.setShowOnLockScreen(requireContext(), isChecked)
-                }
-            }
-        }
 
         binding.vibrationSwitch.apply {
             CoroutineScope(Dispatchers.Main).launch {
@@ -65,7 +41,12 @@ class SettingsFragment : Fragment() {
             }
         }
 
-
+        binding.downloadThreadSlider.apply {
+            value = GlobalSettings.numsOfMaxDownloadThreadExported.toFloat()
+            addOnChangeListener { _, value, _ ->
+                GlobalSettings.numsOfMaxDownloadThreadExported = value.toInt()
+            }
+        }
     }
 
     override fun onCreateView(

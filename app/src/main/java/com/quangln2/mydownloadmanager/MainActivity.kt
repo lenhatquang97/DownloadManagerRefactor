@@ -20,12 +20,18 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
+import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
 import com.quangln2.mydownloadmanager.data.source.local.LocalDataSourceImpl
 import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSourceImpl
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.ActivityMainBinding
 import com.quangln2.mydownloadmanager.ui.dialog.AddToDownloadDialog
 import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -112,6 +118,12 @@ class MainActivity : AppCompatActivity() {
             binding.fab.show()
             true
         }
+        CoroutineScope(Dispatchers.Main).launch {
+            GlobalSettings.getMaximumDownloadThread(applicationContext).collect {
+                GlobalSettings.numsOfMaxDownloadThreadExported = it.toInt()
+            }
+            this.cancel()
+        }
     }
 
     private fun doesHaveWriteExternalPermission(): Boolean {
@@ -145,5 +157,12 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        CoroutineScope(Dispatchers.IO).launch {
+            GlobalSettings.setMaximumDownloadThread(applicationContext, GlobalSettings.numsOfMaxDownloadThreadExported.toFloat())
+        }
     }
 }

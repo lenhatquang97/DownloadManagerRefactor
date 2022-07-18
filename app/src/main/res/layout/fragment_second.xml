@@ -40,95 +40,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/notificationTitle" />
 
-            <TextView
-                android:id="@+id/popUpMessages"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Pop-up messages"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider3" />
 
-            <TextView
-                android:id="@+id/popUpMessagesValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="After finishing"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/grey"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/popUpMessages" />
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/popUpMessagesSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:minHeight="48dp"
-                android:theme="@style/SCBSwitch"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider3" />
-
-            <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/divider4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/popUpMessagesValue" />
-
-            <TextView
-                android:id="@+id/show"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Show"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider4" />
-
-            <TextView
-                android:id="@+id/showValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="on lock screen"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/grey"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/show" />
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/showValueSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:minHeight="48dp"
-                android:theme="@style/SCBSwitch"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider4" />
-
-            <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/divider5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/showValue" />
 
             <TextView
                 android:id="@+id/vibration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 android:text="Vibration"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider5" />
+                app:layout_constraintTop_toBottomOf="@id/divider3" />
 
             <TextView
                 android:id="@+id/vibrationValue"
@@ -148,7 +71,73 @@
                 android:minHeight="48dp"
                 android:theme="@style/SCBSwitch"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider3" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/vibrationValue" />
+
+            <TextView
+                android:id="@+id/downloadTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DOWNLOADS"
+                android:layout_marginTop="24dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/blue"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider4" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/downloadTitle" />
+
+
+
+            <TextView
+                android:id="@+id/downloadThread"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Max Download Thread"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider5" />
+
+            <TextView
+                android:id="@+id/downloadThreadValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="To allow how many files can be downloaded at the same time"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/grey"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/downloadThread" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/downloadThreadSlider"
+                app:thumbColor="@color/blue"
+                app:trackColorActive="@color/blue"
+                style="@style/mySlider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:valueFrom="1"
+                android:stepSize="1"
+                android:valueTo="5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/downloadThreadValue"
+                tools:ignore="SpeakableTextPresentCheck" />
+
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.MainActivity
 import com.quangln2.mydownloadmanager.R
@@ -17,6 +18,7 @@ import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
+import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
 import com.quangln2.mydownloadmanager.domain.*
 import com.quangln2.mydownloadmanager.util.DownloadUtil
 import com.quangln2.mydownloadmanager.util.LogicUtil
@@ -82,6 +84,7 @@ class DownloadService : Service() {
             manager.cancel(item.id.hashCode())
             job?.cancel()
             stopSelf()
+            findNextQueueDownloadFile()
             return
         }
     }
@@ -142,7 +145,7 @@ class DownloadService : Service() {
 
     private fun downloadAFileWithCreating(file: StrucDownFile, context: Context, command: String) {
         if(command == "WaitForDownload"){
-            if(DownloadManagerController.howManyFileDownloadingParallel < DownloadManagerController.MAX_DOWNLOAD_THREAD){
+            if(DownloadManagerController.howManyFileDownloadingParallel < GlobalSettings.numsOfMaxDownloadThreadExported){
                 DownloadManagerController.howManyFileDownloadingParallel++
             } else {
                 addToQueueList(file)
@@ -185,6 +188,23 @@ class DownloadService : Service() {
                     DownloadManagerController._progressFile.value = it
                     onOpenNotification(it)
                 }
+            }
+        }
+    }
+
+    private fun findNextQueueDownloadFile(){
+        val currentList = DownloadManagerController.downloadList.value
+        if(currentList != null){
+            val index = currentList.indexOfFirst { it.downloadState == DownloadStatusState.QUEUED }
+            if(index != -1){
+                currentList[index] = currentList[index].copy(downloadState = DownloadStatusState.DOWNLOADING)
+                DownloadManagerController._downloadList.postValue(currentList)
+                DownloadManagerController.howManyFileDownloadingParallel++
+                val intent = Intent(this@DownloadService, DownloadService::class.java)
+                intent.putExtra("item", currentList[index])
+                intent.putExtra("command", "dequeue")
+                this@DownloadService.startService(intent)
+
             }
         }
     }

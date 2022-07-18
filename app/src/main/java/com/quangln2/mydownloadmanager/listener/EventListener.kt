@@ -18,5 +18,6 @@ interface EventListener {
     fun onResume(item: StrucDownFile)
     fun onOpen(item: StrucDownFile)
     fun onRetry(item: StrucDownFile)
+    fun onStop(item: StrucDownFile)
     fun onUpdateToDatabase(item: StrucDownFile)
 }

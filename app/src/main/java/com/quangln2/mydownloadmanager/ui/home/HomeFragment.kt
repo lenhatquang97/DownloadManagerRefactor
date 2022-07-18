@@ -12,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -134,15 +133,16 @@ class HomeFragment : Fragment() {
                         }
                     }
                 }
-                findNextQueueDownloadFile()
             }
 
             override fun onPause(item: StrucDownFile) {
                 viewModel.pause(item.id)
+                DownloadManagerController.howManyFileDownloadingParallel--
             }
 
             override fun onResume(item: StrucDownFile) {
                 viewModel.resume(requireContext(), item.id)
+                DownloadManagerController.howManyFileDownloadingParallel++
             }
 
             override fun onOpen(item: StrucDownFile) {
@@ -151,6 +151,11 @@ class HomeFragment : Fragment() {
 
             override fun onRetry(item: StrucDownFile) {
                 viewModel.retry(requireContext(), item)
+                DownloadManagerController.howManyFileDownloadingParallel++
+            }
+
+            override fun onStop(item: StrucDownFile) {
+                DownloadManagerController.howManyFileDownloadingParallel--
             }
 
             override fun onUpdateToDatabase(item: StrucDownFile) {
@@ -236,31 +241,15 @@ class HomeFragment : Fragment() {
             }
         })
 
-
-
-        binding.chip0.setOnClickListener {
-            viewModel.filterList(DownloadStatusState.ALL.toString())
-
-        }
-        binding.chip1.setOnClickListener {
-            viewModel.filterList(DownloadStatusState.DOWNLOADING.toString())
-
-        }
-        binding.chip2.setOnClickListener {
-            viewModel.filterList(DownloadStatusState.FAILED.toString())
-
-        }
-        binding.chip3.setOnClickListener {
-            viewModel.filterList(DownloadStatusState.PAUSED.toString())
-
-        }
-        binding.chip4.setOnClickListener {
-            viewModel.filterList(DownloadStatusState.COMPLETED.toString())
-
-        }
-        binding.chip5.setOnClickListener {
-            viewModel.filterList(DownloadStatusState.QUEUED.toString())
-
+        binding.stateGroup.setOnCheckedChangeListener { _, checkedId ->
+            when(checkedId){
+                R.id.chip0 -> viewModel.filterList(DownloadStatusState.ALL.toString())
+                R.id.chip1 -> viewModel.filterList(DownloadStatusState.DOWNLOADING.toString())
+                R.id.chip2 -> viewModel.filterList(DownloadStatusState.FAILED.toString())
+                R.id.chip3 -> viewModel.filterList(DownloadStatusState.PAUSED.toString())
+                R.id.chip4 -> viewModel.filterList(DownloadStatusState.COMPLETED.toString())
+                R.id.chip5 -> viewModel.filterList(DownloadStatusState.QUEUED.toString())
+            }
         }
     }
 
