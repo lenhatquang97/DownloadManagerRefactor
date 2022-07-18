@@ -21,11 +21,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add new download file"
+            android:textStyle="bold"
             android:textAppearance="?android:attr/textAppearanceMedium"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
+            app:boxCornerRadiusBottomEnd="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusTopStart="16dp"
             android:id="@+id/linkTextField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,6 +68,10 @@
                 tools:layout_editor_absoluteX="24dp" />
 
             <com.google.android.material.textfield.TextInputLayout
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopStart="16dp"
                 android:id="@+id/downloadToTextField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
