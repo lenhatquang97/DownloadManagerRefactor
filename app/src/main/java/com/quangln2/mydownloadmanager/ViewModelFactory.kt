@@ -21,7 +21,8 @@ class ViewModelFactory constructor(
                         FetchDownloadInfoUseCase(downloadRepository),
                         RetryDownloadUseCase(downloadRepository),
                         OpenDownloadFileUseCase(downloadRepository),
-                        UpdateToListUseCase(downloadRepository)
+                        UpdateToListUseCase(downloadRepository),
+                        DoesDownloadLinkExistUseCase(downloadRepository),
                     )
                 else ->
                     throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

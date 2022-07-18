@@ -20,10 +20,8 @@ import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusSt
 import com.quangln2.mydownloadmanager.domain.*
 import com.quangln2.mydownloadmanager.util.DownloadUtil
 import com.quangln2.mydownloadmanager.util.LogicUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 
 class DownloadService : Service() {
@@ -36,6 +34,7 @@ class DownloadService : Service() {
         .setContentText("Welcome to DownloadManager")
         .setGroup(CHANNEL_ID)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+    private var job: Job? = null
 
 
     override fun onBind(intent: Intent?): IBinder {
@@ -79,7 +78,9 @@ class DownloadService : Service() {
         builder.setProgress(100, progress, false)
         manager.notify(item.id.hashCode(), builder.build())
         if (progress == 100) {
+            DownloadManagerController.howManyFileDownloadingParallel--
             manager.cancel(item.id.hashCode())
+            job?.cancel()
             stopSelf()
             return
         }
@@ -88,7 +89,8 @@ class DownloadService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null) {
             val item = intent.getSerializableExtra("item") as StrucDownFile
-            downloadAFileWithCreating(item, this)
+            val command = intent.getStringExtra("command") ?: "nothing"
+            downloadAFileWithCreating(item, this, command)
         }
         return START_NOT_STICKY
     }
@@ -106,6 +108,8 @@ class DownloadService : Service() {
         }
     }
 
+
+
     private fun addToDownloadList(file: StrucDownFile) {
         val currentList = DownloadManagerController.downloadList.value
         if (currentList != null) {
@@ -121,7 +125,30 @@ class DownloadService : Service() {
         }
     }
 
-    private fun downloadAFileWithCreating(file: StrucDownFile, context: Context) {
+    private fun addToQueueList(file: StrucDownFile){
+        val currentList = DownloadManagerController.downloadList.value
+        if (currentList != null) {
+            currentList.add(file.copy(downloadState = DownloadStatusState.QUEUED))
+            DownloadManagerController._downloadList.postValue(currentList)
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
+                file.copy(
+                    downloadState = DownloadStatusState.QUEUED
+                )
+            )
+        }
+    }
+
+    private fun downloadAFileWithCreating(file: StrucDownFile, context: Context, command: String) {
+        if(command == "WaitForDownload"){
+            if(DownloadManagerController.howManyFileDownloadingParallel < DownloadManagerController.MAX_DOWNLOAD_THREAD){
+                DownloadManagerController.howManyFileDownloadingParallel++
+            } else {
+                addToQueueList(file)
+                return
+            }
+        }
         if (file.downloadState == DownloadStatusState.FAILED) {
             createFileAgain(file, context)
             val currentList = DownloadManagerController.downloadList.value
@@ -135,14 +162,22 @@ class DownloadService : Service() {
                     file.copy()
                 )
             }
-        } else if (!DownloadUtil.isFileExisting(file, context)) {
+        } else if(!DownloadUtil.isFileExisting(file, context) && command == "dequeue"){
+            createFileAgain(file, context)
+        }
+        else if (!DownloadUtil.isFileExisting(file, context)) {
             createFileAgain(file, context)
             addToDownloadList(file)
         }
         val currentList = DownloadManagerController.downloadList.value
         val index = currentList?.indexOfFirst { it.id == file.id }
+        if (command == "dequeue"){
+            if (index != null) {
+                currentList[index] = file.copy()
+            }
+        }
         if (index != null && index != -1) {
-            CoroutineScope(Dispatchers.Main).launch {
+            job = CoroutineScope(Dispatchers.Main).launch {
                 DownloadAFileUseCase(DownloadManagerApplication.downloadRepository)(
                     currentList[index],
                     context
@@ -152,7 +187,5 @@ class DownloadService : Service() {
                 }
             }
         }
-
-
     }
 }

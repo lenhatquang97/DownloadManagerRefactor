@@ -21,8 +21,6 @@ data class StrucDownFile(
     @ColumnInfo(name = "download_state") var downloadState: DownloadStatusState,
     @ColumnInfo(name = "mime_type") var mimeType: String,
     @ColumnInfo(name = "file_name") var fileName: String,
-
-
     @ColumnInfo(name = "uri") var uri: String?,
 ) : Serializable {
     constructor() :

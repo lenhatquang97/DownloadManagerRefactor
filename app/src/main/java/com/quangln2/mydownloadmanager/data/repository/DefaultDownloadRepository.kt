@@ -3,13 +3,10 @@ package com.quangln2.mydownloadmanager.data.repository
 import android.content.Context
 import androidx.annotation.WorkerThread
 import com.quangln2.mydownloadmanager.data.database.DownloadDao
-import com.quangln2.mydownloadmanager.data.datasource.LocalDataSource
-import com.quangln2.mydownloadmanager.data.datasource.RemoteDataSource
+import com.quangln2.mydownloadmanager.data.source.local.LocalDataSource
+import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSource
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 
 class DefaultDownloadRepository(
@@ -42,6 +39,12 @@ class DefaultDownloadRepository(
         downloadDao.delete(file)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun doesDownloadLinkExist(file: StrucDownFile): Boolean {
+        return downloadDao.doesDownloadLinkExist(file.downloadLink) == 1
+    }
+
     fun addNewDownloadInfo(url: String, downloadTo: String, file: StrucDownFile) =
         remoteDataSource.addNewDownloadInfo(url, downloadTo, file)
 
@@ -66,7 +69,6 @@ class DefaultDownloadRepository(
 
 
     fun queueDownload(file: StrucDownFile) = remoteDataSource.queueDownload(file)
-    suspend fun copyFile() = localDataSource.copyFile()
     fun openDownloadFile(item: StrucDownFile, context: Context) =
         localDataSource.openDownloadFile(item, context)
 

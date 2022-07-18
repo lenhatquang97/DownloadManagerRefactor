@@ -54,4 +54,8 @@
     <style name="MoreButtonFunction.PopupMenu" parent="Widget.AppCompat.PopupMenu">
         <item name="android:itemBackground">@color/white</item>
     </style>
+
+    <style name="checkedChip" parent="@style/Widget.MaterialComponents.Chip.Filter">
+        <item name="checkedIcon">@drawable/ic_baseline_check_white</item>
+    </style>
 </resources>

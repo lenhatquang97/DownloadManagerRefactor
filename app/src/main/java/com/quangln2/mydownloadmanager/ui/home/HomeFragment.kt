@@ -24,8 +24,8 @@ import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController.progressFile
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController.downloadList
-import com.quangln2.mydownloadmanager.data.datasource.LocalDataSourceImpl
-import com.quangln2.mydownloadmanager.data.datasource.RemoteDataSourceImpl
+import com.quangln2.mydownloadmanager.data.source.local.LocalDataSourceImpl
+import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSourceImpl
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
@@ -134,6 +134,7 @@ class HomeFragment : Fragment() {
                         }
                     }
                 }
+                findNextQueueDownloadFile()
             }
 
             override fun onPause(item: StrucDownFile) {
@@ -240,84 +241,25 @@ class HomeFragment : Fragment() {
         binding.chip0.setOnClickListener {
             viewModel.filterList(DownloadStatusState.ALL.toString())
 
-            binding.chip0.chipIcon = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.ic_baseline_check_circle_outline_24
-            )
-            binding.chip1.chipIcon = null
-            binding.chip2.chipIcon = null
-            binding.chip3.chipIcon = null
-            binding.chip4.chipIcon = null
-            binding.chip5.chipIcon = null
         }
         binding.chip1.setOnClickListener {
             viewModel.filterList(DownloadStatusState.DOWNLOADING.toString())
 
-            binding.chip0.chipIcon = null
-            binding.chip1.chipIcon = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.ic_baseline_check_circle_outline_24
-            )
-            binding.chip2.chipIcon = null
-            binding.chip3.chipIcon = null
-            binding.chip4.chipIcon = null
-            binding.chip5.chipIcon = null
         }
         binding.chip2.setOnClickListener {
             viewModel.filterList(DownloadStatusState.FAILED.toString())
 
-            binding.chip0.chipIcon = null
-            binding.chip1.chipIcon = null
-            binding.chip2.chipIcon = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.ic_baseline_check_circle_outline_24
-            )
-            binding.chip3.chipIcon = null
-            binding.chip4.chipIcon = null
-            binding.chip5.chipIcon = null
         }
         binding.chip3.setOnClickListener {
             viewModel.filterList(DownloadStatusState.PAUSED.toString())
-
-            binding.chip0.chipIcon = null
-            binding.chip1.chipIcon = null
-            binding.chip2.chipIcon = null
-            binding.chip3.chipIcon = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.ic_baseline_check_circle_outline_24
-            )
-            binding.chip4.chipIcon = null
-            binding.chip5.chipIcon = null
-
 
         }
         binding.chip4.setOnClickListener {
             viewModel.filterList(DownloadStatusState.COMPLETED.toString())
 
-            binding.chip0.chipIcon = null
-            binding.chip1.chipIcon = null
-            binding.chip2.chipIcon = null
-            binding.chip3.chipIcon = null
-            binding.chip4.chipIcon = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.ic_baseline_check_circle_outline_24
-            )
-            binding.chip5.chipIcon = null
-
-
         }
         binding.chip5.setOnClickListener {
             viewModel.filterList(DownloadStatusState.QUEUED.toString())
-
-            binding.chip0.chipIcon = null
-            binding.chip1.chipIcon = null
-            binding.chip2.chipIcon = null
-            binding.chip3.chipIcon = null
-            binding.chip4.chipIcon = null
-            binding.chip5.chipIcon = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.ic_baseline_check_circle_outline_24
-            )
 
         }
     }
@@ -332,6 +274,23 @@ class HomeFragment : Fragment() {
                 requireContext().stopService(Intent(requireContext(), DownloadService::class.java))
             }
             isBound = false
+        }
+    }
+
+    private fun findNextQueueDownloadFile(){
+        val currentList = downloadList.value
+        if(currentList != null){
+            val index = currentList.indexOfFirst { it.downloadState == DownloadStatusState.QUEUED }
+            if(index != -1){
+                currentList[index] = currentList[index].copy(downloadState = DownloadStatusState.DOWNLOADING)
+                DownloadManagerController._downloadList.postValue(currentList)
+                DownloadManagerController.howManyFileDownloadingParallel++
+                val intent = Intent(requireContext(), DownloadService::class.java)
+                intent.putExtra("item", currentList[index])
+                intent.putExtra("command", "dequeue")
+                requireContext().startService(intent)
+
+            }
         }
     }
 

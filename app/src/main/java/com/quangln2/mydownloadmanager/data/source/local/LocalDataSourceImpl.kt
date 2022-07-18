@@ -1,4 +1,4 @@
-package com.quangln2.mydownloadmanager.data.datasource
+package com.quangln2.mydownloadmanager.data.source.local
 
 import android.content.ContentValues
 import android.content.Context
@@ -90,6 +90,7 @@ class LocalDataSourceImpl : LocalDataSource {
                     .toString()
             }
             cursor?.close()
+            println("Log")
         }
 
     }
@@ -141,4 +142,5 @@ class LocalDataSourceImpl : LocalDataSource {
             context.startActivity(intent)
         }
     }
+
 }

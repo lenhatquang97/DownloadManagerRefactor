@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
-import android.widget.Toast
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import java.io.File
 

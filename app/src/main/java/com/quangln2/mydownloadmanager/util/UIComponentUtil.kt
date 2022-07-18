@@ -1,7 +1,12 @@
 package com.quangln2.mydownloadmanager.util
 
+import android.content.Context
 import androidx.documentfile.provider.DocumentFile
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.mydownloadmanager.R
+import com.quangln2.mydownloadmanager.data.constants.ConstantClass
+import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.listener.OnAcceptPress
 
 class UIComponentUtil {
     companion object {
@@ -57,6 +62,37 @@ class UIComponentUtil {
                 }
             }
             return path1
+        }
+
+        fun showDownloadDialogAgain(context: Context, file: StrucDownFile, onAcceptPress: OnAcceptPress){
+            val builder =
+                MaterialAlertDialogBuilder(context, R.style.AlertDialogShow)
+                    .setTitle(file.fileName)
+                    .setMessage(ConstantClass.DOWNLOAD_AGAIN_MESSAGE)
+                    .setPositiveButton(ConstantClass.POSITIVE_BUTTON) { a, _ ->
+                        onAcceptPress.onAcceptPress()
+                        a.dismiss()
+                    }
+                    .setNegativeButton(ConstantClass.NEGATIVE_BUTTON) { a, _ ->
+                        a.dismiss()
+                    }
+            builder.show()
+        }
+
+        fun showDownloadAlertDialog(context: Context, file: StrucDownFile, onAcceptPress: OnAcceptPress) {
+            val builder =
+                MaterialAlertDialogBuilder(context, R.style.AlertDialogShow)
+                    .setTitle(file.fileName)
+                    .setIcon(R.drawable.ic_baseline_arrow_downward_24)
+                    .setMessage(ConstantClass.DOWNLOAD_MESSAGE + file.convertToSizeUnit())
+                    .setPositiveButton(ConstantClass.POSITIVE_BUTTON) { a, _ ->
+                        onAcceptPress.onAcceptPress()
+                        a.dismiss()
+                    }
+                    .setNegativeButton(ConstantClass.NEGATIVE_BUTTON) { a, _ ->
+                        a.dismiss()
+                    }
+            builder.show()
         }
 
     }

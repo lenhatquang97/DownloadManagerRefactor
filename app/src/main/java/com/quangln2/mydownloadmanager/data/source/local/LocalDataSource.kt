@@ -1,4 +1,4 @@
-package com.quangln2.mydownloadmanager.data.datasource
+package com.quangln2.mydownloadmanager.data.source.local
 
 import android.content.Context
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile

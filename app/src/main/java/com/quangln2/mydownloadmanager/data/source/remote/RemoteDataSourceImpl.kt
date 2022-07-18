@@ -1,4 +1,4 @@
-package com.quangln2.mydownloadmanager.data.datasource
+package com.quangln2.mydownloadmanager.data.source.remote
 
 import android.content.ContentValues
 import android.content.Context
@@ -95,12 +95,15 @@ class RemoteDataSourceImpl : RemoteDataSource {
                         if (file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED) {
                             out.close()
                             connection.disconnect()
-                            break
+                            return@flow
                         }
                         x = inp.read(data, 0, 1024)
                     }
-                    out.close()
-                    connection.disconnect()
+                    if(file.bytesCopied == file.size){
+                        out.close()
+                        connection.disconnect()
+                    }
+
                 }
 
             } else {
@@ -118,12 +121,14 @@ class RemoteDataSourceImpl : RemoteDataSource {
                     if (file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED) {
                         fos.close()
                         connection.disconnect()
-                        break
+                        return@flow
                     }
                     x = inp.read(data, 0, 1024)
                 }
-                fos.close()
-                connection.disconnect()
+                if(file.bytesCopied == file.size){
+                    fos.close()
+                    connection.disconnect()
+                }
             }
         } catch (e: Exception) {
             println(e)

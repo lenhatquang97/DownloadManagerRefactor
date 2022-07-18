@@ -192,7 +192,11 @@ class DownloadListAdapter(private var context: Context) :
         mutableList[index] = file
         submitList(mutableList)
         notifyItemChanged(index)
+    }
 
+    override fun getItemId(position: Int): Long {
+        val item = currentList.get(position)
+        return item.id.hashCode().toLong()
     }
 
 

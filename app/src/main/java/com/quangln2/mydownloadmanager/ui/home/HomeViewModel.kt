@@ -17,8 +17,10 @@ import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.domain.*
+import com.quangln2.mydownloadmanager.listener.OnAcceptPress
 import com.quangln2.mydownloadmanager.service.DownloadService
 import com.quangln2.mydownloadmanager.util.DownloadUtil
+import com.quangln2.mydownloadmanager.util.UIComponentUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,9 +33,8 @@ class HomeViewModel(
     val fetchDownloadInfo: FetchDownloadInfoUseCase,
     val retryDownloadUseCase: RetryDownloadUseCase,
     val openDownloadFileUseCase: OpenDownloadFileUseCase,
-    val updateToListUseCase: UpdateToListUseCase
-
-
+    val updateToListUseCase: UpdateToListUseCase,
+    val doesDownloadLinkExistUseCase: DoesDownloadLinkExistUseCase
 ) : ViewModel() {
     var _isOpenDialog = MutableLiveData<Boolean>().apply { value = false }
     var _filterList =
@@ -42,6 +43,33 @@ class HomeViewModel(
 
 
     var textSearch = MutableLiveData<String>().apply { value = "" }
+
+
+    fun preProcessingDownloadFile(context: Context, file: StrucDownFile){
+        val onAcceptPress = object : OnAcceptPress{
+            override fun onAcceptPress() {
+                val intent = Intent(context, DownloadService::class.java)
+                intent.putExtra("command", "WaitForDownload")
+                intent.putExtra("item", file)
+                context.startService(intent)
+            }
+        }
+
+        //Does same download link exist?
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = doesDownloadLinkExistUseCase(file)
+            if (result){
+                withContext(Dispatchers.Main){
+                    UIComponentUtil.showDownloadDialogAgain(context, file, onAcceptPress)
+                }
+            } else {
+                withContext(Dispatchers.Main){
+                    UIComponentUtil.showDownloadAlertDialog(context, file, onAcceptPress)
+                }
+            }
+        }
+    }
+
 
 
     fun filterList(downloadStatusState: String) {
@@ -135,7 +163,6 @@ class HomeViewModel(
         builder.show()
     }
 
-
     fun addNewDownloadInfo(url: String, downloadTo: String) {
         if (DownloadManagerController._inputItem.value != null) {
             addNewDownloadInfo(url, downloadTo, DownloadManagerController._inputItem.value!!)
@@ -223,6 +250,5 @@ class HomeViewModel(
         intent.putExtra("item", currentFile)
         context.startService(intent)
     }
-
 
 }

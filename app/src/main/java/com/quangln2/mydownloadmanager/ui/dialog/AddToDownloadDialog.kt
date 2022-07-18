@@ -17,7 +17,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
 import com.quangln2.mydownloadmanager.R
@@ -26,12 +25,11 @@ import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.database.DownloadDatabase
-import com.quangln2.mydownloadmanager.data.datasource.LocalDataSourceImpl
-import com.quangln2.mydownloadmanager.data.datasource.RemoteDataSourceImpl
+import com.quangln2.mydownloadmanager.data.source.local.LocalDataSourceImpl
+import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSourceImpl
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
-import com.quangln2.mydownloadmanager.service.DownloadService
 import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
 import com.quangln2.mydownloadmanager.util.UIComponentUtil.Companion.getRealPath
 
@@ -56,7 +54,8 @@ class AddToDownloadDialog : DialogFragment() {
         super.onCreate(savedInstanceState)
         DownloadManagerController.fetchedFileInfo.observe(this) { file ->
             if (file != null && file.downloadLink != ConstantClass.FILE_NAME_DEFAULT && viewModel._isOpenDialog.value!!) {
-                showDownloadAlertDialog(requireContext(), file)
+                dismiss()
+                openDownloadDialog(file)
             }
             viewModel._isOpenDialog.value = false
         }
@@ -125,30 +124,6 @@ class AddToDownloadDialog : DialogFragment() {
             .setView(binding.root).create()
     }
 
-    private fun showDownloadAlertDialog(context: Context, file: StrucDownFile) {
-        if (file.size == -1L) {
-            Toast.makeText(context, ConstantClass.INVALID_LINK, Toast.LENGTH_SHORT).show()
-            binding.addNewDownloadFileButton.icon = null
-            return
-        }
-        val builder =
-            MaterialAlertDialogBuilder(requireActivity(), R.style.AlertDialogShow)
-                .setTitle(file.fileName)
-                .setIcon(R.drawable.ic_baseline_arrow_downward_24)
-                .setMessage(ConstantClass.DOWNLOAD_MESSAGE + file.convertToSizeUnit())
-                .setPositiveButton(ConstantClass.POSITIVE_BUTTON) { _, _ ->
-                    val intent = Intent(context, DownloadService::class.java)
-                    intent.putExtra("item", file)
-                    context.startService(intent)
-                    dismiss()
-                }
-                .setNegativeButton(ConstantClass.NEGATIVE_BUTTON) { _, _ ->
-                    dismiss()
-                }
-        builder.show()
-        dismiss()
-    }
-
     private fun closeKeyboard(view: View) {
         val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         if (view.windowToken != null) {
@@ -160,6 +135,12 @@ class AddToDownloadDialog : DialogFragment() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         resultLauncher.launch(intent)
     }
-
-
+    private fun openDownloadDialog(file: StrucDownFile){
+        if(file.size == -1L){
+            binding.addNewDownloadFileButton.icon = null
+            Toast.makeText(context, ConstantClass.INVALID_LINK, Toast.LENGTH_SHORT).show()
+            return
+        }
+        viewModel.preProcessingDownloadFile(requireContext(), file)
+    }
 }

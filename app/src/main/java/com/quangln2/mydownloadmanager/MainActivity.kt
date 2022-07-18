@@ -20,8 +20,8 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
-import com.quangln2.mydownloadmanager.data.datasource.LocalDataSourceImpl
-import com.quangln2.mydownloadmanager.data.datasource.RemoteDataSourceImpl
+import com.quangln2.mydownloadmanager.data.source.local.LocalDataSourceImpl
+import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSourceImpl
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.ActivityMainBinding
 import com.quangln2.mydownloadmanager.ui.dialog.AddToDownloadDialog

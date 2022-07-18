@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.1273980815347722" />
+        <entry key="../../.gradle/caches/transforms-3/34d1a616bc5f0ee3337a746bf504d5b0/transformed/material-1.5.0-alpha04/res/drawable/ic_mtrl_chip_checked_black.xml" value="0.1545" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.13" />
         <entry key="app/src/main/res/drawable/background_white.xml" value="0.145" />
         <entry key="app/src/main/res/drawable/border_radius.xml" value="0.145" />
@@ -11,12 +12,17 @@
         <entry key="app/src/main/res/drawable/dialog_bg.xml" value="0.145" />
         <entry key="app/src/main/res/drawable/ic_article.xml" value="0.13" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.13" />
+        <entry key="app/src/main/res/drawable/ic_baseline_check_blue.xml" value="0.1545" />
+        <entry key="app/src/main/res/drawable/ic_baseline_check_circle_outline_24.xml" value="0.1575" />
+        <entry key="app/src/main/res/drawable/ic_baseline_check_white.xml" value="0.1545" />
         <entry key="app/src/main/res/drawable/ic_baseline_folder_24.xml" value="0.145" />
         <entry key="app/src/main/res/drawable/ic_baseline_folder_open_24.xml" value="0.145" />
         <entry key="app/src/main/res/drawable/ic_baseline_menu_24.xml" value="0.13" />
+        <entry key="app/src/main/res/drawable/ic_baseline_more_vert_24.xml" value="0.1115" />
         <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.1245" />
         <entry key="app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.1245" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.13" />
+        <entry key="app/src/main/res/drawable/ic_open.xml" value="0.1115" />
         <entry key="app/src/main/res/drawable/ic_pause.xml" value="0.1245" />
         <entry key="app/src/main/res/drawable/ic_retry.xml" value="0.1245" />
         <entry key="app/src/main/res/drawable/ic_start.xml" value="0.1245" />
