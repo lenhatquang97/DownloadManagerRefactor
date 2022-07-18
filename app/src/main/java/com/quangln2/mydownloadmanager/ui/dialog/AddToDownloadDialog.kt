@@ -115,8 +115,11 @@ class AddToDownloadDialog : DialogFragment() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             binding.downloadToTextField.visibility = View.GONE
+            binding.noteAboveAndroid10.visibility = View.VISIBLE
         } else {
             binding.endIcon.inputType = InputType.TYPE_NULL
+            binding.downloadToTextField.visibility = View.VISIBLE
+            binding.noteAboveAndroid10.visibility = View.GONE
         }
 
 
