@@ -1,5 +1,6 @@
 package com.quangln2.mydownloadmanager
 
+import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.database.DownloadDao
 import com.quangln2.mydownloadmanager.data.source.local.LocalDataSourceImpl
 import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSourceImpl
@@ -22,7 +23,7 @@ object ServiceLocator {
     fun initializeStrucDownFile(): StrucDownFile {
         return StrucDownFile(
             "",
-            "test",
+            ConstantClass.FILE_NAME_DEFAULT,
             "test",
             "Documents",
             -1,

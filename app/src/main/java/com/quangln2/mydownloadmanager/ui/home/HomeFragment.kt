@@ -265,22 +265,4 @@ class HomeFragment : Fragment() {
             isBound = false
         }
     }
-
-    private fun findNextQueueDownloadFile(){
-        val currentList = downloadList.value
-        if(currentList != null){
-            val index = currentList.indexOfFirst { it.downloadState == DownloadStatusState.QUEUED }
-            if(index != -1){
-                currentList[index] = currentList[index].copy(downloadState = DownloadStatusState.DOWNLOADING)
-                DownloadManagerController._downloadList.postValue(currentList)
-                DownloadManagerController.howManyFileDownloadingParallel++
-                val intent = Intent(requireContext(), DownloadService::class.java)
-                intent.putExtra("item", currentList[index])
-                intent.putExtra("command", "dequeue")
-                requireContext().startService(intent)
-
-            }
-        }
-    }
-
 }

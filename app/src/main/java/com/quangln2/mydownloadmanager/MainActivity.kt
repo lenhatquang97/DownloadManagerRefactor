@@ -98,7 +98,6 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        //Set burger menu
         supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24)
         }
