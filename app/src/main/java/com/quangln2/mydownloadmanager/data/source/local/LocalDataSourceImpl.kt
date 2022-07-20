@@ -90,7 +90,6 @@ class LocalDataSourceImpl : LocalDataSource {
                     .toString()
             }
             cursor?.close()
-            println("Log")
         }
 
     }
@@ -109,10 +108,6 @@ class LocalDataSourceImpl : LocalDataSource {
             ).absolutePath
         }) + "/" + file.fileName
 
-
-    }
-
-    override suspend fun copyFile() {
 
     }
 

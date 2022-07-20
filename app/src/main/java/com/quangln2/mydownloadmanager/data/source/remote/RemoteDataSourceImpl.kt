@@ -6,8 +6,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
+import android.widget.Toast
 import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
@@ -23,6 +25,7 @@ import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
+import javax.net.ssl.HttpsURLConnection
 
 class RemoteDataSourceImpl : RemoteDataSource {
 
@@ -44,8 +47,8 @@ class RemoteDataSourceImpl : RemoteDataSource {
 
     override fun fetchDownloadInfo(file: StrucDownFile): StrucDownFile {
         val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
         connection.doInput = true
-        connection.doOutput = true
         connection.requestMethod = "GET"
         try {
             val responseCode = connection.responseCode
@@ -55,6 +58,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
                 file.mimeType =
                     if (connection.contentType == null) getMimeType(file.downloadLink) else connection.contentType
                 file.size = connection.contentLength.toLong()
+                Log.d("FileSize", file.size.toString())
                 file.kindOf = UIComponentUtil.defineTypeOfCategoriesBasedOnFileName(file.mimeType)
                 connection.disconnect()
                 file
@@ -65,6 +69,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
                 initFile
             }
         } catch (e: Exception) {
+            Log.d("FileError", e.toString())
             val initFile = ServiceLocator.initializeStrucDownFile()
             file.fileName = initFile.fileName
             file.size = initFile.size
@@ -78,7 +83,6 @@ class RemoteDataSourceImpl : RemoteDataSource {
             val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
             connection.setRequestProperty("Range", "bytes=${file.bytesCopied}-")
             connection.doInput = true
-            connection.doOutput = true
             val inp = BufferedInputStream(connection.inputStream)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 if (file.uri == null) {
@@ -131,7 +135,6 @@ class RemoteDataSourceImpl : RemoteDataSource {
                 }
             }
         } catch (e: Exception) {
-            println(e)
             emit(file.copy(downloadState = DownloadStatusState.FAILED))
         }
 

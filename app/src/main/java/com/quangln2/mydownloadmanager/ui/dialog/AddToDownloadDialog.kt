@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.webkit.URLUtil
@@ -140,6 +141,7 @@ class AddToDownloadDialog : DialogFragment() {
     }
     private fun openDownloadDialog(file: StrucDownFile){
         if(file.size == -1L){
+            Log.d("DownloadDialog", "File size is -1")
             binding.addNewDownloadFileButton.icon = null
             Toast.makeText(context, ConstantClass.INVALID_LINK, Toast.LENGTH_SHORT).show()
             return

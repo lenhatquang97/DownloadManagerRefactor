@@ -7,6 +7,5 @@ interface LocalDataSource {
     suspend fun deletePermanently(file: StrucDownFile, context: Context)
     fun writeToFileAPI29Above(file: StrucDownFile, context: Context)
     fun writeToFileAPI29Below(file: StrucDownFile)
-    suspend fun copyFile()
     fun openDownloadFile(item: StrucDownFile, context: Context)
 }
