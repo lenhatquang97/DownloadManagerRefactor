@@ -37,7 +37,8 @@ class DownloadListAdapter(private var context: Context) :
         private fun initialSetup(item: StrucDownFile) {
             binding.heading.text = cutFileName(item.fileName)
             binding.textView.text =
-                if (binding.textView.text.isNullOrEmpty()) item.convertToSizeUnit() + " - " + item.downloadState.toString() else binding.textView.text.toString()
+                if (binding.textView.text.isNullOrEmpty()) item.convertToSizeUnit() + " - " +
+                        item.downloadState.toString() else binding.textView.text.toString()
             binding.progressBar.progress = 0
             binding.roundCategory.setImageResource(UIComponentUtil.defineIcon(item.kindOf))
             when (item.downloadState) {
@@ -157,12 +158,11 @@ class DownloadListAdapter(private var context: Context) :
                 }
             }
             if (item.downloadState == DownloadStatusState.FAILED) {
-                binding.textView.text =
-                    item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                eventListener?.onUpdateToDatabase(item)
             }
 
-            val progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100).toInt()
-            if (progress == 100) {
+            if (item.bytesCopied == item.size && item.downloadState != DownloadStatusState.FAILED) {
                 eventListener?.onDownloadSuccess(binding, item, context)
             }
         }
@@ -196,7 +196,7 @@ class DownloadListAdapter(private var context: Context) :
     }
 
     override fun getItemId(position: Int): Long {
-        val item = currentList.get(position)
+        val item = currentList[position]
         return item.id.hashCode().toLong()
     }
 

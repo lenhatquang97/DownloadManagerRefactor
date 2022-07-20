@@ -21,18 +21,20 @@ import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
-import com.quangln2.mydownloadmanager.controller.DownloadManagerController.progressFile
+import com.quangln2.mydownloadmanager.controller.DownloadManagerController._downloadList
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController.downloadList
-import com.quangln2.mydownloadmanager.data.source.local.LocalDataSourceImpl
-import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSourceImpl
+import com.quangln2.mydownloadmanager.controller.DownloadManagerController.progressFile
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
+import com.quangln2.mydownloadmanager.data.source.local.LocalDataSourceImpl
+import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSourceImpl
 import com.quangln2.mydownloadmanager.databinding.DownloadItemBinding
 import com.quangln2.mydownloadmanager.databinding.FragmentFirstBinding
 import com.quangln2.mydownloadmanager.listener.EventListener
 import com.quangln2.mydownloadmanager.service.DownloadService
+import com.quangln2.mydownloadmanager.util.DownloadUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -43,6 +45,7 @@ import kotlinx.coroutines.withContext
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentFirstBinding
+    private lateinit var adapterVal: DownloadListAdapter
 
     private val viewModel: HomeViewModel by activityViewModels {
         ViewModelFactory(
@@ -86,7 +89,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapterVal = DownloadListAdapter(requireContext())
+        adapterVal = DownloadListAdapter(requireContext())
         adapterVal.eventListener = object : EventListener {
 
             override fun onHandleDelete(
@@ -122,8 +125,7 @@ class HomeFragment : Fragment() {
                 item.downloadState = DownloadStatusState.COMPLETED
                 binding.stopButton.visibility = View.GONE
                 binding.progressBar.visibility = View.GONE
-                binding.textView.text =
-                    item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
                 binding.downloadStateButton.setImageResource(R.drawable.ic_open)
                 CoroutineScope(Dispatchers.IO).launch {
                     DownloadManagerApplication.downloadRepository.update(item)
@@ -177,9 +179,10 @@ class HomeFragment : Fragment() {
 
         DownloadManagerController.downloadListSchema?.observe(viewLifecycleOwner) {
             it?.let {
-                if (it.isNotEmpty() && DownloadManagerController._downloadList.value != null &&
-                    DownloadManagerController._downloadList.value?.size == 0) {
-                    DownloadManagerController._downloadList.value = it.toMutableList()
+                if (it.isNotEmpty() && _downloadList.value != null &&
+                    _downloadList.value?.size == 0
+                ) {
+                    _downloadList.value = it.toMutableList()
                 }
             }
 
@@ -190,7 +193,7 @@ class HomeFragment : Fragment() {
         downloadList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
-                    binding.chip0.performClick()
+                   // binding.chip0.performClick()
                     viewModel._filterList.value = it
                 }
             }
@@ -204,9 +207,12 @@ class HomeFragment : Fragment() {
                 } else {
                     binding.downloadLists.visibility = View.VISIBLE
                     binding.emptyDataParent.visibility = View.GONE
-                    if(viewModel.textSearch.value != null){
-                        val result = it.filter { itr -> itr.fileName.lowercase().contains(
-                            viewModel.textSearch.value!!.lowercase()) }
+                    if (viewModel.textSearch.value != null) {
+                        val result = it.filter { itr ->
+                            itr.fileName.lowercase().contains(
+                                viewModel.textSearch.value!!.lowercase()
+                            )
+                        }
                         adapterVal.submitList(result.toMutableList())
                     }
 
@@ -242,13 +248,15 @@ class HomeFragment : Fragment() {
         })
 
         binding.stateGroup.setOnCheckedChangeListener { _, checkedId ->
-            when(checkedId){
+            when (checkedId) {
                 R.id.chip0 -> viewModel.filterList(DownloadStatusState.ALL.toString())
                 R.id.chip1 -> viewModel.filterList(DownloadStatusState.DOWNLOADING.toString())
                 R.id.chip2 -> viewModel.filterList(DownloadStatusState.FAILED.toString())
                 R.id.chip3 -> viewModel.filterList(DownloadStatusState.PAUSED.toString())
                 R.id.chip4 -> viewModel.filterList(DownloadStatusState.COMPLETED.toString())
-                R.id.chip5 -> viewModel.filterList(DownloadStatusState.QUEUED.toString())
+                R.id.chip5 -> {
+                    viewModel.filterList(DownloadStatusState.QUEUED.toString())
+                }
             }
         }
     }
@@ -259,10 +267,37 @@ class HomeFragment : Fragment() {
             requireContext().unbindService(connection)
             val currentList = DownloadManagerController._downloadList.value
             val res = currentList?.find { it.downloadState == DownloadStatusState.DOWNLOADING }
-            if(res != null) {
+            if (res != null) {
                 requireContext().stopService(Intent(requireContext(), DownloadService::class.java))
             }
             isBound = false
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        detectFileFailed()
+    }
+
+    private fun detectFileFailed(){
+        val res = downloadList.value
+        val indexArray = mutableListOf<Int>()
+        if (res != null) {
+            for (i in 0 until res.size) {
+                if (!DownloadUtil.isFileExisting(res[i], requireContext())) {
+                    res[i].downloadState = DownloadStatusState.FAILED
+                    indexArray.add(i)
+                }
+            }
+            if (indexArray.size > 0) {
+                _downloadList.postValue(res.toMutableList())
+                adapterVal.submitList(res.toMutableList())
+                for (i in indexArray) {
+                    adapterVal.notifyItemChanged(i)
+                }
+
+            }
+
         }
     }
 }
