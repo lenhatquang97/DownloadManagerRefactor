@@ -23,6 +23,4 @@ object DownloadManagerController {
         MutableLiveData<StrucDownFile>().apply { value = ServiceLocator.initializeStrucDownFile() }
     val progressFile: LiveData<StrucDownFile> get() = _progressFile
 
-    var howManyFileDownloadingParallel = 0
-
 }

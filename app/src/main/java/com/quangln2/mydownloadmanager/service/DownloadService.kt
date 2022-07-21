@@ -80,7 +80,6 @@ class DownloadService : Service() {
         builder.setProgress(100, progress, false)
         manager.notify(item.id.hashCode(), builder.build())
         if (progress == 100) {
-            DownloadManagerController.howManyFileDownloadingParallel--
             manager.cancel(item.id.hashCode())
             job?.cancel()
             stopSelf()
@@ -115,9 +114,31 @@ class DownloadService : Service() {
 
     private fun addToDownloadList(file: StrucDownFile) {
         val currentList = DownloadManagerController.downloadList.value
+
+
         if (currentList != null) {
-            currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
-            DownloadManagerController._downloadList.postValue(currentList)
+            val availableValue = currentList.find { it.id == file.id }
+            if(availableValue != null){
+                CoroutineScope(Dispatchers.IO).launch {
+                    UpdateToListUseCase(DownloadManagerApplication.downloadRepository)(
+                        file.copy(
+                            downloadState = DownloadStatusState.DOWNLOADING
+                        )
+                    )
+                }
+                return
+            } else {
+                currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
+                DownloadManagerController._downloadList.postValue(currentList)
+                CoroutineScope(Dispatchers.IO).launch {
+                    InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
+                        file.copy(
+                            downloadState = DownloadStatusState.DOWNLOADING
+                        )
+                    )
+                }
+                return
+            }
         }
         CoroutineScope(Dispatchers.IO).launch {
             InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
@@ -145,12 +166,15 @@ class DownloadService : Service() {
 
     private fun downloadAFileWithCreating(file: StrucDownFile, context: Context, command: String) {
         if(command == "WaitForDownload"){
-            if(DownloadManagerController.howManyFileDownloadingParallel < GlobalSettings.numsOfMaxDownloadThreadExported){
-                DownloadManagerController.howManyFileDownloadingParallel++
-            } else {
-                addToQueueList(file)
-                return
+            val currentList = DownloadManagerController.downloadList.value
+            if(currentList != null){
+                val numsOfDownloading = currentList.count { it.downloadState == DownloadStatusState.DOWNLOADING }
+                if(numsOfDownloading >= GlobalSettings.numsOfMaxDownloadThreadExported){
+                    addToQueueList(file)
+                    return
+                }
             }
+
         }
         if (file.downloadState == DownloadStatusState.FAILED) {
             createFileAgain(file, context)
@@ -187,6 +211,9 @@ class DownloadService : Service() {
                 ).collect {
                     DownloadManagerController._progressFile.value = it
                     onOpenNotification(it)
+                    if(it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.PAUSED){
+                        findNextQueueDownloadFile()
+                    }
                 }
             }
         }
@@ -199,7 +226,6 @@ class DownloadService : Service() {
             if(index != -1){
                 currentList[index] = currentList[index].copy(downloadState = DownloadStatusState.DOWNLOADING)
                 DownloadManagerController._downloadList.postValue(currentList)
-                DownloadManagerController.howManyFileDownloadingParallel++
                 val intent = Intent(this@DownloadService, DownloadService::class.java)
                 intent.putExtra("item", currentList[index])
                 intent.putExtra("command", "dequeue")

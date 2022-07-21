@@ -39,19 +39,21 @@ class DownloadListAdapter(private var context: Context) :
             binding.textView.text =
                 if (binding.textView.text.isNullOrEmpty()) item.convertToSizeUnit() + " - " +
                         item.downloadState.toString() else binding.textView.text.toString()
-            binding.progressBar.progress = 0
             binding.roundCategory.setImageResource(UIComponentUtil.defineIcon(item.kindOf))
             when (item.downloadState) {
                 DownloadStatusState.COMPLETED -> {
                     binding.apply {
+                        moreButton.visibility = View.VISIBLE
                         progressBar.visibility = View.GONE
                         stopButton.visibility = View.GONE
                         downloadStateButton.visibility = View.VISIBLE
                         downloadStateButton.setImageResource(R.drawable.ic_open)
+
                     }
                 }
                 DownloadStatusState.DOWNLOADING -> {
                     binding.apply {
+                        moreButton.visibility = View.GONE
                         progressBar.visibility = View.VISIBLE
                         stopButton.visibility = View.VISIBLE
                         downloadStateButton.visibility = View.VISIBLE
@@ -60,6 +62,7 @@ class DownloadListAdapter(private var context: Context) :
                 }
                 DownloadStatusState.QUEUED -> {
                     binding.apply {
+                        moreButton.visibility = View.VISIBLE
                         progressBar.visibility = View.GONE
                         stopButton.visibility = View.GONE
                         downloadStateButton.visibility = View.GONE
@@ -67,6 +70,7 @@ class DownloadListAdapter(private var context: Context) :
                 }
                 DownloadStatusState.PAUSED -> {
                     binding.apply {
+                        moreButton.visibility = View.VISIBLE
                         progressBar.visibility = View.VISIBLE
                         stopButton.visibility = View.VISIBLE
                         downloadStateButton.visibility = View.VISIBLE
@@ -77,6 +81,7 @@ class DownloadListAdapter(private var context: Context) :
                 }
                 DownloadStatusState.FAILED -> {
                     binding.apply {
+                        moreButton.visibility = View.VISIBLE
                         progressBar.visibility = View.GONE
                         stopButton.visibility = View.GONE
                         downloadStateButton.visibility = View.VISIBLE
@@ -101,27 +106,16 @@ class DownloadListAdapter(private var context: Context) :
             binding.downloadStateButton.setOnClickListener {
                 when (item.downloadState) {
                     DownloadStatusState.DOWNLOADING -> {
-                        eventListener?.onPause(item)
-                        binding.downloadStateButton.setImageResource(R.drawable.ic_start)
+                        eventListener?.onPause(item, binding)
                     }
                     DownloadStatusState.PAUSED -> {
-                        eventListener?.onResume(item)
-                        binding.progressBar.progress =
-                            (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
-                        binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
+                        eventListener?.onResume(item, binding)
                     }
                     DownloadStatusState.COMPLETED -> {
-                        item.downloadState = DownloadStatusState.COMPLETED
-                        binding.stopButton.visibility = View.GONE
-                        binding.downloadStateButton.setImageResource(R.drawable.ic_open)
-                        eventListener?.onOpen(item)
+                        eventListener?.onOpen(item, binding)
                     }
                     DownloadStatusState.FAILED -> {
-                        binding.progressBar.progress = 0
-                        binding.progressBar.visibility = View.VISIBLE
-                        eventListener?.onRetry(item)
-                        item.downloadState = DownloadStatusState.DOWNLOADING
-                        binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
+                        eventListener?.onRetry(item, binding)
                     }
                     else -> {}
                 }
@@ -132,14 +126,11 @@ class DownloadListAdapter(private var context: Context) :
             }
             binding.stopButton.setOnClickListener {
                 if (item.downloadState == DownloadStatusState.DOWNLOADING || item.downloadState == DownloadStatusState.PAUSED) {
-                    item.downloadState = DownloadStatusState.FAILED
-                    binding.progressBar.visibility = View.GONE
-                    binding.textView.text =
-                        item.convertToSizeUnit() + " - " + item.downloadState.toString()
-                    binding.downloadStateButton.setImageResource(R.drawable.ic_retry)
-                    eventListener?.onStop(item)
+                    eventListener?.onStop(item, binding)
                 }
             }
+
+            //Calculate download speed
             if (item.downloadState == DownloadStatusState.DOWNLOADING) {
                 binding.heading.text = cutFileName(item.fileName)
                 binding.progressBar.progress =
@@ -157,9 +148,13 @@ class DownloadListAdapter(private var context: Context) :
                     startTime = endTime
                 }
             }
+
+
             if (item.downloadState == DownloadStatusState.FAILED) {
+                binding.moreButton.visibility = View.VISIBLE
                 binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
                 eventListener?.onUpdateToDatabase(item)
+
             }
 
             if (item.bytesCopied == item.size && item.downloadState != DownloadStatusState.FAILED) {

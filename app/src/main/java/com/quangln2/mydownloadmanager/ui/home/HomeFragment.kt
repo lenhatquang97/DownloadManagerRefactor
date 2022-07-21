@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Build.VERSION_CODES.P
 import android.os.Bundle
 import android.os.IBinder
 import android.text.Editable
@@ -123,6 +124,7 @@ class HomeFragment : Fragment() {
                 context: Context
             ) {
                 item.downloadState = DownloadStatusState.COMPLETED
+                binding.moreButton.visibility = View.VISIBLE
                 binding.stopButton.visibility = View.GONE
                 binding.progressBar.visibility = View.GONE
                 binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
@@ -137,27 +139,52 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            override fun onPause(item: StrucDownFile) {
+            override fun onPause(item: StrucDownFile, binding:DownloadItemBinding) {
+                binding.moreButton.visibility = View.VISIBLE
+                binding.downloadStateButton.setImageResource(R.drawable.ic_start)
+
                 viewModel.pause(item.id)
-                DownloadManagerController.howManyFileDownloadingParallel--
             }
 
-            override fun onResume(item: StrucDownFile) {
+            override fun onResume(item: StrucDownFile, binding:DownloadItemBinding) {
+                binding.moreButton.visibility = View.GONE
+                binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
+
+                binding.progressBar.progress =
+                    (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
+
                 viewModel.resume(requireContext(), item.id)
-                DownloadManagerController.howManyFileDownloadingParallel++
             }
 
-            override fun onOpen(item: StrucDownFile) {
+            override fun onOpen(item: StrucDownFile, binding:DownloadItemBinding) {
+                binding.moreButton.visibility = View.VISIBLE
+                binding.stopButton.visibility = View.GONE
+                binding.downloadStateButton.setImageResource(R.drawable.ic_open)
+
+                item.downloadState = DownloadStatusState.COMPLETED
                 viewModel.open(requireContext(), item)
             }
 
-            override fun onRetry(item: StrucDownFile) {
+            override fun onRetry(item: StrucDownFile, binding:DownloadItemBinding) {
+                binding.moreButton.visibility = View.VISIBLE
+                binding.progressBar.progress = 0
+                binding.progressBar.visibility = View.VISIBLE
+                binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
+
+                item.downloadState = DownloadStatusState.DOWNLOADING
                 viewModel.retry(requireContext(), item)
-                DownloadManagerController.howManyFileDownloadingParallel++
             }
 
-            override fun onStop(item: StrucDownFile) {
-                DownloadManagerController.howManyFileDownloadingParallel--
+            override fun onStop(item: StrucDownFile, binding:DownloadItemBinding) {
+                binding.moreButton.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                binding.stopButton.visibility = View.GONE
+                binding.downloadStateButton.setImageResource(R.drawable.ic_retry)
+
+
+                item.downloadState = DownloadStatusState.FAILED
+                binding.textView.text =
+                    item.convertToSizeUnit() + " - " + item.downloadState.toString()
             }
 
             override fun onUpdateToDatabase(item: StrucDownFile) {
@@ -264,13 +291,13 @@ class HomeFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         if (isBound) {
-            requireContext().unbindService(connection)
-            val currentList = DownloadManagerController._downloadList.value
+            val currentList = _downloadList.value
             val res = currentList?.find { it.downloadState == DownloadStatusState.DOWNLOADING }
-            if (res != null) {
+            if (res == null) {
                 requireContext().stopService(Intent(requireContext(), DownloadService::class.java))
+                requireContext().unbindService(connection)
+                isBound = false
             }
-            isBound = false
         }
     }
 

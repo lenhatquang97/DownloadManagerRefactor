@@ -23,11 +23,11 @@ object GlobalSettings {
     }
 
 
-    var numsOfMaxDownloadThreadExported = 1
+    var numsOfMaxDownloadThreadExported = 2
     private val MAXIMUM_DOWNLOAD_THREAD = floatPreferencesKey("maximumDownloadThread")
     val getMaximumDownloadThread: (Context) -> Flow<Float> = { it ->
         it.dataStore.data.map {
-            it[MAXIMUM_DOWNLOAD_THREAD] ?: 1.0f
+            it[MAXIMUM_DOWNLOAD_THREAD] ?: 2.0f
         }
     }
 

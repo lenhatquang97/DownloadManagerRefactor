@@ -6,7 +6,10 @@ import com.quangln2.mydownloadmanager.data.database.DownloadDao
 import com.quangln2.mydownloadmanager.data.source.local.LocalDataSource
 import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSource
 import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 
 class DefaultDownloadRepository(
