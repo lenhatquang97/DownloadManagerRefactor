@@ -2,11 +2,11 @@ package com.quangln2.mydownloadmanager
 
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.database.DownloadDao
-import com.quangln2.mydownloadmanager.data.source.local.LocalDataSourceImpl
-import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSourceImpl
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
+import com.quangln2.mydownloadmanager.data.source.local.LocalDataSourceImpl
+import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSourceImpl
 
 object ServiceLocator {
     var downloadRepository: DefaultDownloadRepository? = null
@@ -20,8 +20,8 @@ object ServiceLocator {
         return DefaultDownloadRepository(database, LocalDataSourceImpl(), RemoteDataSourceImpl())
     }
 
-    fun initializeStrucDownFile(): StrucDownFile {
-        return StrucDownFile(
+    fun initializeStructureDownFile(): StructureDownFile {
+        return StructureDownFile(
             "",
             ConstantClass.FILE_NAME_DEFAULT,
             "test",

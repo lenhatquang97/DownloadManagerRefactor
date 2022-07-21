@@ -9,9 +9,8 @@ import android.provider.MediaStore
 import android.util.Log
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
-import android.widget.Toast
 import com.quangln2.mydownloadmanager.ServiceLocator
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.util.UIComponentUtil
 import kotlinx.coroutines.Dispatchers
@@ -25,11 +24,10 @@ import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
-import javax.net.ssl.HttpsURLConnection
 
 class RemoteDataSourceImpl : RemoteDataSource {
 
-    override fun addNewDownloadInfo(url: String, downloadTo: String, file: StrucDownFile) {
+    override fun addNewDownloadInfo(url: String, downloadTo: String, file: StructureDownFile) {
         file.id = UUID.randomUUID().toString()
         file.downloadLink = url
         file.downloadTo = downloadTo
@@ -45,9 +43,12 @@ class RemoteDataSourceImpl : RemoteDataSource {
         return type
     }
 
-    override fun fetchDownloadInfo(file: StrucDownFile): StrucDownFile {
+    override fun fetchDownloadInfo(file: StructureDownFile): StructureDownFile {
         val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
-        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
+        connection.setRequestProperty(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
+        )
         connection.doInput = true
         connection.requestMethod = "GET"
         try {
@@ -63,14 +64,14 @@ class RemoteDataSourceImpl : RemoteDataSource {
                 connection.disconnect()
                 file
             } else {
-                val initFile = ServiceLocator.initializeStrucDownFile()
+                val initFile = ServiceLocator.initializeStructureDownFile()
                 file.fileName = initFile.fileName
                 file.size = initFile.size
                 initFile
             }
         } catch (e: Exception) {
             Log.d("FileError", e.toString())
-            val initFile = ServiceLocator.initializeStrucDownFile()
+            val initFile = ServiceLocator.initializeStructureDownFile()
             file.fileName = initFile.fileName
             file.size = initFile.size
             return initFile
@@ -78,83 +79,84 @@ class RemoteDataSourceImpl : RemoteDataSource {
 
     }
 
-    override fun downloadAFile(file: StrucDownFile, context: Context): Flow<StrucDownFile> = flow {
-        try {
-            val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
-            connection.setRequestProperty("Range", "bytes=${file.bytesCopied}-")
-            connection.doInput = true
-            val inp = BufferedInputStream(connection.inputStream)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                if (file.uri == null) {
-                    return@flow
-                }
-                val out = context.contentResolver.openOutputStream(Uri.parse(file.uri), "wa")
-                if (out != null) {
+    override fun downloadAFile(file: StructureDownFile, context: Context): Flow<StructureDownFile> =
+        flow {
+            try {
+                val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
+                connection.setRequestProperty("Range", "bytes=${file.bytesCopied}-")
+                connection.doInput = true
+                val inp = BufferedInputStream(connection.inputStream)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    if (file.uri == null) {
+                        return@flow
+                    }
+                    val out = context.contentResolver.openOutputStream(Uri.parse(file.uri), "wa")
+                    if (out != null) {
+                        val data = ByteArray(1024)
+                        var x = inp.read(data, 0, 1024)
+                        while (x >= 0) {
+                            out.write(data, 0, x)
+                            file.bytesCopied += x
+                            emit(file)
+                            if (file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED) {
+                                out.close()
+                                connection.disconnect()
+                                return@flow
+                            }
+                            x = inp.read(data, 0, 1024)
+                        }
+                        if (file.bytesCopied == file.size) {
+                            out.close()
+                            connection.disconnect()
+                        }
+
+                    }
+
+                } else {
+                    val fos =
+                        if (file.bytesCopied == 0L) FileOutputStream(file.downloadTo) else FileOutputStream(
+                            file.downloadTo,
+                            true
+                        )
                     val data = ByteArray(1024)
                     var x = inp.read(data, 0, 1024)
                     while (x >= 0) {
-                        out.write(data, 0, x)
+                        fos.write(data, 0, x)
                         file.bytesCopied += x
                         emit(file)
                         if (file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED) {
-                            out.close()
+                            fos.close()
                             connection.disconnect()
                             return@flow
                         }
                         x = inp.read(data, 0, 1024)
                     }
-                    if(file.bytesCopied == file.size){
-                        out.close()
-                        connection.disconnect()
-                    }
-
-                }
-
-            } else {
-                val fos =
-                    if (file.bytesCopied == 0L) FileOutputStream(file.downloadTo) else FileOutputStream(
-                        file.downloadTo,
-                        true
-                    )
-                val data = ByteArray(1024)
-                var x = inp.read(data, 0, 1024)
-                while (x >= 0) {
-                    fos.write(data, 0, x)
-                    file.bytesCopied += x
-                    emit(file)
-                    if (file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED) {
+                    if (file.bytesCopied == file.size) {
                         fos.close()
                         connection.disconnect()
-                        return@flow
                     }
-                    x = inp.read(data, 0, 1024)
                 }
-                if(file.bytesCopied == file.size){
-                    fos.close()
-                    connection.disconnect()
-                }
+            } catch (e: Exception) {
+                emit(file.copy(downloadState = DownloadStatusState.FAILED))
             }
-        } catch (e: Exception) {
-            emit(file.copy(downloadState = DownloadStatusState.FAILED))
-        }
 
-    }.debounce(50).flowOn(Dispatchers.IO)
+        }.debounce(50).flowOn(Dispatchers.IO)
 
 
-    override fun resumeDownload(file: StrucDownFile) {
+    override fun resumeDownload(file: StructureDownFile) {
         file.downloadState = DownloadStatusState.DOWNLOADING
     }
 
-    override fun pauseDownload(file: StrucDownFile) {
+    override fun pauseDownload(file: StructureDownFile) {
         file.downloadState = DownloadStatusState.PAUSED
     }
 
-    override fun stopDownload(file: StrucDownFile) {
+    override fun stopDownload(file: StructureDownFile) {
         file.bytesCopied = 0
         file.downloadState = DownloadStatusState.FAILED
     }
 
-    override fun retryDownload(file: StrucDownFile, context: Context) {
+    override fun retryDownload(file: StructureDownFile, context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val resolver = context.contentResolver
             if (file.uri != null) {
@@ -179,7 +181,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
         file.bytesCopied = 0
     }
 
-    override fun queueDownload(file: StrucDownFile) {
+    override fun queueDownload(file: StructureDownFile) {
         file.downloadState = DownloadStatusState.QUEUED
     }
 

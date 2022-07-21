@@ -26,10 +26,10 @@ import com.quangln2.mydownloadmanager.ViewModelFactory
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.database.DownloadDatabase
+import com.quangln2.mydownloadmanager.data.model.StructureDownFile
+import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.data.source.local.LocalDataSourceImpl
 import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSourceImpl
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
-import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.AddDownloadDialogBinding
 import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
 import com.quangln2.mydownloadmanager.util.UIComponentUtil.Companion.getRealPath
@@ -122,10 +122,10 @@ class AddToDownloadDialog : DialogFragment() {
             binding.downloadToTextField.visibility = View.VISIBLE
             binding.noteAboveAndroid10.visibility = View.GONE
         }
-
-
-        return AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog)
+        val dialog = AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog)
             .setView(binding.root).create()
+        dialog.window?.setBackgroundDrawableResource(R.color.black)
+        return dialog
     }
 
     private fun closeKeyboard(view: View) {
@@ -139,8 +139,9 @@ class AddToDownloadDialog : DialogFragment() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         resultLauncher.launch(intent)
     }
-    private fun openDownloadDialog(file: StrucDownFile){
-        if(file.size == -1L){
+
+    private fun openDownloadDialog(file: StructureDownFile) {
+        if (file.size == -1L) {
             Log.d("DownloadDialog", "File size is -1")
             binding.addNewDownloadFileButton.icon = null
             Toast.makeText(context, ConstantClass.INVALID_LINK, Toast.LENGTH_SHORT).show()

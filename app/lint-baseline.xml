@@ -1,876 +1,561 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.2.1" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.1)" variant="all" version="7.2.1">
+<issues name="AGP (7.2.1)" by="lint 7.2.1" client="gradle" dependencies="false" format="6"
+    type="baseline" variant="all" version="7.2.1">
 
-    <issue
+    <issue errorLine1="                android:layout_width=&quot;match_parent&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="ScrollViewSize"
-        message="This com.google.android.material.chip.ChipGroup should use `android:layout_width=&quot;wrap_content&quot;`"
-        errorLine1="                android:layout_width=&quot;match_parent&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_first.xml"
-            line="57"
-            column="17"/>
+        message="This com.google.android.material.chip.ChipGroup should use `android:layout_width=&quot;wrap_content&quot;`">
+        <location column="17" file="src/main/res/layout/fragment_first.xml" line="57" />
     </issue>
 
-    <issue
+    <issue errorLine1="                        return cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))" errorLine2="                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="Range"
-        message="Value must be ≥ 0 but `getColumnIndex` can be -1"
-        errorLine1="                        return cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))"
-        errorLine2="                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/util/DownloadUtil.kt"
-            line="55"
-            column="47"/>
+        message="Value must be ≥ 0 but `getColumnIndex` can be -1">
+        <location column="47" file="src/main/java/com/quangln2/mydownloadmanager/util/DownloadUtil.kt"
+            line="55" />
     </issue>
 
-    <issue
+    <issue errorLine1="        val adapterVal = DownloadListAdapter(context!!)" errorLine2="                                             ~~~~~~~~~"
         id="UseRequireInsteadOfGet"
-        message="Use requireContext() instead of context!!"
-        errorLine1="        val adapterVal = DownloadListAdapter(context!!)"
-        errorLine2="                                             ~~~~~~~~~">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/HomeFragment.kt"
-            line="88"
-            column="46"/>
+        message="Use requireContext() instead of context!!">
+        <location column="46"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/HomeFragment.kt" line="88" />
     </issue>
 
-    <issue
-        id="FragmentTagUsage"
-        message="Replace the &lt;fragment> tag with FragmentContainerView."
-        errorLine1="        &lt;fragment"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/content_main.xml"
-            line="17"
-            column="10"/>
+    <issue errorLine1="        &lt;fragment" errorLine2="         ~~~~~~~~"
+        id="FragmentTagUsage" message="Replace the &lt;fragment> tag with FragmentContainerView.">
+        <location column="10" file="src/main/res/layout/content_main.xml" line="17" />
     </issue>
 
-    <issue
+    <issue errorLine1="        if (intent.resolveActivity(context.packageManager) == null) {"
+        errorLine2="                   ~~~~~~~~~~~~~~~"
         id="QueryPermissionsNeeded"
-        message="Consider adding a `&lt;queries>` declaration to your manifest when calling this \&#xA;method; see https://g.co/dev/packagevisibility for details"
-        errorLine1="        if (intent.resolveActivity(context.packageManager) == null) {"
-        errorLine2="                   ~~~~~~~~~~~~~~~">
+        message="Consider adding a `&lt;queries>` declaration to your manifest when calling this \&#xA;method; see https://g.co/dev/packagevisibility for details">
         <location
-            file="src/main/java/com/quangln2/mydownloadmanager/data/datasource/LocalDataSourceImpl.kt"
-            line="136"
-            column="20"/>
+            column="20"
+            file="src/main/java/com/quangln2/mydownloadmanager/data/datasource/LocalDataSourceImpl.kt" line="136" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:label=&quot;@string/app_name&quot;" errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="RedundantLabel"
-        message="Redundant label can be removed"
-        errorLine1="            android:label=&quot;@string/app_name&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="41"
-            column="13"/>
+        message="Redundant label can be removed">
+        <location column="13" file="src/main/AndroidManifest.xml" line="41" />
     </issue>
 
-    <issue
+    <issue errorLine1="    implementation &apos;com.google.android.material:material:1.5.0-alpha04&apos;"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="GradleDependency"
-        message="A newer version of com.google.android.material:material than 1.5.0-alpha04 is available: 1.7.0-alpha03"
-        errorLine1="    implementation &apos;com.google.android.material:material:1.5.0-alpha04&apos;"
-        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="46"
-            column="20"/>
+        message="A newer version of com.google.android.material:material than 1.5.0-alpha04 is available: 1.7.0-alpha03">
+        <location column="20" file="build.gradle" line="46" />
     </issue>
 
-    <issue
+    <issue errorLine1="    implementation &apos;androidx.navigation:navigation-fragment-ktx:2.4.2&apos;"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="GradleDependency"
-        message="A newer version of androidx.navigation:navigation-fragment-ktx than 2.4.2 is available: 2.5.0"
-        errorLine1="    implementation &apos;androidx.navigation:navigation-fragment-ktx:2.4.2&apos;"
-        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="48"
-            column="20"/>
+        message="A newer version of androidx.navigation:navigation-fragment-ktx than 2.4.2 is available: 2.5.0">
+        <location column="20" file="build.gradle" line="48" />
     </issue>
 
-    <issue
+    <issue errorLine1="    implementation &apos;androidx.navigation:navigation-ui-ktx:2.4.2&apos;"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="GradleDependency"
-        message="A newer version of androidx.navigation:navigation-ui-ktx than 2.4.2 is available: 2.5.0"
-        errorLine1="    implementation &apos;androidx.navigation:navigation-ui-ktx:2.4.2&apos;"
-        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="49"
-            column="20"/>
+        message="A newer version of androidx.navigation:navigation-ui-ktx than 2.4.2 is available: 2.5.0">
+        <location column="20" file="build.gradle" line="49" />
     </issue>
 
-    <issue
+    <issue errorLine1="    implementation &apos;androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1&apos;"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="GradleDependency"
-        message="A newer version of androidx.lifecycle:lifecycle-viewmodel-ktx than 2.4.1 is available: 2.5.0"
-        errorLine1="    implementation &apos;androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1&apos;"
-        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="50"
-            column="20"/>
+        message="A newer version of androidx.lifecycle:lifecycle-viewmodel-ktx than 2.4.1 is available: 2.5.0">
+        <location column="20" file="build.gradle" line="50" />
     </issue>
 
-    <issue
+    <issue errorLine1="    implementation &quot;androidx.lifecycle:lifecycle-livedata-ktx:2.4.1&quot;"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="GradleDependency"
-        message="A newer version of androidx.lifecycle:lifecycle-livedata-ktx than 2.4.1 is available: 2.5.0"
-        errorLine1="    implementation &quot;androidx.lifecycle:lifecycle-livedata-ktx:2.4.1&quot;"
-        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="59"
-            column="20"/>
+        message="A newer version of androidx.lifecycle:lifecycle-livedata-ktx than 2.4.1 is available: 2.5.0">
+        <location column="20" file="build.gradle" line="59" />
     </issue>
 
-    <issue
+    <issue errorLine1="                val cursor = resolver.query(" errorLine2="                                      ~~~~~"
         id="Recycle"
-        message="This `Cursor` should be freed up after use with `#close()`"
-        errorLine1="                val cursor = resolver.query("
-        errorLine2="                                      ~~~~~">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/util/DownloadUtil.kt"
-            line="46"
-            column="39"/>
+        message="This `Cursor` should be freed up after use with `#close()`">
+        <location column="39" file="src/main/java/com/quangln2/mydownloadmanager/util/DownloadUtil.kt"
+            line="46" />
     </issue>
 
-    <issue
+    <issue errorLine1="            val cursor = resolver.query(" errorLine2="                                  ~~~~~"
         id="Recycle"
-        message="This `Cursor` should be freed up after use with `#close()`"
-        errorLine1="            val cursor = resolver.query("
-        errorLine2="                                  ~~~~~">
+        message="This `Cursor` should be freed up after use with `#close()`">
         <location
-            file="src/main/java/com/quangln2/mydownloadmanager/data/datasource/LocalDataSourceImpl.kt"
-            line="69"
-            column="35"/>
+            column="35"
+            file="src/main/java/com/quangln2/mydownloadmanager/data/datasource/LocalDataSourceImpl.kt" line="69" />
     </issue>
 
-    <issue
-        id="ObsoleteSdkInt"
+    <issue id="ObsoleteSdkInt"
         message="This folder configuration (`v24`) is unnecessary; `minSdkVersion` is 24. Merge all the resources in this folder into `drawable`.">
-        <location
-            file="src/main/res/drawable-v24"/>
+        <location file="src/main/res/drawable-v24" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:pathData=&quot;M6,20C5.45,20 4.979,19.804 4.588,19.413C4.196,19.021 4,18.55 4,18C4,17.45 4.196,16.979 4.588,16.587C4.979,16.196 5.45,16 6,16C6.55,16 7.021,16.196 7.412,16.587C7.804,16.979 8,17.45 8,18C8,18.55 7.804,19.021 7.412,19.413C7.021,19.804 6.55,20 6,20ZM6,14C5.45,14 4.979,13.804 4.588,13.412C4.196,13.021 4,12.55 4,12C4,11.45 4.196,10.979 4.588,10.587C4.979,10.196 5.45,10 6,10C6.55,10 7.021,10.196 7.412,10.587C7.804,10.979 8,11.45 8,12C8,12.55 7.804,13.021 7.412,13.412C7.021,13.804 6.55,14 6,14ZM6,8C5.45,8 4.979,7.804 4.588,7.412C4.196,7.021 4,6.55 4,6C4,5.45 4.196,4.979 4.588,4.588C4.979,4.196 5.45,4 6,4C6.55,4 7.021,4.196 7.412,4.588C7.804,4.979 8,5.45 8,6C8,6.55 7.804,7.021 7.412,7.412C7.021,7.804 6.55,8 6,8ZM12,20C11.45,20 10.979,19.804 10.588,19.413C10.196,19.021 10,18.55 10,18C10,17.45 10.196,16.979 10.588,16.587C10.979,16.196 11.45,16 12,16C12.55,16 13.021,16.196 13.413,16.587C13.804,16.979 14,17.45 14,18C14,18.55 13.804,19.021 13.413,19.413C13.021,19.804 12.55,20 12,20ZM12,14C11.45,14 10.979,13.804 10.588,13.412C10.196,13.021 10,12.55 10,12C10,11.45 10.196,10.979 10.588,10.587C10.979,10.196 11.45,10 12,10C12.55,10 13.021,10.196 13.413,10.587C13.804,10.979 14,11.45 14,12C14,12.55 13.804,13.021 13.413,13.412C13.021,13.804 12.55,14 12,14ZM12,8C11.45,8 10.979,7.804 10.588,7.412C10.196,7.021 10,6.55 10,6C10,5.45 10.196,4.979 10.588,4.588C10.979,4.196 11.45,4 12,4C12.017,4 12.029,4 12.038,4C12.046,4 12.058,4 12.075,4C12.042,4.167 12.021,4.329 12.012,4.487C12.004,4.646 12,4.817 12,5C12,5.517 12.054,6.021 12.163,6.512C12.271,7.004 12.425,7.467 12.625,7.9C12.525,7.933 12.425,7.958 12.325,7.975C12.225,7.992 12.117,8 12,8ZM19,10C17.617,10 16.438,9.512 15.463,8.537C14.488,7.562 14,6.383 14,5C14,3.617 14.488,2.437 15.463,1.462C16.438,0.487 17.617,0 19,0C20.383,0 21.563,0.487 22.538,1.462C23.513,2.437 24,3.617 24,5C24,6.383 23.513,7.562 22.538,8.537C21.563,9.512 20.383,10 19,10ZM18,20C17.45,20 16.979,19.804 16.587,19.413C16.196,19.021 16,18.55 16,18C16,17.45 16.196,16.979 16.587,16.587C16.979,16.196 17.45,16 18,16C18.55,16 19.021,16.196 19.413,16.587C19.804,16.979 20,17.45 20,18C20,18.55 19.804,19.021 19.413,19.413C19.021,19.804 18.55,20 18,20ZM18,14C17.45,14 16.979,13.804 16.587,13.412C16.196,13.021 16,12.55 16,12C16,11.883 16.008,11.775 16.025,11.675C16.042,11.575 16.067,11.475 16.1,11.375C16.533,11.575 16.996,11.729 17.488,11.837C17.979,11.946 18.483,12 19,12C19.183,12 19.354,11.996 19.513,11.988C19.671,11.979 19.833,11.958 20,11.925C20,11.942 20,11.954 20,11.962C20,11.971 20,11.983 20,12C20,12.55 19.804,13.021 19.413,13.412C19.021,13.804 18.55,14 18,14ZM19,8C19.133,8 19.25,7.95 19.35,7.85C19.45,7.75 19.5,7.633 19.5,7.5C19.5,7.367 19.45,7.25 19.35,7.15C19.25,7.05 19.133,7 19,7C18.867,7 18.75,7.05 18.65,7.15C18.55,7.25 18.5,7.367 18.5,7.5C18.5,7.633 18.55,7.75 18.65,7.85C18.75,7.95 18.867,8 19,8ZM18.5,6H19.5V2H18.5V6Z&quot; />"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="VectorPath"
-        message="Very long vector path (2857 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
-        errorLine1="            android:pathData=&quot;M6,20C5.45,20 4.979,19.804 4.588,19.413C4.196,19.021 4,18.55 4,18C4,17.45 4.196,16.979 4.588,16.587C4.979,16.196 5.45,16 6,16C6.55,16 7.021,16.196 7.412,16.587C7.804,16.979 8,17.45 8,18C8,18.55 7.804,19.021 7.412,19.413C7.021,19.804 6.55,20 6,20ZM6,14C5.45,14 4.979,13.804 4.588,13.412C4.196,13.021 4,12.55 4,12C4,11.45 4.196,10.979 4.588,10.587C4.979,10.196 5.45,10 6,10C6.55,10 7.021,10.196 7.412,10.587C7.804,10.979 8,11.45 8,12C8,12.55 7.804,13.021 7.412,13.412C7.021,13.804 6.55,14 6,14ZM6,8C5.45,8 4.979,7.804 4.588,7.412C4.196,7.021 4,6.55 4,6C4,5.45 4.196,4.979 4.588,4.588C4.979,4.196 5.45,4 6,4C6.55,4 7.021,4.196 7.412,4.588C7.804,4.979 8,5.45 8,6C8,6.55 7.804,7.021 7.412,7.412C7.021,7.804 6.55,8 6,8ZM12,20C11.45,20 10.979,19.804 10.588,19.413C10.196,19.021 10,18.55 10,18C10,17.45 10.196,16.979 10.588,16.587C10.979,16.196 11.45,16 12,16C12.55,16 13.021,16.196 13.413,16.587C13.804,16.979 14,17.45 14,18C14,18.55 13.804,19.021 13.413,19.413C13.021,19.804 12.55,20 12,20ZM12,14C11.45,14 10.979,13.804 10.588,13.412C10.196,13.021 10,12.55 10,12C10,11.45 10.196,10.979 10.588,10.587C10.979,10.196 11.45,10 12,10C12.55,10 13.021,10.196 13.413,10.587C13.804,10.979 14,11.45 14,12C14,12.55 13.804,13.021 13.413,13.412C13.021,13.804 12.55,14 12,14ZM12,8C11.45,8 10.979,7.804 10.588,7.412C10.196,7.021 10,6.55 10,6C10,5.45 10.196,4.979 10.588,4.588C10.979,4.196 11.45,4 12,4C12.017,4 12.029,4 12.038,4C12.046,4 12.058,4 12.075,4C12.042,4.167 12.021,4.329 12.012,4.487C12.004,4.646 12,4.817 12,5C12,5.517 12.054,6.021 12.163,6.512C12.271,7.004 12.425,7.467 12.625,7.9C12.525,7.933 12.425,7.958 12.325,7.975C12.225,7.992 12.117,8 12,8ZM19,10C17.617,10 16.438,9.512 15.463,8.537C14.488,7.562 14,6.383 14,5C14,3.617 14.488,2.437 15.463,1.462C16.438,0.487 17.617,0 19,0C20.383,0 21.563,0.487 22.538,1.462C23.513,2.437 24,3.617 24,5C24,6.383 23.513,7.562 22.538,8.537C21.563,9.512 20.383,10 19,10ZM18,20C17.45,20 16.979,19.804 16.587,19.413C16.196,19.021 16,18.55 16,18C16,17.45 16.196,16.979 16.587,16.587C16.979,16.196 17.45,16 18,16C18.55,16 19.021,16.196 19.413,16.587C19.804,16.979 20,17.45 20,18C20,18.55 19.804,19.021 19.413,19.413C19.021,19.804 18.55,20 18,20ZM18,14C17.45,14 16.979,13.804 16.587,13.412C16.196,13.021 16,12.55 16,12C16,11.883 16.008,11.775 16.025,11.675C16.042,11.575 16.067,11.475 16.1,11.375C16.533,11.575 16.996,11.729 17.488,11.837C17.979,11.946 18.483,12 19,12C19.183,12 19.354,11.996 19.513,11.988C19.671,11.979 19.833,11.958 20,11.925C20,11.942 20,11.954 20,11.962C20,11.971 20,11.983 20,12C20,12.55 19.804,13.021 19.413,13.412C19.021,13.804 18.55,14 18,14ZM19,8C19.133,8 19.25,7.95 19.35,7.85C19.45,7.75 19.5,7.633 19.5,7.5C19.5,7.367 19.45,7.25 19.35,7.15C19.25,7.05 19.133,7 19,7C18.867,7 18.75,7.05 18.65,7.15C18.55,7.25 18.5,7.367 18.5,7.5C18.5,7.633 18.55,7.75 18.65,7.85C18.75,7.95 18.867,8 19,8ZM18.5,6H19.5V2H18.5V6Z&quot; />"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/drawable/ic_baseline_all.xml"
-            line="10"
-            column="31"/>
+        message="Very long vector path (2857 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector.">
+        <location column="31" file="src/main/res/drawable/ic_baseline_all.xml" line="10" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:pathData=&quot;M19.14,12.94c0.04,-0.3 0.06,-0.61 0.06,-0.94c0,-0.32 -0.02,-0.64 -0.07,-0.94l2.03,-1.58c0.18,-0.14 0.23,-0.41 0.12,-0.61l-1.92,-3.32c-0.12,-0.22 -0.37,-0.29 -0.59,-0.22l-2.39,0.96c-0.5,-0.38 -1.03,-0.7 -1.62,-0.94L14.4,2.81c-0.04,-0.24 -0.24,-0.41 -0.48,-0.41h-3.84c-0.24,0 -0.43,0.17 -0.47,0.41L9.25,5.35C8.66,5.59 8.12,5.92 7.63,6.29L5.24,5.33c-0.22,-0.08 -0.47,0 -0.59,0.22L2.74,8.87C2.62,9.08 2.66,9.34 2.86,9.48l2.03,1.58C4.84,11.36 4.8,11.69 4.8,12s0.02,0.64 0.07,0.94l-2.03,1.58c-0.18,0.14 -0.23,0.41 -0.12,0.61l1.92,3.32c0.12,0.22 0.37,0.29 0.59,0.22l2.39,-0.96c0.5,0.38 1.03,0.7 1.62,0.94l0.36,2.54c0.05,0.24 0.24,0.41 0.48,0.41h3.84c0.24,0 0.44,-0.17 0.47,-0.41l0.36,-2.54c0.59,-0.24 1.13,-0.56 1.62,-0.94l2.39,0.96c0.22,0.08 0.47,0 0.59,-0.22l1.92,-3.32c0.12,-0.22 0.07,-0.47 -0.12,-0.61L19.14,12.94zM12,15.6c-1.98,0 -3.6,-1.62 -3.6,-3.6s1.62,-3.6 3.6,-3.6s3.6,1.62 3.6,3.6S13.98,15.6 12,15.6z&quot; />"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="VectorPath"
-        message="Very long vector path (904 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
-        errorLine1="        android:pathData=&quot;M19.14,12.94c0.04,-0.3 0.06,-0.61 0.06,-0.94c0,-0.32 -0.02,-0.64 -0.07,-0.94l2.03,-1.58c0.18,-0.14 0.23,-0.41 0.12,-0.61l-1.92,-3.32c-0.12,-0.22 -0.37,-0.29 -0.59,-0.22l-2.39,0.96c-0.5,-0.38 -1.03,-0.7 -1.62,-0.94L14.4,2.81c-0.04,-0.24 -0.24,-0.41 -0.48,-0.41h-3.84c-0.24,0 -0.43,0.17 -0.47,0.41L9.25,5.35C8.66,5.59 8.12,5.92 7.63,6.29L5.24,5.33c-0.22,-0.08 -0.47,0 -0.59,0.22L2.74,8.87C2.62,9.08 2.66,9.34 2.86,9.48l2.03,1.58C4.84,11.36 4.8,11.69 4.8,12s0.02,0.64 0.07,0.94l-2.03,1.58c-0.18,0.14 -0.23,0.41 -0.12,0.61l1.92,3.32c0.12,0.22 0.37,0.29 0.59,0.22l2.39,-0.96c0.5,0.38 1.03,0.7 1.62,0.94l0.36,2.54c0.05,0.24 0.24,0.41 0.48,0.41h3.84c0.24,0 0.44,-0.17 0.47,-0.41l0.36,-2.54c0.59,-0.24 1.13,-0.56 1.62,-0.94l2.39,0.96c0.22,0.08 0.47,0 0.59,-0.22l1.92,-3.32c0.12,-0.22 0.07,-0.47 -0.12,-0.61L19.14,12.94zM12,15.6c-1.98,0 -3.6,-1.62 -3.6,-3.6s1.62,-3.6 3.6,-3.6s3.6,1.62 3.6,3.6S13.98,15.6 12,15.6z&quot; />"
-        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/drawable/ic_baseline_settings_24.xml"
-            line="9"
-            column="27"/>
+        message="Very long vector path (904 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector.">
+        <location column="27" file="src/main/res/drawable/ic_baseline_settings_24.xml" line="9" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:pathData=&quot;M5,11V10C5,8.8 5.271,7.704 5.812,6.712C6.354,5.721 7.083,4.908 8,4.275L6.125,2.4L7,1.5L9.125,3.625C9.558,3.425 10.021,3.271 10.512,3.162C11.004,3.054 11.5,3 12,3C12.5,3 12.996,3.054 13.488,3.162C13.979,3.271 14.442,3.425 14.875,3.625L17,1.5L17.875,2.4L16,4.275C16.917,4.908 17.646,5.721 18.188,6.712C18.729,7.704 19,8.8 19,10V11H5ZM15,9C15.283,9 15.521,8.904 15.713,8.712C15.904,8.521 16,8.283 16,8C16,7.717 15.904,7.479 15.713,7.287C15.521,7.096 15.283,7 15,7C14.717,7 14.479,7.096 14.288,7.287C14.096,7.479 14,7.717 14,8C14,8.283 14.096,8.521 14.288,8.712C14.479,8.904 14.717,9 15,9ZM9,9C9.283,9 9.521,8.904 9.713,8.712C9.904,8.521 10,8.283 10,8C10,7.717 9.904,7.479 9.713,7.287C9.521,7.096 9.283,7 9,7C8.717,7 8.479,7.096 8.288,7.287C8.096,7.479 8,7.717 8,8C8,8.283 8.096,8.521 8.288,8.712C8.479,8.904 8.717,9 9,9ZM12,23C10.05,23 8.396,22.321 7.038,20.962C5.679,19.604 5,17.95 5,16V12H19V16C19,17.95 18.321,19.604 16.962,20.962C15.604,22.321 13.95,23 12,23Z&quot; />"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="VectorPath"
-        message="Very long vector path (960 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
-        errorLine1="            android:pathData=&quot;M5,11V10C5,8.8 5.271,7.704 5.812,6.712C6.354,5.721 7.083,4.908 8,4.275L6.125,2.4L7,1.5L9.125,3.625C9.558,3.425 10.021,3.271 10.512,3.162C11.004,3.054 11.5,3 12,3C12.5,3 12.996,3.054 13.488,3.162C13.979,3.271 14.442,3.425 14.875,3.625L17,1.5L17.875,2.4L16,4.275C16.917,4.908 17.646,5.721 18.188,6.712C18.729,7.704 19,8.8 19,10V11H5ZM15,9C15.283,9 15.521,8.904 15.713,8.712C15.904,8.521 16,8.283 16,8C16,7.717 15.904,7.479 15.713,7.287C15.521,7.096 15.283,7 15,7C14.717,7 14.479,7.096 14.288,7.287C14.096,7.479 14,7.717 14,8C14,8.283 14.096,8.521 14.288,8.712C14.479,8.904 14.717,9 15,9ZM9,9C9.283,9 9.521,8.904 9.713,8.712C9.904,8.521 10,8.283 10,8C10,7.717 9.904,7.479 9.713,7.287C9.521,7.096 9.283,7 9,7C8.717,7 8.479,7.096 8.288,7.287C8.096,7.479 8,7.717 8,8C8,8.283 8.096,8.521 8.288,8.712C8.479,8.904 8.717,9 9,9ZM12,23C10.05,23 8.396,22.321 7.038,20.962C5.679,19.604 5,17.95 5,16V12H19V16C19,17.95 18.321,19.604 16.962,20.962C15.604,22.321 13.95,23 12,23Z&quot; />"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/drawable/ic_packages.xml"
-            line="10"
-            column="31"/>
+        message="Very long vector path (960 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector.">
+        <location column="31" file="src/main/res/drawable/ic_packages.xml" line="10" />
     </issue>
 
-    <issue
+    <issue errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^"
         id="UnusedResources"
-        message="The resource `R.drawable.background_white` appears to be unused"
-        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/background_white.xml"
-            line="2"
-            column="1"/>
+        message="The resource `R.drawable.background_white` appears to be unused">
+        <location column="1" file="src/main/res/drawable/background_white.xml" line="2" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;color name=&quot;nearly_black&quot;>#1C1B1F&lt;/color>" errorLine2="           ~~~~~~~~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.color.nearly_black` appears to be unused"
-        errorLine1="    &lt;color name=&quot;nearly_black&quot;>#1C1B1F&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/colors.xml"
-            line="10"
-            column="12"/>
+        message="The resource `R.color.nearly_black` appears to be unused">
+        <location column="12" file="src/main/res/values/colors.xml" line="10" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;string name=&quot;first_fragment_label&quot;>DownloadManager&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.string.first_fragment_label` appears to be unused"
-        errorLine1="    &lt;string name=&quot;first_fragment_label&quot;>DownloadManager&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="5"
-            column="13"/>
+        message="The resource `R.string.first_fragment_label` appears to be unused">
+        <location column="13" file="src/main/res/values/strings.xml" line="5" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;string name=&quot;second_fragment_label&quot;>Second Fragment&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.string.second_fragment_label` appears to be unused"
-        errorLine1="    &lt;string name=&quot;second_fragment_label&quot;>Second Fragment&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="6"
-            column="13"/>
+        message="The resource `R.string.second_fragment_label` appears to be unused">
+        <location column="13" file="src/main/res/values/strings.xml" line="6" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;string name=&quot;next&quot;>Next&lt;/string>" errorLine2="            ~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.string.next` appears to be unused"
-        errorLine1="    &lt;string name=&quot;next&quot;>Next&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="7"
-            column="13"/>
+        message="The resource `R.string.next` appears to be unused">
+        <location column="13" file="src/main/res/values/strings.xml" line="7" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;string name=&quot;previous&quot;>Previous&lt;/string>" errorLine2="            ~~~~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.string.previous` appears to be unused"
-        errorLine1="    &lt;string name=&quot;previous&quot;>Previous&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="8"
-            column="13"/>
+        message="The resource `R.string.previous` appears to be unused">
+        <location column="13" file="src/main/res/values/strings.xml" line="8" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;string name=&quot;lorem_ipsum&quot;>" errorLine2="            ~~~~~~~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.string.lorem_ipsum` appears to be unused"
-        errorLine1="    &lt;string name=&quot;lorem_ipsum&quot;>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="10"
-            column="13"/>
+        message="The resource `R.string.lorem_ipsum` appears to be unused">
+        <location column="13" file="src/main/res/values/strings.xml" line="10" />
     </issue>
 
-    <issue
-        id="IconLocation"
+    <issue id="IconLocation"
         message="Found bitmap drawable `res/drawable/download_img.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/download_img.png"/>
+        <location file="src/main/res/drawable/download_img.png" />
     </issue>
 
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/download_item.xml"
-            line="11"
-            column="10"/>
+    <issue errorLine1="        &lt;ImageView" errorLine2="         ~~~~~~~~~"
+        id="ContentDescription" message="Missing `contentDescription` attribute on image">
+        <location column="10" file="src/main/res/layout/download_item.xml" line="11" />
     </issue>
 
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/download_item.xml"
-            line="42"
-            column="10"/>
+    <issue errorLine1="        &lt;ImageView" errorLine2="         ~~~~~~~~~"
+        id="ContentDescription" message="Missing `contentDescription` attribute on image">
+        <location column="10" file="src/main/res/layout/download_item.xml" line="42" />
     </issue>
 
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/download_item.xml"
-            line="50"
-            column="10"/>
+    <issue errorLine1="        &lt;ImageView" errorLine2="         ~~~~~~~~~"
+        id="ContentDescription" message="Missing `contentDescription` attribute on image">
+        <location column="10" file="src/main/res/layout/download_item.xml" line="50" />
     </issue>
 
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/download_item.xml"
-            line="59"
-            column="10"/>
+    <issue errorLine1="        &lt;ImageView" errorLine2="         ~~~~~~~~~"
+        id="ContentDescription" message="Missing `contentDescription` attribute on image">
+        <location column="10" file="src/main/res/layout/download_item.xml" line="59" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="                    item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt"
-            line="128"
-            column="21"/>
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders.">
+        <location column="21"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt" line="128" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="                    item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt"
-            line="128"
-            column="21"/>
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders.">
+        <location column="21"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt" line="128" />
     </issue>
 
-    <issue
+    <issue errorLine1="                        item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="                        item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt"
-            line="135"
-            column="25"/>
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders.">
+        <location column="25"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt" line="135" />
     </issue>
 
-    <issue
+    <issue errorLine1="                        item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="                        item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt"
-            line="135"
-            column="25"/>
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders.">
+        <location column="25"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt" line="135" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    binding.textView.text = String.format("
+        errorLine2="                                            ^"
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="                    binding.textView.text = String.format("
-        errorLine2="                                            ^">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt"
-            line="148"
-            column="45"/>
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders.">
+        <location column="45"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt" line="148" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    binding.textView.text = String.format("
+        errorLine2="                                            ^"
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="                    binding.textView.text = String.format("
-        errorLine2="                                            ^">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt"
-            line="148"
-            column="45"/>
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders.">
+        <location column="45"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt" line="148" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    binding.textView.text = String.format("
+        errorLine2="                                            ^"
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="                    binding.textView.text = String.format("
-        errorLine2="                                            ^">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt"
-            line="148"
-            column="45"/>
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders.">
+        <location column="45"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt" line="148" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    binding.textView.text = String.format("
+        errorLine2="                                            ^"
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="                    binding.textView.text = String.format("
-        errorLine2="                                            ^">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt"
-            line="148"
-            column="45"/>
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders.">
+        <location column="45"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt" line="148" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="                    item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt"
-            line="158"
-            column="21"/>
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders.">
+        <location column="21"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt" line="158" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="                    item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt"
-            line="158"
-            column="21"/>
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders.">
+        <location column="21"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/DownloadListAdapter.kt" line="158" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="                    item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/HomeFragment.kt"
-            line="125"
-            column="21"/>
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders.">
+        <location column="21"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/HomeFragment.kt" line="125" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="                    item.convertToSizeUnit() + &quot; - &quot; + item.downloadState.toString()"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/HomeFragment.kt"
-            line="125"
-            column="21"/>
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders.">
+        <location column="21"
+            file="src/main/java/com/quangln2/mydownloadmanager/ui/home/HomeFragment.kt" line="125" />
     </issue>
 
-    <issue
+    <issue errorLine1="                android:contentDescription=&quot;AddFAB&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;AddFAB&quot;, should use `@string` resource"
-        errorLine1="                android:contentDescription=&quot;AddFAB&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_main.xml"
-            line="49"
-            column="17"/>
+        message="Hardcoded string &quot;AddFAB&quot;, should use `@string` resource">
+        <location column="17" file="src/main/res/layout/activity_main.xml" line="49" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:text=&quot;Add new download file&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Add new download file&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;Add new download file&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/add_download_dialog.xml"
-            line="22"
-            column="13"/>
+        message="Hardcoded string &quot;Add new download file&quot;, should use `@string` resource">
+        <location column="13" file="src/main/res/layout/add_download_dialog.xml" line="22" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:hint=&quot;Link&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Link&quot;, should use `@string` resource"
-        errorLine1="            android:hint=&quot;Link&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/add_download_dialog.xml"
-            line="32"
-            column="13"/>
+        message="Hardcoded string &quot;Link&quot;, should use `@string` resource">
+        <location column="13" file="src/main/res/layout/add_download_dialog.xml" line="32" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:hint=&quot;Download to:&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Download to:&quot;, should use `@string` resource"
-        errorLine1="            android:hint=&quot;Download to:&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/add_download_dialog.xml"
-            line="49"
-            column="13"/>
+        message="Hardcoded string &quot;Download to:&quot;, should use `@string` resource">
+        <location column="13" file="src/main/res/layout/add_download_dialog.xml" line="49" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:text=&quot;OK&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;OK&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;OK&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/add_download_dialog.xml"
-            line="67"
-            column="13"/>
+        message="Hardcoded string &quot;OK&quot;, should use `@string` resource">
+        <location column="13" file="src/main/res/layout/add_download_dialog.xml" line="67" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:text=&quot;CANCEL&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;CANCEL&quot;, should use `@string` resource"
-        errorLine1="            android:text=&quot;CANCEL&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/add_download_dialog.xml"
-            line="80"
-            column="13"/>
+        message="Hardcoded string &quot;CANCEL&quot;, should use `@string` resource">
+        <location column="13" file="src/main/res/layout/add_download_dialog.xml" line="80" />
     </issue>
 
-    <issue
+    <issue errorLine1="                android:hint=&quot;Search&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Search&quot;, should use `@string` resource"
-        errorLine1="                android:hint=&quot;Search&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_first.xml"
-            line="42"
-            column="17"/>
+        message="Hardcoded string &quot;Search&quot;, should use `@string` resource">
+        <location column="17" file="src/main/res/layout/fragment_first.xml" line="42" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    android:text=&quot;All&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;All&quot;, should use `@string` resource"
-        errorLine1="                    android:text=&quot;All&quot;"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_first.xml"
-            line="67"
-            column="21"/>
+        message="Hardcoded string &quot;All&quot;, should use `@string` resource">
+        <location column="21" file="src/main/res/layout/fragment_first.xml" line="67" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    android:text=&quot;Downloading&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Downloading&quot;, should use `@string` resource"
-        errorLine1="                    android:text=&quot;Downloading&quot;"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_first.xml"
-            line="79"
-            column="21"/>
+        message="Hardcoded string &quot;Downloading&quot;, should use `@string` resource">
+        <location column="21" file="src/main/res/layout/fragment_first.xml" line="79" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    android:text=&quot;Failed&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Failed&quot;, should use `@string` resource"
-        errorLine1="                    android:text=&quot;Failed&quot;"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_first.xml"
-            line="90"
-            column="21"/>
+        message="Hardcoded string &quot;Failed&quot;, should use `@string` resource">
+        <location column="21" file="src/main/res/layout/fragment_first.xml" line="90" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    android:text=&quot;Paused&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Paused&quot;, should use `@string` resource"
-        errorLine1="                    android:text=&quot;Paused&quot;"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_first.xml"
-            line="101"
-            column="21"/>
+        message="Hardcoded string &quot;Paused&quot;, should use `@string` resource">
+        <location column="21" file="src/main/res/layout/fragment_first.xml" line="101" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    android:text=&quot;Success&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Success&quot;, should use `@string` resource"
-        errorLine1="                    android:text=&quot;Success&quot;"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_first.xml"
-            line="112"
-            column="21"/>
+        message="Hardcoded string &quot;Success&quot;, should use `@string` resource">
+        <location column="21" file="src/main/res/layout/fragment_first.xml" line="112" />
     </issue>
 
-    <issue
+    <issue errorLine1="                    android:text=&quot;Queued&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Queued&quot;, should use `@string` resource"
-        errorLine1="                    android:text=&quot;Queued&quot;"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_first.xml"
-            line="123"
-            column="21"/>
+        message="Hardcoded string &quot;Queued&quot;, should use `@string` resource">
+        <location column="21" file="src/main/res/layout/fragment_first.xml" line="123" />
     </issue>
 
-    <issue
+    <issue errorLine1="                android:text=&quot;NOTIFICATIONS&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;NOTIFICATIONS&quot;, should use `@string` resource"
-        errorLine1="                android:text=&quot;NOTIFICATIONS&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_second.xml"
-            line="28"
-            column="17"/>
+        message="Hardcoded string &quot;NOTIFICATIONS&quot;, should use `@string` resource">
+        <location column="17" file="src/main/res/layout/fragment_second.xml" line="28" />
     </issue>
 
-    <issue
+    <issue errorLine1="                android:text=&quot;Pop-up messages&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Pop-up messages&quot;, should use `@string` resource"
-        errorLine1="                android:text=&quot;Pop-up messages&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_second.xml"
-            line="48"
-            column="17"/>
+        message="Hardcoded string &quot;Pop-up messages&quot;, should use `@string` resource">
+        <location column="17" file="src/main/res/layout/fragment_second.xml" line="48" />
     </issue>
 
-    <issue
+    <issue errorLine1="                android:text=&quot;After finishing&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;After finishing&quot;, should use `@string` resource"
-        errorLine1="                android:text=&quot;After finishing&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_second.xml"
-            line="58"
-            column="17"/>
+        message="Hardcoded string &quot;After finishing&quot;, should use `@string` resource">
+        <location column="17" file="src/main/res/layout/fragment_second.xml" line="58" />
     </issue>
 
-    <issue
+    <issue errorLine1="                android:text=&quot;Show&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Show&quot;, should use `@string` resource"
-        errorLine1="                android:text=&quot;Show&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_second.xml"
-            line="87"
-            column="17"/>
+        message="Hardcoded string &quot;Show&quot;, should use `@string` resource">
+        <location column="17" file="src/main/res/layout/fragment_second.xml" line="87" />
     </issue>
 
-    <issue
+    <issue errorLine1="                android:text=&quot;on lock screen&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;on lock screen&quot;, should use `@string` resource"
-        errorLine1="                android:text=&quot;on lock screen&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_second.xml"
-            line="97"
-            column="17"/>
+        message="Hardcoded string &quot;on lock screen&quot;, should use `@string` resource">
+        <location column="17" file="src/main/res/layout/fragment_second.xml" line="97" />
     </issue>
 
-    <issue
+    <issue errorLine1="                android:text=&quot;Vibration&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Vibration&quot;, should use `@string` resource"
-        errorLine1="                android:text=&quot;Vibration&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_second.xml"
-            line="127"
-            column="17"/>
+        message="Hardcoded string &quot;Vibration&quot;, should use `@string` resource">
+        <location column="17" file="src/main/res/layout/fragment_second.xml" line="127" />
     </issue>
 
-    <issue
+    <issue errorLine1="                android:text=&quot;To show success&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;To show success&quot;, should use `@string` resource"
-        errorLine1="                android:text=&quot;To show success&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_second.xml"
-            line="137"
-            column="17"/>
+        message="Hardcoded string &quot;To show success&quot;, should use `@string` resource">
+        <location column="17" file="src/main/res/layout/fragment_second.xml" line="137" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:text=&quot;DownloadManager&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;DownloadManager&quot;, should use `@string` resource"
-        errorLine1="        android:text=&quot;DownloadManager&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/header_navigation_drawer.xml"
-            line="12"
-            column="9"/>
+        message="Hardcoded string &quot;DownloadManager&quot;, should use `@string` resource">
+        <location column="9" file="src/main/res/layout/header_navigation_drawer.xml" line="12" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:title=&quot;All&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;All&quot;, should use `@string` resource"
-        errorLine1="        android:title=&quot;All&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/menu/navigation_drawer.xml"
-            line="7"
-            column="9"/>
+        message="Hardcoded string &quot;All&quot;, should use `@string` resource">
+        <location column="9" file="src/main/res/menu/navigation_drawer.xml" line="7" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:title=&quot;Compressed&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Compressed&quot;, should use `@string` resource"
-        errorLine1="        android:title=&quot;Compressed&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/menu/navigation_drawer.xml"
-            line="12"
-            column="9"/>
+        message="Hardcoded string &quot;Compressed&quot;, should use `@string` resource">
+        <location column="9" file="src/main/res/menu/navigation_drawer.xml" line="12" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:title=&quot;Documents&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Documents&quot;, should use `@string` resource"
-        errorLine1="        android:title=&quot;Documents&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/menu/navigation_drawer.xml"
-            line="17"
-            column="9"/>
+        message="Hardcoded string &quot;Documents&quot;, should use `@string` resource">
+        <location column="9" file="src/main/res/menu/navigation_drawer.xml" line="17" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:title=&quot;Packages&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Packages&quot;, should use `@string` resource"
-        errorLine1="        android:title=&quot;Packages&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/menu/navigation_drawer.xml"
-            line="22"
-            column="9"/>
+        message="Hardcoded string &quot;Packages&quot;, should use `@string` resource">
+        <location column="9" file="src/main/res/menu/navigation_drawer.xml" line="22" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:title=&quot;Music&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Music&quot;, should use `@string` resource"
-        errorLine1="        android:title=&quot;Music&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/menu/navigation_drawer.xml"
-            line="27"
-            column="9"/>
+        message="Hardcoded string &quot;Music&quot;, should use `@string` resource">
+        <location column="9" file="src/main/res/menu/navigation_drawer.xml" line="27" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:title=&quot;Video&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Video&quot;, should use `@string` resource"
-        errorLine1="        android:title=&quot;Video&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/menu/navigation_drawer.xml"
-            line="32"
-            column="9"/>
+        message="Hardcoded string &quot;Video&quot;, should use `@string` resource">
+        <location column="9" file="src/main/res/menu/navigation_drawer.xml" line="32" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:title=&quot;Others&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Others&quot;, should use `@string` resource"
-        errorLine1="        android:title=&quot;Others&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/menu/navigation_drawer.xml"
-            line="37"
-            column="9"/>
+        message="Hardcoded string &quot;Others&quot;, should use `@string` resource">
+        <location column="9" file="src/main/res/menu/navigation_drawer.xml" line="37" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:title=&quot;Delete From List&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Delete From List&quot;, should use `@string` resource"
-        errorLine1="        android:title=&quot;Delete From List&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/menu/viewholder_more_menu.xml"
-            line="5"
-            column="9"/>
+        message="Hardcoded string &quot;Delete From List&quot;, should use `@string` resource">
+        <location column="9" file="src/main/res/menu/viewholder_more_menu.xml" line="5" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:title=&quot;Delete Permanently&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="HardcodedText"
-        message="Hardcoded string &quot;Delete Permanently&quot;, should use `@string` resource"
-        errorLine1="        android:title=&quot;Delete Permanently&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/menu/viewholder_more_menu.xml"
-            line="8"
-            column="9"/>
+        message="Hardcoded string &quot;Delete Permanently&quot;, should use `@string` resource">
+        <location column="9" file="src/main/res/menu/viewholder_more_menu.xml" line="8" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:paddingRight=&quot;16dp&quot;>"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~"
         id="RtlSymmetry"
-        message="When you define `paddingRight` you should probably also define `paddingLeft` for right-to-left symmetry"
-        errorLine1="        android:paddingRight=&quot;16dp&quot;>"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/download_item.xml"
-            line="9"
-            column="9"/>
+        message="When you define `paddingRight` you should probably also define `paddingLeft` for right-to-left symmetry">
+        <location column="9" file="src/main/res/layout/download_item.xml" line="9" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:paddingLeft=&quot;16dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~"
         id="RtlSymmetry"
-        message="When you define `paddingLeft` you should probably also define `paddingRight` for right-to-left symmetry"
-        errorLine1="            android:paddingLeft=&quot;16dp&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/download_item.xml"
-            line="26"
-            column="13"/>
+        message="When you define `paddingLeft` you should probably also define `paddingRight` for right-to-left symmetry">
+        <location column="13" file="src/main/res/layout/download_item.xml" line="26" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:paddingLeft=&quot;16dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~"
         id="RtlSymmetry"
-        message="When you define `paddingLeft` you should probably also define `paddingRight` for right-to-left symmetry"
-        errorLine1="            android:paddingLeft=&quot;16dp&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/download_item.xml"
-            line="36"
-            column="13"/>
+        message="When you define `paddingLeft` you should probably also define `paddingRight` for right-to-left symmetry">
+        <location column="13" file="src/main/res/layout/download_item.xml" line="36" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:layout_marginRight=&quot;4dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
-        errorLine1="            android:layout_marginRight=&quot;4dp&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/add_download_dialog.xml"
-            line="65"
-            column="13"/>
+        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts">
+        <location column="13" file="src/main/res/layout/add_download_dialog.xml" line="65" />
     </issue>
 
-    <issue
+    <issue errorLine1="        android:paddingRight=&quot;16dp&quot;>"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~"
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;16dp&quot;` to better support right-to-left layouts"
-        errorLine1="        android:paddingRight=&quot;16dp&quot;>"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/download_item.xml"
-            line="9"
-            column="9"/>
+        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;16dp&quot;` to better support right-to-left layouts">
+        <location column="9" file="src/main/res/layout/download_item.xml" line="9" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:paddingLeft=&quot;16dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~"
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;16dp&quot;` to better support right-to-left layouts"
-        errorLine1="            android:paddingLeft=&quot;16dp&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/download_item.xml"
-            line="26"
-            column="13"/>
+        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;16dp&quot;` to better support right-to-left layouts">
+        <location column="13" file="src/main/res/layout/download_item.xml" line="26" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:paddingLeft=&quot;16dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~"
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;16dp&quot;` to better support right-to-left layouts"
-        errorLine1="            android:paddingLeft=&quot;16dp&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/download_item.xml"
-            line="36"
-            column="13"/>
+        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;16dp&quot;` to better support right-to-left layouts">
+        <location column="13" file="src/main/res/layout/download_item.xml" line="36" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:layout_marginLeft=&quot;56dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;56dp&quot;` to better support right-to-left layouts"
-        errorLine1="            android:layout_marginLeft=&quot;56dp&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/download_item.xml"
-            line="73"
-            column="13"/>
+        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;56dp&quot;` to better support right-to-left layouts">
+        <location column="13" file="src/main/res/layout/download_item.xml" line="73" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:layout_marginLeft=&quot;56dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;56dp&quot;` to better support right-to-left layouts"
-        errorLine1="            android:layout_marginLeft=&quot;56dp&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/download_item.xml"
-            line="87"
-            column="13"/>
+        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;56dp&quot;` to better support right-to-left layouts">
+        <location column="13" file="src/main/res/layout/download_item.xml" line="87" />
     </issue>
 
 </issues>

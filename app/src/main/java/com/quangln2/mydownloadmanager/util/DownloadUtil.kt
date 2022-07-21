@@ -5,7 +5,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 import java.io.File
 
 class DownloadUtil {
@@ -19,7 +19,7 @@ class DownloadUtil {
             return type
         }
 
-        fun isFileExisting(file: StrucDownFile, context: Context): Boolean {
+        fun isFileExisting(file: StructureDownFile, context: Context): Boolean {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val filePath =
                     File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName)
@@ -35,7 +35,7 @@ class DownloadUtil {
             return true
         }
 
-        fun getBytesFromExistingFile(file: StrucDownFile, context: Context): Long {
+        fun getBytesFromExistingFile(file: StructureDownFile, context: Context): Long {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val resolver = context.contentResolver
                 val selection = MediaStore.MediaColumns.DISPLAY_NAME + " LIKE ?"
@@ -49,7 +49,8 @@ class DownloadUtil {
                 )
                 if (cursor != null && cursor.count > 0) {
                     while (cursor.moveToNext() && cursor.getColumnIndex(MediaStore.MediaColumns.SIZE) != -1) {
-                        val result = cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))
+                        val result =
+                            cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))
                         cursor.close()
                         return result
                     }

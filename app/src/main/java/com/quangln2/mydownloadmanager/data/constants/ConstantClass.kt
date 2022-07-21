@@ -11,7 +11,8 @@ class ConstantClass {
         const val CHANNEL_DESCRIPTION = "This is a notification channel for downloading"
 
         const val DOWNLOAD_MESSAGE = "Do you want to download this file? This will cost "
-        const val DOWNLOAD_AGAIN_MESSAGE = "You have downloaded this file. Do you want to download it again?"
+        const val DOWNLOAD_AGAIN_MESSAGE =
+            "You have downloaded this file. Do you want to download it again?"
 
         const val FILE_NAME_DEFAULT = "test"
 

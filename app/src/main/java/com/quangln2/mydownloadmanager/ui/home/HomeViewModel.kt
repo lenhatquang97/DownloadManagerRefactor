@@ -14,7 +14,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.domain.*
 import com.quangln2.mydownloadmanager.listener.OnAcceptPress
@@ -38,15 +38,15 @@ class HomeViewModel(
 ) : ViewModel() {
     var _isOpenDialog = MutableLiveData<Boolean>().apply { value = false }
     var _filterList =
-        MutableLiveData<MutableList<StrucDownFile>>().apply { value = mutableListOf() }
-    val filterList: LiveData<MutableList<StrucDownFile>> get() = _filterList
+        MutableLiveData<MutableList<StructureDownFile>>().apply { value = mutableListOf() }
+    val filterList: LiveData<MutableList<StructureDownFile>> get() = _filterList
 
 
     var textSearch = MutableLiveData<String>().apply { value = "" }
 
 
-    fun preProcessingDownloadFile(context: Context, file: StrucDownFile){
-        val onAcceptPress = object : OnAcceptPress{
+    fun preProcessingDownloadFile(context: Context, file: StructureDownFile) {
+        val onAcceptPress = object : OnAcceptPress {
             override fun onAcceptPress() {
                 val intent = Intent(context, DownloadService::class.java)
                 intent.putExtra("command", "WaitForDownload")
@@ -58,18 +58,17 @@ class HomeViewModel(
         //Does same download link exist?
         CoroutineScope(Dispatchers.IO).launch {
             val result = doesDownloadLinkExistUseCase(file)
-            if (result){
-                withContext(Dispatchers.Main){
+            if (result) {
+                withContext(Dispatchers.Main) {
                     UIComponentUtil.showDownloadDialogAgain(context, file, onAcceptPress)
                 }
             } else {
-                withContext(Dispatchers.Main){
+                withContext(Dispatchers.Main) {
                     UIComponentUtil.showDownloadAlertDialog(context, file, onAcceptPress)
                 }
             }
         }
     }
-
 
 
     fun filterList(downloadStatusState: String) {
@@ -125,9 +124,9 @@ class HomeViewModel(
         }
     }
 
-    fun deleteFromList(file: StrucDownFile) {
+    fun deleteFromList(file: StructureDownFile, context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
-            deleteFromListUseCase(file)
+            deleteFromListUseCase(file, context)
             val res = DownloadManagerController.downloadList.value?.filter { it.id != file.id }
                 ?.toMutableList()
             DownloadManagerController._downloadList.postValue(res)
@@ -135,7 +134,7 @@ class HomeViewModel(
         }
     }
 
-    fun deletePermanently(context: Context, file: StrucDownFile, onHandle: (Boolean) -> Unit) {
+    fun deletePermanently(context: Context, file: StructureDownFile, onHandle: (Boolean) -> Unit) {
         val builder =
             MaterialAlertDialogBuilder(context, R.style.AlertDialogShow)
                 .setTitle(file.fileName)
@@ -187,6 +186,7 @@ class HomeViewModel(
             currentFile.downloadState = DownloadStatusState.PAUSED
             DownloadManagerController._progressFile.value = currentFile
         }
+
     }
 
     fun resume(context: Context, id: String) {
@@ -207,19 +207,19 @@ class HomeViewModel(
         }
     }
 
-    fun retry(context: Context, item: StrucDownFile) {
+    fun retry(context: Context, item: StructureDownFile) {
         retryDownloadUseCase(item, context)
         sendToDownloadService(context, item)
     }
 
-    fun open(context: Context, item: StrucDownFile) {
+    fun open(context: Context, item: StructureDownFile) {
         val doesFileExist = DownloadUtil.isFileExisting(item, context)
         if (doesFileExist) {
             openDownloadFileUseCase(item, context)
         }
     }
 
-    fun update(item: StrucDownFile) {
+    fun update(item: StructureDownFile) {
         CoroutineScope(Dispatchers.IO).launch {
             updateToListUseCase(item)
         }
@@ -245,7 +245,7 @@ class HomeViewModel(
 
     }
 
-    private fun sendToDownloadService(context: Context, currentFile: StrucDownFile) {
+    private fun sendToDownloadService(context: Context, currentFile: StructureDownFile) {
         val intent = Intent(context, DownloadService::class.java)
         intent.putExtra("item", currentFile)
         context.startService(intent)

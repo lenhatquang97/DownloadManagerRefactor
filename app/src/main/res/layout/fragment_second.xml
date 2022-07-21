@@ -41,7 +41,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/notificationTitle" />
 
 
-
             <TextView
                 android:id="@+id/vibration"
                 android:layout_width="wrap_content"
@@ -85,8 +84,8 @@
                 android:id="@+id/downloadTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DOWNLOADS"
                 android:layout_marginTop="24dp"
+                android:text="DOWNLOADS"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/blue"
                 android:textStyle="bold"
@@ -100,7 +99,6 @@
                 android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/downloadTitle" />
-
 
 
             <TextView
@@ -126,18 +124,17 @@
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/downloadThreadSlider"
-                app:thumbColor="@color/blue"
-                app:trackColorActive="@color/blue"
                 style="@style/mySlider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:valueFrom="1"
                 android:stepSize="1"
+                android:valueFrom="1"
                 android:valueTo="5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/downloadThreadValue"
+                app:thumbColor="@color/blue"
+                app:trackColorActive="@color/blue"
                 tools:ignore="SpeakableTextPresentCheck" />
-
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

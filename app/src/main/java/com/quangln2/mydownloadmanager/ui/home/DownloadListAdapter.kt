@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.quangln2.mydownloadmanager.R
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.databinding.DownloadItemBinding
 import com.quangln2.mydownloadmanager.listener.EventListener
@@ -21,7 +21,7 @@ import com.quangln2.mydownloadmanager.util.UIComponentUtil
 import java.util.concurrent.Executors
 
 class DownloadListAdapter(private var context: Context) :
-    ListAdapter<StrucDownFile, DownloadListAdapter.DownloadItemViewHolder>(
+    ListAdapter<StructureDownFile, DownloadListAdapter.DownloadItemViewHolder>(
         AsyncDifferConfig.Builder(DownloadListDiffCallback())
             .setBackgroundThreadExecutor(Executors.newSingleThreadExecutor())
             .build()
@@ -34,7 +34,7 @@ class DownloadListAdapter(private var context: Context) :
         private var endTime: Long = 0L
         private var startBytes = 0L
         private var endBytes: Long = 0L
-        private fun initialSetup(item: StrucDownFile) {
+        private fun initialSetup(item: StructureDownFile) {
             binding.heading.text = cutFileName(item.fileName)
             binding.textView.text =
                 if (binding.textView.text.isNullOrEmpty()) item.convertToSizeUnit() + " - " +
@@ -101,7 +101,7 @@ class DownloadListAdapter(private var context: Context) :
             }
         }
 
-        fun bind(item: StrucDownFile, context: Context) {
+        fun bind(item: StructureDownFile, context: Context) {
             initialSetup(item)
             binding.downloadStateButton.setOnClickListener {
                 when (item.downloadState) {
@@ -152,7 +152,8 @@ class DownloadListAdapter(private var context: Context) :
 
             if (item.downloadState == DownloadStatusState.FAILED) {
                 binding.moreButton.visibility = View.VISIBLE
-                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                binding.textView.text =
+                    item.convertToSizeUnit() + " - " + item.downloadState.toString()
                 eventListener?.onUpdateToDatabase(item)
 
             }
@@ -179,7 +180,7 @@ class DownloadListAdapter(private var context: Context) :
         holder.bind(item, context)
     }
 
-    fun updateProgress(file: StrucDownFile) {
+    fun updateProgress(file: StructureDownFile) {
         val index = currentList.indexOfFirst { it.id == file.id }
         val mutableList = currentList.toMutableList()
         if (index == -1) {
@@ -198,12 +199,15 @@ class DownloadListAdapter(private var context: Context) :
 
 }
 
-class DownloadListDiffCallback : DiffUtil.ItemCallback<StrucDownFile>() {
-    override fun areItemsTheSame(oldItem: StrucDownFile, newItem: StrucDownFile): Boolean {
+class DownloadListDiffCallback : DiffUtil.ItemCallback<StructureDownFile>() {
+    override fun areItemsTheSame(oldItem: StructureDownFile, newItem: StructureDownFile): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: StrucDownFile, newItem: StrucDownFile): Boolean {
+    override fun areContentsTheSame(
+        oldItem: StructureDownFile,
+        newItem: StructureDownFile
+    ): Boolean {
         return oldItem.id == newItem.id && oldItem.downloadState == newItem.downloadState
                 && oldItem.fileName == newItem.fileName && oldItem.size == newItem.size
                 && oldItem.bytesCopied == newItem.bytesCopied

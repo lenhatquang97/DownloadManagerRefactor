@@ -1,15 +1,14 @@
 package com.quangln2.mydownloadmanager.data.repository
 
 import android.content.Context
+import android.content.Intent
 import androidx.annotation.WorkerThread
 import com.quangln2.mydownloadmanager.data.database.DownloadDao
+import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 import com.quangln2.mydownloadmanager.data.source.local.LocalDataSource
 import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSource
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.quangln2.mydownloadmanager.service.DownloadService
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 
 class DefaultDownloadRepository(
@@ -19,60 +18,64 @@ class DefaultDownloadRepository(
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insert(strucDownFile: StrucDownFile) {
-        downloadDao.insert(strucDownFile)
+    suspend fun insert(StructureDownFile: StructureDownFile) {
+        downloadDao.insert(StructureDownFile)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun update(strucDownFile: StrucDownFile) {
-        downloadDao.update(strucDownFile)
+    suspend fun update(StructureDownFile: StructureDownFile) {
+        downloadDao.update(StructureDownFile)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun deleteFromList(strucDownFile: StrucDownFile) {
-        downloadDao.delete(strucDownFile)
+    suspend fun deleteFromList(StructureDownFile: StructureDownFile, context: Context) {
+        val intent = Intent(context, DownloadService::class.java)
+        intent.putExtra("item", StructureDownFile)
+        intent.putExtra("command", "KillNotification")
+        context.startService(intent)
+        downloadDao.delete(StructureDownFile)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun deletePermanently(file: StrucDownFile, context: Context) {
+    suspend fun deletePermanently(file: StructureDownFile, context: Context) {
         localDataSource.deletePermanently(file, context)
         downloadDao.delete(file)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun doesDownloadLinkExist(file: StrucDownFile): Boolean {
+    suspend fun doesDownloadLinkExist(file: StructureDownFile): Boolean {
         return downloadDao.doesDownloadLinkExist(file.downloadLink) == 1
     }
 
-    fun addNewDownloadInfo(url: String, downloadTo: String, file: StrucDownFile) =
+    fun addNewDownloadInfo(url: String, downloadTo: String, file: StructureDownFile) =
         remoteDataSource.addNewDownloadInfo(url, downloadTo, file)
 
-    fun fetchDownloadInfo(file: StrucDownFile): StrucDownFile =
+    fun fetchDownloadInfo(file: StructureDownFile): StructureDownFile =
         remoteDataSource.fetchDownloadInfo(file)
 
-    fun writeToFileAPI29Above(file: StrucDownFile, context: Context) =
+    fun writeToFileAPI29Above(file: StructureDownFile, context: Context) =
         localDataSource.writeToFileAPI29Above(file, context)
 
-    fun writeToFileAPI29Below(file: StrucDownFile) =
+    fun writeToFileAPI29Below(file: StructureDownFile) =
         localDataSource.writeToFileAPI29Below(file)
 
-    fun downloadAFile(file: StrucDownFile, context: Context): Flow<StrucDownFile> =
+    fun downloadAFile(file: StructureDownFile, context: Context): Flow<StructureDownFile> =
         remoteDataSource.downloadAFile(file, context)
 
-    fun resumeDownload(file: StrucDownFile) = remoteDataSource.resumeDownload(file)
-    fun pauseDownload(file: StrucDownFile) = remoteDataSource.pauseDownload(file)
-    fun stopDownload(file: StrucDownFile) = remoteDataSource.stopDownload(file)
-    fun retryDownload(file: StrucDownFile, context: Context){
+    fun resumeDownload(file: StructureDownFile) = remoteDataSource.resumeDownload(file)
+    fun pauseDownload(file: StructureDownFile) = remoteDataSource.pauseDownload(file)
+    fun stopDownload(file: StructureDownFile) = remoteDataSource.stopDownload(file)
+    fun retryDownload(file: StructureDownFile, context: Context) {
         remoteDataSource.retryDownload(file, context)
     }
 
 
-    fun queueDownload(file: StrucDownFile) = remoteDataSource.queueDownload(file)
-    fun openDownloadFile(item: StrucDownFile, context: Context) =
+    fun queueDownload(file: StructureDownFile) = remoteDataSource.queueDownload(file)
+    fun openDownloadFile(item: StructureDownFile, context: Context) =
         localDataSource.openDownloadFile(item, context)
 
 

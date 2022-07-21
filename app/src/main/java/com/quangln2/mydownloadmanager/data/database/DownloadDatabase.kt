@@ -6,9 +6,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.quangln2.mydownloadmanager.data.converter.Converters
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 
-@Database(entities = [StrucDownFile::class], version = 1, exportSchema = false)
+@Database(entities = [StructureDownFile::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class DownloadDatabase : RoomDatabase() {
     abstract fun downloadDao(): DownloadDao

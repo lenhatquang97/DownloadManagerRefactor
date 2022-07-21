@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
@@ -21,15 +20,13 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
-import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
+import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.data.source.local.LocalDataSourceImpl
 import com.quangln2.mydownloadmanager.data.source.remote.RemoteDataSourceImpl
-import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
 import com.quangln2.mydownloadmanager.databinding.ActivityMainBinding
 import com.quangln2.mydownloadmanager.ui.dialog.AddToDownloadDialog
 import com.quangln2.mydownloadmanager.ui.home.HomeViewModel
-import com.quangln2.mydownloadmanager.util.DownloadUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -165,7 +162,10 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         CoroutineScope(Dispatchers.IO).launch {
-            GlobalSettings.setMaximumDownloadThread(applicationContext, GlobalSettings.numsOfMaxDownloadThreadExported.toFloat())
+            GlobalSettings.setMaximumDownloadThread(
+                applicationContext,
+                GlobalSettings.numsOfMaxDownloadThreadExported.toFloat()
+            )
         }
     }
 }

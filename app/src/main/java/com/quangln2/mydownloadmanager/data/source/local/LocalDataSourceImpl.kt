@@ -11,7 +11,8 @@ import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.content.FileProvider
 import com.quangln2.mydownloadmanager.BuildConfig
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.data.model.StructureDownFile
+import com.quangln2.mydownloadmanager.service.DownloadService
 import com.quangln2.mydownloadmanager.util.DownloadUtil.Companion.getMimeType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,8 +23,9 @@ import java.util.*
 class LocalDataSourceImpl : LocalDataSource {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    override suspend fun deletePermanently(file: StrucDownFile, context: Context) {
+    override suspend fun deletePermanently(file: StructureDownFile, context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+
             val resolver = context.contentResolver
             if (file.uri != null) {
                 val rowsDeleted = resolver.delete(
@@ -53,10 +55,14 @@ class LocalDataSourceImpl : LocalDataSource {
                 }
             }
         }
+        val intent = Intent(context, DownloadService::class.java)
+        intent.putExtra("item", file)
+        intent.putExtra("command", "KillNotification")
+        context.startService(intent)
     }
 
 
-    override fun writeToFileAPI29Above(file: StrucDownFile, context: Context) {
+    override fun writeToFileAPI29Above(file: StructureDownFile, context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, file.fileName)
@@ -94,7 +100,7 @@ class LocalDataSourceImpl : LocalDataSource {
 
     }
 
-    override fun writeToFileAPI29Below(file: StrucDownFile) {
+    override fun writeToFileAPI29Below(file: StructureDownFile) {
         if (file.fileName.contains(".")) {
             val extension = file.fileName.substring(file.fileName.lastIndexOf("."))
             val name = file.fileName.substring(0, file.fileName.lastIndexOf("."))
@@ -112,7 +118,7 @@ class LocalDataSourceImpl : LocalDataSource {
     }
 
 
-    override fun openDownloadFile(item: StrucDownFile, context: Context) {
+    override fun openDownloadFile(item: StructureDownFile, context: Context) {
         val intent = Intent(Intent.ACTION_VIEW)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             intent.setDataAndType(Uri.parse(item.uri), item.mimeType)

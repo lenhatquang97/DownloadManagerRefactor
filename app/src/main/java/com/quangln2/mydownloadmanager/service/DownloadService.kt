@@ -10,20 +10,24 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.MainActivity
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
+import com.quangln2.mydownloadmanager.controller.DownloadManagerController.addToQueueList
+import com.quangln2.mydownloadmanager.controller.DownloadManagerController.findNextQueueDownloadFile
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
 import com.quangln2.mydownloadmanager.domain.*
 import com.quangln2.mydownloadmanager.util.DownloadUtil
 import com.quangln2.mydownloadmanager.util.LogicUtil
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 
 class DownloadService : Service() {
@@ -55,7 +59,7 @@ class DownloadService : Service() {
     }
 
 
-    private fun onOpenNotification(item: StrucDownFile) {
+    private fun onOpenNotification(item: StructureDownFile) {
         val resultIntent = Intent(this@DownloadService, MainActivity::class.java)
         val resultPendingIntent: PendingIntent? =
             TaskStackBuilder.create(this@DownloadService).run {
@@ -69,7 +73,7 @@ class DownloadService : Service() {
         builder = NotificationCompat.Builder(this@DownloadService, ConstantClass.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_arrow_downward_24)
             .setContentTitle(LogicUtil.cutFileName(item.fileName))
-            .setContentText(item.downloadState.toString())
+            .setContentText(item.downloadState.toString() + " " + item.convertBytesCopiedToSizeUnit())
             .setGroup(ConstantClass.CHANNEL_ID)
             .setContentIntent(resultPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -83,21 +87,21 @@ class DownloadService : Service() {
             manager.cancel(item.id.hashCode())
             job?.cancel()
             stopSelf()
-            findNextQueueDownloadFile()
+            findNextQueueDownloadFile(this@DownloadService)
             return
         }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null) {
-            val item = intent.getSerializableExtra("item") as StrucDownFile
+            val item = intent.getSerializableExtra("item") as StructureDownFile
             val command = intent.getStringExtra("command") ?: "nothing"
             downloadAFileWithCreating(item, this, command)
         }
         return START_NOT_STICKY
     }
 
-    private fun createFileAgain(file: StrucDownFile, context: Context) {
+    private fun createFileAgain(file: StructureDownFile, context: Context) {
         if (file.uri == null && file.downloadTo.isEmpty()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 WriteToFileAPI29AboveUseCase(DownloadManagerApplication.downloadRepository)(
@@ -111,14 +115,13 @@ class DownloadService : Service() {
     }
 
 
-
-    private fun addToDownloadList(file: StrucDownFile) {
+    private fun addToDownloadList(file: StructureDownFile) {
         val currentList = DownloadManagerController.downloadList.value
 
 
         if (currentList != null) {
             val availableValue = currentList.find { it.id == file.id }
-            if(availableValue != null){
+            if (availableValue != null) {
                 CoroutineScope(Dispatchers.IO).launch {
                     UpdateToListUseCase(DownloadManagerApplication.downloadRepository)(
                         file.copy(
@@ -149,32 +152,30 @@ class DownloadService : Service() {
         }
     }
 
-    private fun addToQueueList(file: StrucDownFile){
-        val currentList = DownloadManagerController.downloadList.value
-        if (currentList != null) {
-            currentList.add(file.copy(downloadState = DownloadStatusState.QUEUED))
-            DownloadManagerController._downloadList.postValue(currentList)
-        }
-        CoroutineScope(Dispatchers.IO).launch {
-            InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
-                file.copy(
-                    downloadState = DownloadStatusState.QUEUED
-                )
-            )
-        }
-    }
 
-    private fun downloadAFileWithCreating(file: StrucDownFile, context: Context, command: String) {
-        if(command == "WaitForDownload"){
+
+    private fun downloadAFileWithCreating(
+        file: StructureDownFile,
+        context: Context,
+        command: String
+    ) {
+        if (command == "WaitForDownload") {
             val currentList = DownloadManagerController.downloadList.value
-            if(currentList != null){
-                val numsOfDownloading = currentList.count { it.downloadState == DownloadStatusState.DOWNLOADING }
-                if(numsOfDownloading >= GlobalSettings.numsOfMaxDownloadThreadExported){
+            if (currentList != null) {
+                val numsOfDownloading =
+                    currentList.count { it.downloadState == DownloadStatusState.DOWNLOADING }
+                if (numsOfDownloading >= GlobalSettings.numsOfMaxDownloadThreadExported) {
                     addToQueueList(file)
                     return
                 }
             }
 
+        } else if(command == "KillNotification"){
+            val manager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.cancel(file.id.hashCode())
+            stopSelf()
+            return
         }
         if (file.downloadState == DownloadStatusState.FAILED) {
             createFileAgain(file, context)
@@ -189,16 +190,15 @@ class DownloadService : Service() {
                     file.copy()
                 )
             }
-        } else if(!DownloadUtil.isFileExisting(file, context) && command == "dequeue"){
+        } else if (!DownloadUtil.isFileExisting(file, context) && command == "dequeue") {
             createFileAgain(file, context)
-        }
-        else if (!DownloadUtil.isFileExisting(file, context)) {
+        } else if (!DownloadUtil.isFileExisting(file, context)) {
             createFileAgain(file, context)
             addToDownloadList(file)
         }
         val currentList = DownloadManagerController.downloadList.value
         val index = currentList?.indexOfFirst { it.id == file.id }
-        if (command == "dequeue"){
+        if (command == "dequeue") {
             if (index != null) {
                 currentList[index] = file.copy()
             }
@@ -211,27 +211,12 @@ class DownloadService : Service() {
                 ).collect {
                     DownloadManagerController._progressFile.value = it
                     onOpenNotification(it)
-                    if(it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.PAUSED){
-                        findNextQueueDownloadFile()
+                    if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.PAUSED) {
+                        findNextQueueDownloadFile(this@DownloadService)
                     }
                 }
             }
         }
     }
 
-    private fun findNextQueueDownloadFile(){
-        val currentList = DownloadManagerController.downloadList.value
-        if(currentList != null){
-            val index = currentList.indexOfFirst { it.downloadState == DownloadStatusState.QUEUED }
-            if(index != -1){
-                currentList[index] = currentList[index].copy(downloadState = DownloadStatusState.DOWNLOADING)
-                DownloadManagerController._downloadList.postValue(currentList)
-                val intent = Intent(this@DownloadService, DownloadService::class.java)
-                intent.putExtra("item", currentList[index])
-                intent.putExtra("command", "dequeue")
-                this@DownloadService.startService(intent)
-
-            }
-        }
-    }
 }

@@ -62,6 +62,7 @@
     <style name="mySlider" parent="@style/Widget.MaterialComponents.Slider">
         <item name="labelStyle">@style/myTooltip</item>
     </style>
+
     <style name="myTooltip" parent="Widget.MaterialComponents.Tooltip">
         <!-- background color of the Tooltip -->
         <item name="backgroundTint">@color/blue</item>

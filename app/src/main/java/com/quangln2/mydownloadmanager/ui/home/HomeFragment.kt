@@ -4,7 +4,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Build.VERSION_CODES.P
 import android.os.Bundle
 import android.os.IBinder
 import android.text.Editable
@@ -25,7 +24,7 @@ import com.quangln2.mydownloadmanager.controller.DownloadManagerController
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController._downloadList
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController.downloadList
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController.progressFile
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
 import com.quangln2.mydownloadmanager.data.repository.DefaultDownloadRepository
@@ -96,12 +95,12 @@ class HomeFragment : Fragment() {
             override fun onHandleDelete(
                 menuItem: MenuItem,
                 binding: DownloadItemBinding,
-                item: StrucDownFile,
+                item: StructureDownFile,
                 context: Context
             ): Boolean {
                 return when (menuItem.itemId) {
                     R.id.delete_from_list_option -> {
-                        viewModel.deleteFromList(item)
+                        viewModel.deleteFromList(item, context)
                         binding.textView.text = ""
                         true
                     }
@@ -120,14 +119,15 @@ class HomeFragment : Fragment() {
 
             override fun onDownloadSuccess(
                 binding: DownloadItemBinding,
-                item: StrucDownFile,
+                item: StructureDownFile,
                 context: Context
             ) {
                 item.downloadState = DownloadStatusState.COMPLETED
                 binding.moreButton.visibility = View.VISIBLE
                 binding.stopButton.visibility = View.GONE
                 binding.progressBar.visibility = View.GONE
-                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                binding.textView.text =
+                    item.convertToSizeUnit() + " - " + item.downloadState.toString()
                 binding.downloadStateButton.setImageResource(R.drawable.ic_open)
                 CoroutineScope(Dispatchers.IO).launch {
                     DownloadManagerApplication.downloadRepository.update(item)
@@ -139,14 +139,16 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            override fun onPause(item: StrucDownFile, binding:DownloadItemBinding) {
+            override fun onPause(item: StructureDownFile, binding: DownloadItemBinding) {
                 binding.moreButton.visibility = View.VISIBLE
                 binding.downloadStateButton.setImageResource(R.drawable.ic_start)
 
                 viewModel.pause(item.id)
+                //onUpdateToDatabase(item)
+
             }
 
-            override fun onResume(item: StrucDownFile, binding:DownloadItemBinding) {
+            override fun onResume(item: StructureDownFile, binding: DownloadItemBinding) {
                 binding.moreButton.visibility = View.GONE
                 binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
 
@@ -154,18 +156,10 @@ class HomeFragment : Fragment() {
                     (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
 
                 viewModel.resume(requireContext(), item.id)
+                //onUpdateToDatabase(item)
             }
 
-            override fun onOpen(item: StrucDownFile, binding:DownloadItemBinding) {
-                binding.moreButton.visibility = View.VISIBLE
-                binding.stopButton.visibility = View.GONE
-                binding.downloadStateButton.setImageResource(R.drawable.ic_open)
-
-                item.downloadState = DownloadStatusState.COMPLETED
-                viewModel.open(requireContext(), item)
-            }
-
-            override fun onRetry(item: StrucDownFile, binding:DownloadItemBinding) {
+            override fun onRetry(item: StructureDownFile, binding: DownloadItemBinding) {
                 binding.moreButton.visibility = View.VISIBLE
                 binding.progressBar.progress = 0
                 binding.progressBar.visibility = View.VISIBLE
@@ -173,9 +167,10 @@ class HomeFragment : Fragment() {
 
                 item.downloadState = DownloadStatusState.DOWNLOADING
                 viewModel.retry(requireContext(), item)
+                //onUpdateToDatabase(item)
             }
 
-            override fun onStop(item: StrucDownFile, binding:DownloadItemBinding) {
+            override fun onStop(item: StructureDownFile, binding: DownloadItemBinding) {
                 binding.moreButton.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
                 binding.stopButton.visibility = View.GONE
@@ -185,9 +180,19 @@ class HomeFragment : Fragment() {
                 item.downloadState = DownloadStatusState.FAILED
                 binding.textView.text =
                     item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                //onUpdateToDatabase(item)
             }
 
-            override fun onUpdateToDatabase(item: StrucDownFile) {
+            override fun onOpen(item: StructureDownFile, binding: DownloadItemBinding) {
+                binding.moreButton.visibility = View.VISIBLE
+                binding.stopButton.visibility = View.GONE
+                binding.downloadStateButton.setImageResource(R.drawable.ic_open)
+
+                item.downloadState = DownloadStatusState.COMPLETED
+                viewModel.open(requireContext(), item)
+            }
+
+            override fun onUpdateToDatabase(item: StructureDownFile) {
                 CoroutineScope(Dispatchers.IO).launch {
                     viewModel.update(item)
                 }
@@ -220,7 +225,7 @@ class HomeFragment : Fragment() {
         downloadList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
-                   // binding.chip0.performClick()
+                    // binding.chip0.performClick()
                     viewModel._filterList.value = it
                 }
             }
@@ -306,7 +311,7 @@ class HomeFragment : Fragment() {
         detectFileFailed()
     }
 
-    private fun detectFileFailed(){
+    private fun detectFileFailed() {
         val res = downloadList.value
         val indexArray = mutableListOf<Int>()
         if (res != null) {

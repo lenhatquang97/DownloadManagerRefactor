@@ -5,7 +5,7 @@ import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
-import com.quangln2.mydownloadmanager.data.model.StrucDownFile
+import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 import com.quangln2.mydownloadmanager.listener.OnAcceptPress
 
 class UIComponentUtil {
@@ -64,7 +64,11 @@ class UIComponentUtil {
             return path1
         }
 
-        fun showDownloadDialogAgain(context: Context, file: StrucDownFile, onAcceptPress: OnAcceptPress){
+        fun showDownloadDialogAgain(
+            context: Context,
+            file: StructureDownFile,
+            onAcceptPress: OnAcceptPress
+        ) {
             val builder =
                 MaterialAlertDialogBuilder(context, R.style.AlertDialogShow)
                     .setTitle(file.fileName)
@@ -79,7 +83,11 @@ class UIComponentUtil {
             builder.show()
         }
 
-        fun showDownloadAlertDialog(context: Context, file: StrucDownFile, onAcceptPress: OnAcceptPress) {
+        fun showDownloadAlertDialog(
+            context: Context,
+            file: StructureDownFile,
+            onAcceptPress: OnAcceptPress
+        ) {
             val builder =
                 MaterialAlertDialogBuilder(context, R.style.AlertDialogShow)
                     .setTitle(file.fileName)

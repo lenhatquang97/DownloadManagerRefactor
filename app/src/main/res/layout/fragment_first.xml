@@ -61,8 +61,8 @@
                 app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
-                    style="@style/checkedChip"
                     android:id="@+id/chip0"
+                    style="@style/checkedChip"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="All"
@@ -74,8 +74,8 @@
                     app:chipStrokeColor="@color/blue" />
 
                 <com.google.android.material.chip.Chip
-                    style="@style/checkedChip"
                     android:id="@+id/chip1"
+                    style="@style/checkedChip"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="Downloading"
@@ -86,8 +86,8 @@
                     app:chipStrokeColor="@color/nearly_yellow" />
 
                 <com.google.android.material.chip.Chip
-                    style="@style/checkedChip"
                     android:id="@+id/chip2"
+                    style="@style/checkedChip"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="Failed"
@@ -98,8 +98,8 @@
                     app:chipStrokeColor="@color/failed" />
 
                 <com.google.android.material.chip.Chip
-                    style="@style/checkedChip"
                     android:id="@+id/chip3"
+                    style="@style/checkedChip"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="Paused"
@@ -110,8 +110,8 @@
                     app:chipStrokeColor="@color/paused" />
 
                 <com.google.android.material.chip.Chip
-                    style="@style/checkedChip"
                     android:id="@+id/chip4"
+                    style="@style/checkedChip"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="Success"
@@ -122,8 +122,8 @@
                     app:chipStrokeColor="@color/success" />
 
                 <com.google.android.material.chip.Chip
-                    style="@style/checkedChip"
                     android:id="@+id/chip5"
+                    style="@style/checkedChip"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="Queued"
