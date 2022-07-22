@@ -19,6 +19,7 @@
 
     <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowBackground">@drawable/border_radius</item>
+        <item name="android:background">@color/white</item>
     </style>
 
     <style name="AlertDialogShow" parent="ThemeOverlay.Material3.MaterialAlertDialog.Centered">

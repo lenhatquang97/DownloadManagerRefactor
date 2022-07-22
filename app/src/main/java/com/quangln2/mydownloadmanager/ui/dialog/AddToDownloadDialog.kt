@@ -124,7 +124,6 @@ class AddToDownloadDialog : DialogFragment() {
         }
         val dialog = AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog)
             .setView(binding.root).create()
-        dialog.window?.setBackgroundDrawableResource(R.color.black)
         return dialog
     }
 
