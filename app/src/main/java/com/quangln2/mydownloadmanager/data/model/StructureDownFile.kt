@@ -42,7 +42,7 @@ data class StructureDownFile(
         }
     }
 
-    fun convertBytesCopiedToSizeUnit(): String{
+    fun convertBytesCopiedToSizeUnit(): String {
         if (bytesCopied < ConstantClass.KB) {
             return bytesCopied.toString() + "B"
         }

@@ -66,15 +66,11 @@ class DefaultDownloadRepository(
     fun downloadAFile(file: StructureDownFile, context: Context): Flow<StructureDownFile> =
         remoteDataSource.downloadAFile(file, context)
 
-    fun resumeDownload(file: StructureDownFile) = remoteDataSource.resumeDownload(file)
-    fun pauseDownload(file: StructureDownFile) = remoteDataSource.pauseDownload(file)
-    fun stopDownload(file: StructureDownFile) = remoteDataSource.stopDownload(file)
     fun retryDownload(file: StructureDownFile, context: Context) {
         remoteDataSource.retryDownload(file, context)
     }
 
 
-    fun queueDownload(file: StructureDownFile) = remoteDataSource.queueDownload(file)
     fun openDownloadFile(item: StructureDownFile, context: Context) =
         localDataSource.openDownloadFile(item, context)
 

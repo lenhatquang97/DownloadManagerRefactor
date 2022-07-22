@@ -15,5 +15,6 @@ class LogicUtil {
                 10
             ) + "..." + fileName.substring(fileName.length - 10, fileName.length)
         }
+
     }
 }

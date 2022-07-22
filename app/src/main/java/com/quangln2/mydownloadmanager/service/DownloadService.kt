@@ -6,7 +6,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
@@ -14,13 +13,16 @@ import com.quangln2.mydownloadmanager.DownloadManagerApplication
 import com.quangln2.mydownloadmanager.MainActivity
 import com.quangln2.mydownloadmanager.R
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController
+import com.quangln2.mydownloadmanager.controller.DownloadManagerController.addToDownloadList
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController.addToQueueList
+import com.quangln2.mydownloadmanager.controller.DownloadManagerController.createFileAgain
 import com.quangln2.mydownloadmanager.controller.DownloadManagerController.findNextQueueDownloadFile
 import com.quangln2.mydownloadmanager.data.constants.ConstantClass
 import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.data.model.settings.GlobalSettings
-import com.quangln2.mydownloadmanager.domain.*
+import com.quangln2.mydownloadmanager.domain.DownloadAFileUseCase
+import com.quangln2.mydownloadmanager.domain.UpdateToListUseCase
 import com.quangln2.mydownloadmanager.util.DownloadUtil
 import com.quangln2.mydownloadmanager.util.LogicUtil
 import kotlinx.coroutines.CoroutineScope
@@ -101,58 +103,6 @@ class DownloadService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun createFileAgain(file: StructureDownFile, context: Context) {
-        if (file.uri == null && file.downloadTo.isEmpty()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                WriteToFileAPI29AboveUseCase(DownloadManagerApplication.downloadRepository)(
-                    file,
-                    context
-                )
-            } else {
-                WriteToFileAPI29BelowUseCase(DownloadManagerApplication.downloadRepository)(file)
-            }
-        }
-    }
-
-
-    private fun addToDownloadList(file: StructureDownFile) {
-        val currentList = DownloadManagerController.downloadList.value
-
-
-        if (currentList != null) {
-            val availableValue = currentList.find { it.id == file.id }
-            if (availableValue != null) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    UpdateToListUseCase(DownloadManagerApplication.downloadRepository)(
-                        file.copy(
-                            downloadState = DownloadStatusState.DOWNLOADING
-                        )
-                    )
-                }
-                return
-            } else {
-                currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
-                DownloadManagerController._downloadList.postValue(currentList)
-                CoroutineScope(Dispatchers.IO).launch {
-                    InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
-                        file.copy(
-                            downloadState = DownloadStatusState.DOWNLOADING
-                        )
-                    )
-                }
-                return
-            }
-        }
-        CoroutineScope(Dispatchers.IO).launch {
-            InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
-                file.copy(
-                    downloadState = DownloadStatusState.DOWNLOADING
-                )
-            )
-        }
-    }
-
-
 
     private fun downloadAFileWithCreating(
         file: StructureDownFile,
@@ -170,7 +120,7 @@ class DownloadService : Service() {
                 }
             }
 
-        } else if(command == "KillNotification"){
+        } else if (command == "KillNotification") {
             val manager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.cancel(file.id.hashCode())

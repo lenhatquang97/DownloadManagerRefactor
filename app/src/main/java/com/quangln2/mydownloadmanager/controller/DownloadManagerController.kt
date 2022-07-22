@@ -2,6 +2,7 @@ package com.quangln2.mydownloadmanager.controller
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.quangln2.mydownloadmanager.DownloadManagerApplication
@@ -9,6 +10,9 @@ import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.mydownloadmanager.domain.InsertToListUseCase
+import com.quangln2.mydownloadmanager.domain.UpdateToListUseCase
+import com.quangln2.mydownloadmanager.domain.WriteToFileAPI29AboveUseCase
+import com.quangln2.mydownloadmanager.domain.WriteToFileAPI29BelowUseCase
 import com.quangln2.mydownloadmanager.service.DownloadService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -67,5 +71,56 @@ object DownloadManagerController {
             )
         }
     }
+
+    fun addToDownloadList(file: StructureDownFile) {
+        val currentList = downloadList.value
+
+
+        if (currentList != null) {
+            val availableValue = currentList.find { it.id == file.id }
+            if (availableValue != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    UpdateToListUseCase(DownloadManagerApplication.downloadRepository)(
+                        file.copy(
+                            downloadState = DownloadStatusState.DOWNLOADING
+                        )
+                    )
+                }
+                return
+            } else {
+                currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
+                _downloadList.postValue(currentList)
+                CoroutineScope(Dispatchers.IO).launch {
+                    InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
+                        file.copy(
+                            downloadState = DownloadStatusState.DOWNLOADING
+                        )
+                    )
+                }
+                return
+            }
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
+                file.copy(
+                    downloadState = DownloadStatusState.DOWNLOADING
+                )
+            )
+        }
+    }
+
+    fun createFileAgain(file: StructureDownFile, context: Context) {
+        if (file.uri == null && file.downloadTo.isEmpty()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                WriteToFileAPI29AboveUseCase(DownloadManagerApplication.downloadRepository)(
+                    file,
+                    context
+                )
+            } else {
+                WriteToFileAPI29BelowUseCase(DownloadManagerApplication.downloadRepository)(file)
+            }
+        }
+    }
+
 
 }

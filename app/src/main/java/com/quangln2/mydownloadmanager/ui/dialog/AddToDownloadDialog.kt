@@ -122,9 +122,8 @@ class AddToDownloadDialog : DialogFragment() {
             binding.downloadToTextField.visibility = View.VISIBLE
             binding.noteAboveAndroid10.visibility = View.GONE
         }
-        val dialog = AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog)
+        return AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog)
             .setView(binding.root).create()
-        return dialog
     }
 
     private fun closeKeyboard(view: View) {
