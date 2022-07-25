@@ -161,7 +161,7 @@ class DownloadService : Service() {
                 ).collect {
                     DownloadManagerController._progressFile.value = it
                     onOpenNotification(it)
-                    if(!DownloadUtil.isNetworkAvailable(context)) {
+                    if (!DownloadUtil.isNetworkAvailable(context)) {
                         DownloadManagerController._downloadList.value?.forEach {
                             if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.DOWNLOADING) {
                                 it.downloadState = DownloadStatusState.FAILED

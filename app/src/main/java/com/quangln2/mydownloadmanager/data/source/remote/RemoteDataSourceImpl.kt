@@ -12,7 +12,6 @@ import android.webkit.URLUtil
 import com.quangln2.mydownloadmanager.ServiceLocator
 import com.quangln2.mydownloadmanager.data.model.StructureDownFile
 import com.quangln2.mydownloadmanager.data.model.downloadstatus.DownloadStatusState
-import com.quangln2.mydownloadmanager.util.DownloadUtil
 import com.quangln2.mydownloadmanager.util.UIComponentUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

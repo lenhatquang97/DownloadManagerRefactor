@@ -123,13 +123,7 @@ class HomeFragment : Fragment() {
                 item: StructureDownFile,
                 context: Context
             ) {
-                item.downloadState = DownloadStatusState.COMPLETED
-                binding.moreButton.visibility = View.VISIBLE
-                binding.stopButton.visibility = View.GONE
-                binding.progressBar.visibility = View.GONE
-                binding.textView.text =
-                    item.convertToSizeUnit() + " - " + item.downloadState.toString()
-                binding.downloadStateButton.setImageResource(R.drawable.ic_open)
+
                 CoroutineScope(Dispatchers.IO).launch {
                     DownloadManagerApplication.downloadRepository.update(item)
                     withContext(Dispatchers.Main) {
@@ -140,51 +134,31 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            override fun onPause(item: StructureDownFile, binding: DownloadItemBinding) {
-                binding.moreButton.visibility = View.VISIBLE
-                binding.downloadStateButton.setImageResource(R.drawable.ic_start)
+            override fun onPause(item: StructureDownFile) {
                 viewModel.pause(item.id)
-
             }
 
-            override fun onResume(item: StructureDownFile, binding: DownloadItemBinding) {
-                binding.moreButton.visibility = View.GONE
-                binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
-                binding.progressBar.progress =
-                    (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
-
+            override fun onResume(item: StructureDownFile) {
                 viewModel.resume(requireContext(), item.id)
-                //onUpdateToDatabase(item)
             }
 
-            override fun onRetry(item: StructureDownFile, binding: DownloadItemBinding) {
-                binding.moreButton.visibility = View.VISIBLE
-                binding.progressBar.progress = 0
-                binding.progressBar.visibility = View.VISIBLE
-                binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
-
+            override fun onRetry(item: StructureDownFile) {
                 item.downloadState = DownloadStatusState.DOWNLOADING
                 viewModel.retry(requireContext(), item)
-                //onUpdateToDatabase(item)
             }
 
             override fun onStop(item: StructureDownFile, binding: DownloadItemBinding) {
+                item.downloadState = DownloadStatusState.FAILED
+
                 binding.moreButton.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
                 binding.stopButton.visibility = View.GONE
                 binding.downloadStateButton.setImageResource(R.drawable.ic_retry)
-
-
-                item.downloadState = DownloadStatusState.FAILED
                 binding.textView.text =
                     item.convertToSizeUnit() + " - " + item.downloadState.toString()
             }
 
-            override fun onOpen(item: StructureDownFile, binding: DownloadItemBinding) {
-                binding.moreButton.visibility = View.VISIBLE
-                binding.stopButton.visibility = View.GONE
-                binding.downloadStateButton.setImageResource(R.drawable.ic_open)
-
+            override fun onOpen(item: StructureDownFile) {
                 item.downloadState = DownloadStatusState.COMPLETED
                 viewModel.open(requireContext(), item)
             }
@@ -212,8 +186,8 @@ class HomeFragment : Fragment() {
                     _downloadList.value?.size == 0
                 ) {
                     val currentList = it
-                    for(item in currentList) {
-                        if(item.downloadState == DownloadStatusState.DOWNLOADING) {
+                    for (item in currentList) {
+                        if (item.downloadState == DownloadStatusState.DOWNLOADING) {
                             item.downloadState = DownloadStatusState.PAUSED
                         }
                     }
@@ -223,12 +197,9 @@ class HomeFragment : Fragment() {
 
         }
 
-
-
         downloadList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
-                    // binding.chip0.performClick()
                     viewModel._filterList.value = it
                 }
             }
@@ -256,7 +227,6 @@ class HomeFragment : Fragment() {
 
             }
         }
-
 
         progressFile.observe(viewLifecycleOwner) {
             it?.let {

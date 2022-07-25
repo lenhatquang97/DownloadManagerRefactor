@@ -106,16 +106,29 @@ class DownloadListAdapter(private var context: Context) :
             binding.downloadStateButton.setOnClickListener {
                 when (item.downloadState) {
                     DownloadStatusState.DOWNLOADING -> {
-                        eventListener?.onPause(item, binding)
+                        binding.moreButton.visibility = View.VISIBLE
+                        binding.downloadStateButton.setImageResource(R.drawable.ic_start)
+                        eventListener?.onPause(item)
                     }
                     DownloadStatusState.PAUSED -> {
-                        eventListener?.onResume(item, binding)
+                        binding.moreButton.visibility = View.GONE
+                        binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
+                        binding.progressBar.progress =
+                            (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
+                        eventListener?.onResume(item)
                     }
                     DownloadStatusState.COMPLETED -> {
-                        eventListener?.onOpen(item, binding)
+                        binding.moreButton.visibility = View.VISIBLE
+                        binding.stopButton.visibility = View.GONE
+                        binding.downloadStateButton.setImageResource(R.drawable.ic_open)
+                        eventListener?.onOpen(item)
                     }
                     DownloadStatusState.FAILED -> {
-                        eventListener?.onRetry(item, binding)
+                        binding.moreButton.visibility = View.VISIBLE
+                        binding.progressBar.progress = 0
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
+                        eventListener?.onRetry(item)
                     }
                     else -> {}
                 }
@@ -151,14 +164,19 @@ class DownloadListAdapter(private var context: Context) :
 
 
             if (item.downloadState == DownloadStatusState.FAILED) {
-                binding.moreButton.visibility = View.VISIBLE
-                binding.textView.text =
-                    item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                eventListener?.onStop(item, binding)
                 eventListener?.onUpdateToDatabase(item)
 
             }
 
             if (item.bytesCopied == item.size && item.downloadState != DownloadStatusState.FAILED) {
+                item.downloadState = DownloadStatusState.COMPLETED
+                binding.moreButton.visibility = View.VISIBLE
+                binding.stopButton.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
+                binding.textView.text =
+                    item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                binding.downloadStateButton.setImageResource(R.drawable.ic_open)
                 eventListener?.onDownloadSuccess(binding, item, context)
             }
         }
@@ -187,7 +205,7 @@ class DownloadListAdapter(private var context: Context) :
             return
         }
         mutableList[index] = file
-        submitList(mutableList)
+        submitList(mutableList.toMutableList())
         notifyItemChanged(index)
     }
 

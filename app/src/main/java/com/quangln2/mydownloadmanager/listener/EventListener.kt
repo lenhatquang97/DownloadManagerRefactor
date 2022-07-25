@@ -14,10 +14,10 @@ interface EventListener {
     ): Boolean
 
     fun onDownloadSuccess(binding: DownloadItemBinding, item: StructureDownFile, context: Context)
-    fun onPause(item: StructureDownFile, binding: DownloadItemBinding)
-    fun onResume(item: StructureDownFile, binding: DownloadItemBinding)
-    fun onOpen(item: StructureDownFile, binding: DownloadItemBinding)
-    fun onRetry(item: StructureDownFile, binding: DownloadItemBinding)
+    fun onPause(item: StructureDownFile)
+    fun onResume(item: StructureDownFile)
+    fun onOpen(item: StructureDownFile)
+    fun onRetry(item: StructureDownFile)
     fun onStop(item: StructureDownFile, binding: DownloadItemBinding)
     fun onUpdateToDatabase(item: StructureDownFile)
 }
