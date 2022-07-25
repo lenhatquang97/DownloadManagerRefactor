@@ -87,6 +87,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        println("OnCreate HomeFragment")
         super.onViewCreated(view, savedInstanceState)
 
         adapterVal = DownloadListAdapter(requireContext())
@@ -142,16 +143,13 @@ class HomeFragment : Fragment() {
             override fun onPause(item: StructureDownFile, binding: DownloadItemBinding) {
                 binding.moreButton.visibility = View.VISIBLE
                 binding.downloadStateButton.setImageResource(R.drawable.ic_start)
-
                 viewModel.pause(item.id)
-                //onUpdateToDatabase(item)
 
             }
 
             override fun onResume(item: StructureDownFile, binding: DownloadItemBinding) {
                 binding.moreButton.visibility = View.GONE
                 binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
-
                 binding.progressBar.progress =
                     (item.bytesCopied.toFloat() / item.size.toFloat() * 100.0).toInt()
 
@@ -180,7 +178,6 @@ class HomeFragment : Fragment() {
                 item.downloadState = DownloadStatusState.FAILED
                 binding.textView.text =
                     item.convertToSizeUnit() + " - " + item.downloadState.toString()
-                //onUpdateToDatabase(item)
             }
 
             override fun onOpen(item: StructureDownFile, binding: DownloadItemBinding) {
@@ -214,6 +211,12 @@ class HomeFragment : Fragment() {
                 if (it.isNotEmpty() && _downloadList.value != null &&
                     _downloadList.value?.size == 0
                 ) {
+                    val currentList = it
+                    for(item in currentList) {
+                        if(item.downloadState == DownloadStatusState.DOWNLOADING) {
+                            item.downloadState = DownloadStatusState.PAUSED
+                        }
+                    }
                     _downloadList.value = it.toMutableList()
                 }
             }

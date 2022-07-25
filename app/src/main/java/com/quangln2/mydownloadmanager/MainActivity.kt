@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.os.StrictMode
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -49,6 +51,8 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        println("OnCreate MainActivity")
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
@@ -124,6 +128,7 @@ class MainActivity : AppCompatActivity() {
             }
             this.cancel()
         }
+
     }
 
     private fun doesHaveWriteExternalPermission(): Boolean {
@@ -168,4 +173,5 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+
 }

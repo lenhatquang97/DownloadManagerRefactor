@@ -161,6 +161,14 @@ class DownloadService : Service() {
                 ).collect {
                     DownloadManagerController._progressFile.value = it
                     onOpenNotification(it)
+                    if(!DownloadUtil.isNetworkAvailable(context)) {
+                        DownloadManagerController._downloadList.value?.forEach {
+                            if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.DOWNLOADING) {
+                                it.downloadState = DownloadStatusState.FAILED
+                                DownloadManagerController._progressFile.value = it
+                            }
+                        }
+                    }
                     if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.PAUSED) {
                         findNextQueueDownloadFile(this@DownloadService)
                     }

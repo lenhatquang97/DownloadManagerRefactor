@@ -1,5 +1,6 @@
 package com.quangln2.mydownloadmanager.data.source.local
 
+import android.content.ActivityNotFoundException
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -9,6 +10,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.annotation.WorkerThread
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
 import com.quangln2.mydownloadmanager.BuildConfig
 import com.quangln2.mydownloadmanager.data.model.StructureDownFile
@@ -139,6 +141,14 @@ class LocalDataSourceImpl : LocalDataSource {
         if (intent.resolveActivity(context.packageManager) == null) {
             Toast.makeText(context, "There is no application to open this file", Toast.LENGTH_SHORT)
                 .show()
+            val extension = item.fileName.substring(item.fileName.lastIndexOf("."))
+            try {
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=${extension}")))
+            } catch (e: ActivityNotFoundException) {
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/search?q=${extension}")))
+            }
+
+
         } else {
             context.startActivity(intent)
         }
