@@ -200,6 +200,7 @@ class HomeFragment : Fragment() {
         downloadList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
+                    binding.chip0.performClick()
                     viewModel._filterList.value = it
                 }
             }

@@ -20,4 +20,8 @@
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
     </style>
+
+    <style name="MoreButtonFunction.PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:itemBackground">@color/black</item>
+    </style>
 </resources>
