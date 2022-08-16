@@ -64,28 +64,17 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/black" />
 
-        <ProgressBar
+        <com.quangln2.downloadmanagerrefactor.ui.customview.ChunkProgressBar
             android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="56dp"
-            android:layout_marginTop="10dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="56dp"
             android:layout_marginBottom="15dp"
+            android:minHeight="600dp"
             android:paddingBottom="5dp"
-            android:progress="90"
-            android:progressTint="@color/blue"
-            app:layout_constraintBottom_toTopOf="@+id/materialDivider"
+            android:visibility="visible"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-        <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/materialDivider"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="56dp"
-            app:layout_constraintBottom_toBottomOf="@+id/progressBar"
-            app:layout_constraintLeft_toLeftOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

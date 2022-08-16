@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.quangln2.mydownloadmanager.ui.home.HomeViewModel" />
+            type="com.quangln2.downloadmanagerrefactor.ui.home.HomeViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView

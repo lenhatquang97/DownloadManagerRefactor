@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ChunkProgressBar">
+        <attr name="howManyChunks" format="integer" />
+        <attr name="chunkValues" format="string" />
+    </declare-styleable>
+</resources>
