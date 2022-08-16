@@ -110,7 +110,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
                             if (from >= to) return@async
                             connection.setRequestProperty("Range", "bytes=${from}-${to}")
                             val inp = BufferedInputStream(connection.inputStream)
-                            val filePath = File(file.downloadTo)
+                            val filePath = File(file.downloadTo + "/" + file.fileName)
                             val raf = RandomAccessFile(filePath, "rws")
                             raf.seek(from)
                             val data = ByteArray(1024)
@@ -140,7 +140,8 @@ class RemoteDataSourceImpl : RemoteDataSource {
                 println(e)
                 send(file.copy(downloadState = DownloadStatusState.FAILED))
             }
-        }.debounce(100).flowOn(Dispatchers.IO)
+            //debounce(100)
+        }.flowOn(Dispatchers.IO)
 
 
     override fun resumeDownload(file: StructureDownFile, context: Context) {

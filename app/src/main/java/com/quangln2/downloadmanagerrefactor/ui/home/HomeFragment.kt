@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.ItemAnimator
@@ -35,12 +36,9 @@ import com.quangln2.downloadmanagerrefactor.databinding.FragmentFirstBinding
 import com.quangln2.downloadmanagerrefactor.listener.EventListener
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
 
 class HomeFragment : Fragment() {
 
@@ -123,11 +121,9 @@ class HomeFragment : Fragment() {
             ) {
                 item.downloadState = DownloadStatusState.COMPLETED
                 viewModel.update(item)
-                CoroutineScope(Dispatchers.IO).launch {
-                    withContext(Dispatchers.Main) {
-                        GlobalSettings.getVibrated(context).collect {
-                            if (it) viewModel.vibratePhone(context)
-                        }
+                lifecycleScope.launch {
+                    GlobalSettings.getVibrated(context).collect {
+                        if (it) viewModel.vibratePhone(context)
                     }
                 }
             }
@@ -201,7 +197,7 @@ class HomeFragment : Fragment() {
             it?.let {
                 if (it.size != -1L) {
                     adapterVal.updateProgress(it)
-                    CoroutineScope(Dispatchers.IO).launch {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
                         if (progress == 100) {
                             it.downloadState = DownloadStatusState.COMPLETED

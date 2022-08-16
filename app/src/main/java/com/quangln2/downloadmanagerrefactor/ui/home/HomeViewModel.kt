@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.downloadmanagerrefactor.R
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
@@ -15,9 +16,7 @@ import com.quangln2.downloadmanagerrefactor.domain.local.*
 import com.quangln2.downloadmanagerrefactor.domain.remote.*
 import com.quangln2.downloadmanagerrefactor.listener.OnAcceptPress
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
-import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -52,7 +51,7 @@ class HomeViewModel(
             }
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val result = doesDownloadLinkExistUseCase(file)
             if (result) {
                 withContext(Dispatchers.Main) {
@@ -68,14 +67,14 @@ class HomeViewModel(
 
     fun filterList(downloadStatusState: String) {
         if (downloadStatusState == DownloadStatusState.ALL.toString()) {
-            CoroutineScope(Dispatchers.IO).launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 _filterList.postValue(DownloadManagerController.downloadList.value?.toMutableList())
             }
             return
         }
         val currentList = DownloadManagerController._downloadList.value
         if (currentList != null) {
-            CoroutineScope(Dispatchers.IO).launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 val newList =
                     currentList.filter { it.downloadState.toString() == downloadStatusState }
                 _filterList.postValue(newList.toMutableList())
@@ -87,13 +86,13 @@ class HomeViewModel(
     fun filterCategories(categories: String) {
         val currentList = DownloadManagerController.downloadList.value
         if (categories == "All") {
-            CoroutineScope(Dispatchers.IO).launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 _filterList.postValue(currentList?.toMutableList())
             }
             return
         }
         if (currentList != null) {
-            CoroutineScope(Dispatchers.IO).launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 val newList = currentList.filter { it.kindOf == categories }
                 _filterList.postValue(newList.toMutableList())
             }
@@ -105,13 +104,13 @@ class HomeViewModel(
     fun filterStartsWithNameCaseInsensitive(name: String) {
         val currentList = DownloadManagerController._downloadList.value
         if (name == "") {
-            CoroutineScope(Dispatchers.IO).launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 _filterList.postValue(currentList?.toMutableList())
             }
             return
         }
         if (currentList != null) {
-            CoroutineScope(Dispatchers.IO).launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 val newList =
                     currentList.filter { it.fileName.lowercase().startsWith(name.lowercase()) }
                 _filterList.postValue(newList.toMutableList())
@@ -120,7 +119,7 @@ class HomeViewModel(
     }
 
     fun deleteFromList(file: StructureDownFile, context: Context) {
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             deleteFromListUseCase(file, context)
             val res = DownloadManagerController.downloadList.value?.filter { it.id != file.id }
                 ?.toMutableList()
@@ -136,7 +135,7 @@ class HomeViewModel(
                 .setIcon(R.drawable.ic_baseline_delete_24)
                 .setMessage("Are you sure that you will delete this file? You cannot undo this action.")
                 .setPositiveButton(ConstantClass.POSITIVE_BUTTON) { a, _ ->
-                    CoroutineScope(Dispatchers.IO).launch {
+                    viewModelScope.launch(Dispatchers.IO) {
                         withContext(Dispatchers.Main) {
                             onHandle(true)
                         }
@@ -165,7 +164,7 @@ class HomeViewModel(
 
     fun fetchDownloadFileInfo() {
         val file = DownloadManagerController.inputItem.value
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (file != null) {
                 fetchDownloadInfo(file)
                 DownloadManagerController._fetchedFileInfo.postValue(file)
@@ -192,7 +191,7 @@ class HomeViewModel(
         DownloadManagerController._downloadList.postValue(currentList?.map { if (it.id == item.id) item else it }
             ?.toMutableList())
 
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             updateToListUseCase(item)
         }
     }

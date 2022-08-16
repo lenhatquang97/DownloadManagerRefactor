@@ -22,13 +22,7 @@ class DownloadUtil {
         }
 
         fun isFileExisting(file: StructureDownFile, context: Context): Boolean {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val filePath =
-                    File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName)
-                if (!filePath.exists()) {
-                    return false
-                }
-            } else {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
                 val filePath = File(file.downloadTo + '/' + file.fileName)
                 if (!filePath.exists()) {
                     return false

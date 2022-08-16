@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -27,7 +28,6 @@ import com.quangln2.downloadmanagerrefactor.data.source.remote.RemoteDataSourceI
 import com.quangln2.downloadmanagerrefactor.databinding.ActivityMainBinding
 import com.quangln2.downloadmanagerrefactor.ui.dialog.AddToDownloadDialog
 import com.quangln2.downloadmanagerrefactor.ui.home.HomeViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
             binding.fab.show()
             true
         }
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             GlobalSettings.getMaximumDownloadThread(applicationContext).collect {
                 GlobalSettings.numsOfMaxDownloadThreadExported = it.toInt()
             }
@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             GlobalSettings.setMaximumDownloadThread(
                 applicationContext,
                 GlobalSettings.numsOfMaxDownloadThreadExported.toFloat()

@@ -6,10 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.quangln2.downloadmanagerrefactor.data.model.settings.GlobalSettings
 import com.quangln2.downloadmanagerrefactor.databinding.FragmentSecondBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -28,13 +27,13 @@ class SettingsFragment : Fragment() {
 
 
         binding.vibrationSwitch.apply {
-            CoroutineScope(Dispatchers.Main).launch {
+            lifecycleScope.launch {
                 GlobalSettings.getVibrated(requireContext()).collect {
                     isChecked = it
                 }
             }
             setOnClickListener {
-                CoroutineScope(Dispatchers.IO).launch {
+                lifecycleScope.launch {
                     GlobalSettings.setVibrated(requireContext(), isChecked)
                 }
             }

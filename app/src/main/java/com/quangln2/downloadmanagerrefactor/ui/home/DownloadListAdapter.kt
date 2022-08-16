@@ -37,7 +37,7 @@ class DownloadListAdapter(private var context: Context) :
         private fun initialSetup(item: StructureDownFile) {
             binding.heading.text = cutFileName(item.fileName)
             binding.textView.text = if (binding.textView.text.isNullOrEmpty()) item.convertToSizeUnit() + " - " +
-                        item.downloadState.toString() else binding.textView.text.toString()
+                    item.downloadState.toString() else binding.textView.text.toString()
             binding.roundCategory.setImageResource(UIComponentUtil.defineIcon(item.kindOf))
             when (item.downloadState) {
                 DownloadStatusState.COMPLETED -> {

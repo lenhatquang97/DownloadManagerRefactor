@@ -158,15 +158,18 @@ class DownloadService : Service() {
                     currentList[index],
                     context
                 ).collect {
-                    DownloadManagerController._progressFile.value = it
-                    onOpenNotification(it)
+                    withContext(Dispatchers.IO){
+                        DownloadManagerController._progressFile.postValue(it)
+                    }
+                    withContext(Dispatchers.Main){
+                        onOpenNotification(it)
+                    }
                     if (!DownloadUtil.isNetworkAvailable(context)) {
                         DownloadManagerController._downloadList.value?.forEach {
                             if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.DOWNLOADING) {
                                 it.downloadState = DownloadStatusState.FAILED
                                 DownloadManagerController._progressFile.value = it
                                 onOpenNotification(it)
-
                             }
                         }
                     }

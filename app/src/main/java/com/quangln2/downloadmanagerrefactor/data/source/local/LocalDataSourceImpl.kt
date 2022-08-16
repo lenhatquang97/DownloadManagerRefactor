@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.*
 import android.widget.Toast
-import androidx.annotation.WorkerThread
 import androidx.core.content.FileProvider
 import com.quangln2.downloadmanagerrefactor.BuildConfig
 import com.quangln2.downloadmanagerrefactor.data.database.DownloadDao
@@ -15,6 +14,7 @@ import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
@@ -24,21 +24,26 @@ class LocalDataSourceImpl(
 ) : LocalDataSource {
     override suspend fun insert(file: StructureDownFile) = downloadDao.insert(file)
     override suspend fun update(file: StructureDownFile) = downloadDao.update(file)
-    override suspend fun deleteFromDatabase(StructureDownFile: StructureDownFile) = downloadDao.delete(StructureDownFile)
-    override suspend fun doesDownloadLinkExist(file: StructureDownFile): Boolean = downloadDao.doesDownloadLinkExist(file.downloadLink) > 0
+    override suspend fun deleteFromDatabase(StructureDownFile: StructureDownFile) =
+        downloadDao.delete(StructureDownFile)
+
+    override suspend fun doesDownloadLinkExist(file: StructureDownFile): Boolean =
+        downloadDao.doesDownloadLinkExist(file.downloadLink) > 0
+
     override suspend fun deletePermanently(file: StructureDownFile, context: Context) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-            val filePath = File(file.downloadTo)
+            val filePath = File(file.downloadTo + '/' + file.fileName)
             if (filePath.exists()) {
                 filePath.delete()
             } else {
-                CoroutineScope(Dispatchers.Main).launch {
+                val job = CoroutineScope(Dispatchers.Main).launch {
                     Toast.makeText(
                         context,
                         "File not found so we'll delete from list",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
+                job.cancelChildren()
             }
         }
         val intent = Intent(context, DownloadService::class.java)
@@ -60,17 +65,16 @@ class LocalDataSourceImpl(
             Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS
             ).absolutePath
-        }) + "/" + file.fileName
+        })
     }
 
     override fun openDownloadFile(item: StructureDownFile, context: Context) {
         val doesFileExist = DownloadUtil.isFileExisting(item, context)
-
-        if(!doesFileExist) return
+        if (!doesFileExist) return
 
         val intent = Intent(Intent.ACTION_VIEW)
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-            val file = File(item.downloadTo)
+            val file = File(item.downloadTo + '/' + item.fileName)
             if (file.exists()) {
                 val uri = FileProvider.getUriForFile(
                     context,

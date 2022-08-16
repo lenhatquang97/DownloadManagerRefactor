@@ -42,7 +42,6 @@ object DownloadManagerController {
     val progressFile: LiveData<StructureDownFile> get() = _progressFile
 
 
-
     fun findNextQueueDownloadFile(context: Context) {
         val currentList = downloadList.value
         if (currentList != null) {
