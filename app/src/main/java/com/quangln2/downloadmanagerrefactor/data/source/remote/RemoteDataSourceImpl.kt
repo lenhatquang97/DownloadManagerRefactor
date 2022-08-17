@@ -105,6 +105,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
                             connection.doInput = true
                             connection.connectTimeout = 5000
 
+
                             val from = if (file.chunkValues[it] == 0L) file.listChunks!![it].from
                             else file.chunkValues[it]
                             val to = file.listChunks!![it].to
