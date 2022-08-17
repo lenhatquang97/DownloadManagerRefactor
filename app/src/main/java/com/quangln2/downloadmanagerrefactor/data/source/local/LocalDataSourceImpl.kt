@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.*
+import android.provider.DocumentsContract
 import android.widget.Toast
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.FileProvider
 import com.quangln2.downloadmanagerrefactor.BuildConfig
 import com.quangln2.downloadmanagerrefactor.data.database.DownloadDao
@@ -31,20 +33,18 @@ class LocalDataSourceImpl(
         downloadDao.doesDownloadLinkExist(file.downloadLink) > 0
 
     override suspend fun deletePermanently(file: StructureDownFile, context: Context) {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-            val filePath = File(file.downloadTo + '/' + file.fileName)
-            if (filePath.exists()) {
-                filePath.delete()
-            } else {
-                val job = CoroutineScope(Dispatchers.Main).launch {
-                    Toast.makeText(
-                        context,
-                        "File not found so we'll delete from list",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                job.cancelChildren()
+        val filePath = File(file.downloadTo + '/' + file.fileName)
+        if (filePath.exists()) {
+            filePath.delete()
+        } else {
+            val job = CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(
+                    context,
+                    "File not found so we'll delete from list",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
+            job.cancelChildren()
         }
         val intent = Intent(context, DownloadService::class.java)
         intent.putExtra("item", file)
@@ -71,20 +71,17 @@ class LocalDataSourceImpl(
     override fun openDownloadFile(item: StructureDownFile, context: Context) {
         val doesFileExist = DownloadUtil.isFileExisting(item, context)
         if (!doesFileExist) return
-
         val intent = Intent(Intent.ACTION_VIEW)
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-            val file = File(item.downloadTo + '/' + item.fileName)
-            if (file.exists()) {
-                val uri = FileProvider.getUriForFile(
-                    context,
-                    BuildConfig.APPLICATION_ID + ".provider",
-                    file
-                )
-                intent.setDataAndType(uri, item.mimeType)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
+        val file = File(item.downloadTo + '/' + item.fileName)
+        if (file.exists()) {
+            val uri = FileProvider.getUriForFile(
+                context,
+                BuildConfig.APPLICATION_ID + ".provider",
+                file
+            )
+            intent.setDataAndType(uri, item.mimeType)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         if (intent.resolveActivity(context.packageManager) == null) {
             Toast.makeText(context, "There is no application to open this file", Toast.LENGTH_SHORT)

@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.fab.setOnClickListener {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
                 if (doesHaveWriteExternalPermission()) {
                     val dialog = AddToDownloadDialog()
                     dialog.show(supportFragmentManager, "AddToDownloadDialog")

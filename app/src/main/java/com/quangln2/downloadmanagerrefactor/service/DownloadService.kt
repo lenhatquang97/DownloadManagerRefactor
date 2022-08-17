@@ -158,10 +158,10 @@ class DownloadService : Service() {
                     currentList[index],
                     context
                 ).collect {
-                    withContext(Dispatchers.IO){
+                    withContext(Dispatchers.IO) {
                         DownloadManagerController._progressFile.postValue(it)
                     }
-                    withContext(Dispatchers.Main){
+                    withContext(Dispatchers.Main) {
                         onOpenNotification(it)
                     }
                     if (!DownloadUtil.isNetworkAvailable(context)) {

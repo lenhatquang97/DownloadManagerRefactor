@@ -1,7 +1,6 @@
 package com.quangln2.downloadmanagerrefactor.data.source.remote
 
 import android.content.Context
-import android.os.Build
 import android.util.Log
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
@@ -18,11 +17,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
 import java.io.File
 import java.io.RandomAccessFile
 import java.net.HttpURLConnection
@@ -111,8 +108,6 @@ class RemoteDataSourceImpl : RemoteDataSource {
                             connection.setRequestProperty("Range", "bytes=${from}-${to}")
                             val inp = BufferedInputStream(connection.inputStream)
                             val filePath = File(file.downloadTo + "/" + file.fileName)
-                            val out = BufferedOutputStream(connection.outputStream)
-                            out.write(inp.readBytes(), 0, inp.available())
                             val raf = RandomAccessFile(filePath, "rws")
                             raf.seek(from)
                             val data = ByteArray(1024)
@@ -178,14 +173,11 @@ class RemoteDataSourceImpl : RemoteDataSource {
     }
 
     override fun retryDownload(file: StructureDownFile, context: Context) {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-            val filePath = File(file.downloadTo)
-            if (filePath.exists()) {
-                filePath.delete()
-            }
-            file.downloadTo = ""
-            file.uri = null
+        val filePath = File(file.downloadTo +'/' + file.fileName)
+        if (filePath.exists()) {
+            filePath.delete()
         }
+        file.uri = null
         file.downloadState = DownloadStatusState.DOWNLOADING
         file.bytesCopied = 0
     }

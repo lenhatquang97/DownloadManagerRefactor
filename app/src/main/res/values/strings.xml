@@ -6,5 +6,5 @@
     <string name="no_files_download_yet">No files download yet</string>
     <string name="no_download_dataset_description">Your downloaded files in will be shown here!!!</string>
     <string name="no_download_img_description">Download Image</string>
-    <string name="note_above_android_10">Note: From Android 10 above, your downloaded files will be in Downloads folder because of Google Policy.</string>
+    <string name="note_above_android_10">Note: From Android 11 above, your downloaded files will be in Downloads folder because of Google Policy.</string>
 </resources>

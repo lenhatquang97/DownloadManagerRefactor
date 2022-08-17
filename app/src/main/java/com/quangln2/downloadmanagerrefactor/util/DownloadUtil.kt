@@ -5,7 +5,6 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Environment
-import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import java.io.File
@@ -22,42 +21,19 @@ class DownloadUtil {
         }
 
         fun isFileExisting(file: StructureDownFile, context: Context): Boolean {
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-                val filePath = File(file.downloadTo + '/' + file.fileName)
-                if (!filePath.exists()) {
-                    return false
-                }
+            val filePath = File(file.downloadTo + '/' + file.fileName)
+            if (!filePath.exists()) {
+                return false
             }
             return true
         }
 
         fun getBytesFromExistingFile(file: StructureDownFile, context: Context): Long {
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
-                val resolver = context.contentResolver
-                val selection = MediaStore.MediaColumns.DISPLAY_NAME + " LIKE ?"
-                val selectionArgs = arrayOf(file.fileName)
-                val cursor = resolver.query(
-                    MediaStore.Downloads.EXTERNAL_CONTENT_URI,
-                    null,
-                    selection,
-                    selectionArgs,
-                    null
-                )
-                if (cursor != null && cursor.count > 0) {
-                    while (cursor.moveToNext() && cursor.getColumnIndex(MediaStore.MediaColumns.SIZE) != -1) {
-                        val result =
-                            cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE))
-                        cursor.close()
-                        return result
-                    }
-                }
-            } else {
-                val filePath =
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName
-                val fileOpen = File(filePath)
-                if (fileOpen.exists()) {
-                    return fileOpen.length()
-                }
+            val filePath =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName
+            val fileOpen = File(filePath)
+            if (fileOpen.exists()) {
+                return fileOpen.length()
             }
             return 0L
         }

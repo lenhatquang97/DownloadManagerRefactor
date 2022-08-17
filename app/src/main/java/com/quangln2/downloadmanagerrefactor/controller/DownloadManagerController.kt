@@ -2,7 +2,6 @@ package com.quangln2.downloadmanagerrefactor.controller
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.quangln2.downloadmanagerrefactor.DownloadManagerApplication
@@ -111,9 +110,7 @@ object DownloadManagerController {
 
     fun createFileAgain(file: StructureDownFile, context: Context) {
         if (file.uri == null && file.downloadTo.isEmpty()) {
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-                WriteToFileAPI29BelowUseCase(DownloadManagerApplication.downloadRepository)(file)
-            }
+            WriteToFileAPI29BelowUseCase(DownloadManagerApplication.downloadRepository)(file)
         }
     }
 
