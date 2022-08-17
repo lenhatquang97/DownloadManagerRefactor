@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
 import java.io.File
 import java.io.RandomAccessFile
 import java.net.HttpURLConnection
@@ -111,6 +112,8 @@ class RemoteDataSourceImpl : RemoteDataSource {
                             connection.setRequestProperty("Range", "bytes=${from}-${to}")
                             val inp = BufferedInputStream(connection.inputStream)
                             val filePath = File(file.downloadTo + "/" + file.fileName)
+                            val out = BufferedOutputStream(connection.outputStream)
+                            out.write(inp.readBytes(), 0, inp.available())
                             val raf = RandomAccessFile(filePath, "rws")
                             raf.seek(from)
                             val data = ByteArray(1024)
