@@ -9,7 +9,7 @@ interface RemoteDataSource {
     fun fetchDownloadInfo(file: StructureDownFile): StructureDownFile
     fun downloadAFileWithChunks(file: StructureDownFile, context: Context): Flow<StructureDownFile>
     fun pauseDownload(file: StructureDownFile)
-    fun stopDownload(file: StructureDownFile)
+    fun stopDownload(file: StructureDownFile, context: Context)
     fun retryDownload(file: StructureDownFile, context: Context)
     fun resumeDownload(file: StructureDownFile, context: Context)
 }

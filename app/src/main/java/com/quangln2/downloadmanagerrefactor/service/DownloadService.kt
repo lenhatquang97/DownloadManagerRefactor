@@ -6,7 +6,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
-import android.os.FileUtils
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
@@ -28,6 +27,8 @@ import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
 import com.quangln2.downloadmanagerrefactor.util.LogicUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
+import java.io.File
+import java.io.FileOutputStream
 
 
 class DownloadService : Service() {
@@ -88,10 +89,25 @@ class DownloadService : Service() {
         if (item.bytesCopied >= item.size) {
             manager.cancel(item.id.hashCode())
             job?.cancelChildren()
+            combineFile(item, this@DownloadService)
             stopSelf()
             findNextQueueDownloadFile(this@DownloadService)
             return
         }
+    }
+
+    private fun combineFile(file: StructureDownFile, context: Context) {
+        val fin = FileOutputStream(file.downloadTo + "/" + file.fileName)
+        (0 until DownloadManagerController.numberOfChunks).forEach {
+            val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
+            val fos = File(appSpecificExternalDir.absolutePath)
+            fin.write(fos.readBytes())
+            if (fos.exists()) {
+                fos.delete()
+            }
+        }
+        fin.close()
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

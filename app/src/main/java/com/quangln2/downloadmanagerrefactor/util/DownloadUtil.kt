@@ -4,8 +4,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import android.os.Environment
-import android.webkit.MimeTypeMap
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import java.io.File
 
@@ -14,10 +12,12 @@ class DownloadUtil {
 
         fun isFileExisting(file: StructureDownFile, context: Context): Boolean {
             val filePath = File(file.downloadTo + '/' + file.fileName)
-            if (!filePath.exists()) {
-                return false
-            }
-            return true
+            return filePath.exists()
+        }
+
+        fun isFileExistingInFilesDir(fileName: String, context: Context): Boolean {
+            val appSpecificExternalDir = File(context.getExternalFilesDir(null), fileName)
+            return appSpecificExternalDir.exists()
         }
 
 

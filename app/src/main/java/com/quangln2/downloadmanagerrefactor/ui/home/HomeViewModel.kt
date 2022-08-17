@@ -196,7 +196,7 @@ class HomeViewModel(
         }
     }
 
-    fun stop(item: StructureDownFile) = stopDownloadUseCase(item)
+    fun stop(item: StructureDownFile, context: Context) = stopDownloadUseCase(item, context)
     fun vibratePhone(context: Context) = vibratePhoneUseCase(context)
 
 

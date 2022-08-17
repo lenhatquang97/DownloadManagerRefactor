@@ -70,7 +70,7 @@ class DefaultDownloadRepository(
 
     fun resumeDownload(file: StructureDownFile, context: Context) = remoteDataSource.resumeDownload(file, context)
     fun pauseDownload(file: StructureDownFile) = remoteDataSource.pauseDownload(file)
-    fun stopDownload(file: StructureDownFile) = remoteDataSource.stopDownload(file)
+    fun stopDownload(file: StructureDownFile, context: Context) = remoteDataSource.stopDownload(file, context)
     fun vibratePhone(context: Context) = localDataSource.vibratePhone(context)
 
 }

@@ -39,4 +39,14 @@ class Converters {
         }
         return mutableListOf()
     }
+
+    @TypeConverter
+    fun convertChunkNames(value: MutableList<String>): String {
+        return value.joinToString("?")
+    }
+
+    @TypeConverter
+    fun convertChunkNames(value: String): MutableList<String> {
+        return value.split("?").toMutableList()
+    }
 }

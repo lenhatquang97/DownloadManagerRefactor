@@ -131,7 +131,9 @@ class HomeFragment : Fragment() {
             override fun onPause(item: StructureDownFile) = viewModel.pause(item)
             override fun onResume(item: StructureDownFile) = viewModel.resume(item, requireContext())
             override fun onRetry(item: StructureDownFile) = viewModel.retry(requireContext(), item)
-            override fun onStop(item: StructureDownFile, binding: DownloadItemBinding) = viewModel.stop(item)
+            override fun onStop(item: StructureDownFile, binding: DownloadItemBinding, context: Context) =
+                viewModel.stop(item, context)
+
             override fun onOpen(item: StructureDownFile) = viewModel.open(requireContext(), item)
             override fun onUpdateToDatabase(item: StructureDownFile) = viewModel.update(item)
         }
@@ -253,7 +255,11 @@ class HomeFragment : Fragment() {
         val indexArray = mutableListOf<Int>()
         if (res != null) {
             for (i in 0 until res.size) {
-                if (!DownloadUtil.isFileExisting(res[i], requireContext())) {
+                if (!DownloadUtil.isFileExisting(
+                        res[i],
+                        requireContext()
+                    ) && res[i].downloadState == DownloadStatusState.COMPLETED
+                ) {
                     res[i].downloadState = DownloadStatusState.FAILED
                     indexArray.add(i)
                 }

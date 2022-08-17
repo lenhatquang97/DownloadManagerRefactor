@@ -48,13 +48,12 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        println("OnCreate MainActivity")
-
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
         DownloadManagerController.downloadListSchema =
             DownloadManagerApplication.database.downloadDao().getAll().asLiveData()
+
 
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)

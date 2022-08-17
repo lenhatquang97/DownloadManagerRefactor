@@ -137,7 +137,7 @@ class DownloadListAdapter(private var context: Context) :
                     binding.stopButton.visibility = View.GONE
                     binding.downloadStateButton.setImageResource(R.drawable.ic_retry)
                     binding.textView.text = item.convertToSizeUnit() + " - " + DownloadStatusState.FAILED.toString()
-                    eventListener?.onStop(item, binding)
+                    eventListener?.onStop(item, binding, context)
                 }
             }
 
@@ -164,7 +164,7 @@ class DownloadListAdapter(private var context: Context) :
 
 
             if (item.downloadState == DownloadStatusState.FAILED) {
-                eventListener?.onStop(item, binding)
+                eventListener?.onStop(item, binding, context)
                 eventListener?.onUpdateToDatabase(item)
 
             }

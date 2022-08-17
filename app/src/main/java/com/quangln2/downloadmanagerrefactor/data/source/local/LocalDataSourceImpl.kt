@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.*
-import android.provider.DocumentsContract
 import android.widget.Toast
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.FileProvider
 import com.quangln2.downloadmanagerrefactor.BuildConfig
 import com.quangln2.downloadmanagerrefactor.data.database.DownloadDao

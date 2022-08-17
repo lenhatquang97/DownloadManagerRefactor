@@ -22,8 +22,9 @@ data class StructureDownFile(
     @ColumnInfo(name = "mime_type") var mimeType: String,
     @ColumnInfo(name = "file_name") var fileName: String,
     @ColumnInfo(name = "list_chunks") var listChunks: MutableList<FromTo>,
+    @ColumnInfo(name = "chunk_names") var chunkNames: MutableList<String>,
 
-) : Serializable {
+    ) : Serializable {
     constructor() :
             this(
                 "",
@@ -35,6 +36,7 @@ data class StructureDownFile(
                 DownloadStatusState.DOWNLOADING,
                 "",
                 "",
+                mutableListOf(),
                 mutableListOf()
             )
 
