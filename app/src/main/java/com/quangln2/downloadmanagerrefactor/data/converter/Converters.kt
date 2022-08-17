@@ -22,16 +22,6 @@ class Converters {
     }
 
     @TypeConverter
-    fun convertChunkValues(value: String): MutableList<Long> {
-        return value.split(" ").map { it.toLong() }.toMutableList()
-    }
-
-    @TypeConverter
-    fun convertChunkValues(value: MutableList<Long>): String {
-        return value.joinToString(" ")
-    }
-
-    @TypeConverter
     fun convertListChunks(value: MutableList<FromTo>?): String {
         if (value != null) {
             return value.joinToString("@") { "${it.from} ${it.to} ${it.curr}" }

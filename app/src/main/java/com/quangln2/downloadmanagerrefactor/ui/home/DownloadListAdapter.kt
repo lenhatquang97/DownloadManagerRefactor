@@ -145,8 +145,8 @@ class DownloadListAdapter(private var context: Context) :
             if (item.downloadState == DownloadStatusState.DOWNLOADING) {
                 binding.progressBar.visibility = View.VISIBLE
                 binding.heading.text = cutFileName(item.fileName)
-                binding.progressBar.percentArr = item.chunkValues.mapIndexed { index, l ->
-                    (l.toDouble() - item.listChunks!![index].from) / (item.listChunks!![index].to - item.listChunks!![index].from)
+                binding.progressBar.percentArr = item.listChunks.map { l ->
+                    (l.curr - l.from).toDouble() / (l.to - l.from).toDouble()
                 }
                 endTime = System.currentTimeMillis()
                 endBytes = item.bytesCopied

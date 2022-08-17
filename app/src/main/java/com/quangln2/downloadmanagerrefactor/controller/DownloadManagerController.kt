@@ -108,8 +108,8 @@ object DownloadManagerController {
         }
     }
 
-    fun createFileAgain(file: StructureDownFile, context: Context) {
-        if (file.uri == null && file.downloadTo.isEmpty()) {
+    fun createFileAgain(file: StructureDownFile) {
+        if (file.downloadTo.isEmpty()) {
             WriteToFileAPI29BelowUseCase(DownloadManagerApplication.downloadRepository)(file)
         }
     }

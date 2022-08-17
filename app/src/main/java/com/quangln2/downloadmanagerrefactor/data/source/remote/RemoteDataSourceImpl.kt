@@ -66,11 +66,8 @@ class RemoteDataSourceImpl : RemoteDataSource {
                 file.listChunks = (0 until numberOfChunks).map {
                     val tmp = file.size / numberOfChunks
                     val endVal = if (it == numberOfChunks - 1) file.size else tmp * (it + 1) - 1
-                    FromTo(tmp * it, endVal, tmp * it)
+                    FromTo(tmp * it, endVal, tmp*it)
                 }.toMutableList()
-                if (file.listChunks != null) {
-                    file.chunkValues = file.listChunks?.map { it.from }!!.toMutableList()
-                }
                 file
             } else {
                 val initFile = ServiceLocator.initializeStructureDownFile()
@@ -101,9 +98,9 @@ class RemoteDataSourceImpl : RemoteDataSource {
                             connection.setRequestProperty("Connection", "Keep-Alive")
                             connection.doInput = true
                             connection.connectTimeout = 5000
-                            val from = if (file.chunkValues[it] == 0L) file.listChunks!![it].from
-                            else file.chunkValues[it]
-                            val to = file.listChunks!![it].to
+                            val from = if (file.listChunks[it].curr == 0L) file.listChunks[it].from
+                            else file.listChunks[it].curr
+                            val to = file.listChunks[it].to
                             if (from >= to) return@async
                             connection.setRequestProperty("Range", "bytes=${from}-${to}")
                             val inp = BufferedInputStream(connection.inputStream)
@@ -114,9 +111,9 @@ class RemoteDataSourceImpl : RemoteDataSource {
                             var x = inp.read(data, 0, 1024)
                             while (x >= 0) {
                                 raf.write(data, 0, x)
-                                file.chunkValues[it] += x.toLong()
-                                file.bytesCopied = file.chunkValues.zip(file.listChunks!!).map {
-                                    minOf(it.first, it.second.to) - it.second.from + 1
+                                file.listChunks[it].curr += x.toLong()
+                                file.bytesCopied = file.listChunks.map {
+                                    minOf(it.curr, it.to) - it.from + 1
                                 }.reduce { a, b -> a + b } - 1
                                 if (file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED) {
                                     raf.close()
@@ -168,7 +165,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
 
     override fun stopDownload(file: StructureDownFile) {
         file.bytesCopied = 0
-        file.chunkValues = file.listChunks?.map { it.from }!!.toMutableList()
+        file.listChunks = file.listChunks.map { it.copy(curr = it.from) }.toMutableList()
         file.downloadState = DownloadStatusState.FAILED
     }
 
@@ -177,7 +174,6 @@ class RemoteDataSourceImpl : RemoteDataSource {
         if (filePath.exists()) {
             filePath.delete()
         }
-        file.uri = null
         file.downloadState = DownloadStatusState.DOWNLOADING
         file.bytesCopied = 0
     }

@@ -6,6 +6,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
+import android.os.FileUtils
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
@@ -127,7 +128,7 @@ class DownloadService : Service() {
             return
         }
         if (file.downloadState == DownloadStatusState.FAILED) {
-            createFileAgain(file, context)
+            createFileAgain(file)
             val currentList = DownloadManagerController.downloadList.value
             val index = currentList?.indexOfFirst { it.id == file.id }
             if (index != null && index != -1) {
@@ -140,9 +141,9 @@ class DownloadService : Service() {
                 )
             }
         } else if (!DownloadUtil.isFileExisting(file, context) && command == "dequeue") {
-            createFileAgain(file, context)
+            createFileAgain(file)
         } else if (!DownloadUtil.isFileExisting(file, context)) {
-            createFileAgain(file, context)
+            createFileAgain(file)
             addToDownloadList(file)
         }
         val currentList = DownloadManagerController.downloadList.value

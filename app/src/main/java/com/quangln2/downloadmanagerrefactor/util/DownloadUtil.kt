@@ -11,14 +11,6 @@ import java.io.File
 
 class DownloadUtil {
     companion object {
-        fun getMimeType(url: String?): String {
-            var type = "*/*"
-            val extension = MimeTypeMap.getFileExtensionFromUrl(url)
-            if (extension != null) {
-                type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension).toString()
-            }
-            return type
-        }
 
         fun isFileExisting(file: StructureDownFile, context: Context): Boolean {
             val filePath = File(file.downloadTo + '/' + file.fileName)
@@ -28,15 +20,6 @@ class DownloadUtil {
             return true
         }
 
-        fun getBytesFromExistingFile(file: StructureDownFile, context: Context): Long {
-            val filePath =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + file.fileName
-            val fileOpen = File(filePath)
-            if (fileOpen.exists()) {
-                return fileOpen.length()
-            }
-            return 0L
-        }
 
         fun isNetworkAvailable(context: Context?): Boolean {
             if (context == null) return false

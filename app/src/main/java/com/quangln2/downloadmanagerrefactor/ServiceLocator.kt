@@ -31,9 +31,7 @@ object ServiceLocator {
             DownloadStatusState.COMPLETED,
             "*/*",
             "test.apk",
-            null,
-            mutableListOf(0L, 0L, 0L, 0L, 0L),
-            null
+            mutableListOf()
         )
     }
 }
