@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/contentTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:text="SampleVideo_720x480_30mb.mp4"
+        android:textColor="@color/blue"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/contentText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contentTitle"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:text="896 KB of 30.1 MB, Paused"
+        android:textColor="#000"
+        android:textSize="12sp" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contentText"
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginTop="5dp"
+        android:progress="25"
+        android:progressTint="@color/blue" />
+
+</RelativeLayout>

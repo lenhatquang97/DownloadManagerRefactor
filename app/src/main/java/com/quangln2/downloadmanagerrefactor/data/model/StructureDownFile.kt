@@ -2,6 +2,7 @@ package com.quangln2.downloadmanagerrefactor.data.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
@@ -17,12 +18,13 @@ data class StructureDownFile(
     @ColumnInfo(name = "size") var size: Long,
 
     @ColumnInfo(name = "bytes_copied") var bytesCopied: Long,
-    //@Ignore var bytesCopied: Long,
     @ColumnInfo(name = "download_state") var downloadState: DownloadStatusState,
     @ColumnInfo(name = "mime_type") var mimeType: String,
     @ColumnInfo(name = "file_name") var fileName: String,
     @ColumnInfo(name = "list_chunks") var listChunks: MutableList<FromTo>,
     @ColumnInfo(name = "chunk_names") var chunkNames: MutableList<String>,
+
+    @Ignore var textProgressFormat: String = "Loading...",
 
     ) : Serializable {
     constructor() :

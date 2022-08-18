@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.quangln2.downloadmanagerrefactor.DownloadManagerApplication
 import com.quangln2.downloadmanagerrefactor.ServiceLocator
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController._downloadList
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.downloadList
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.domain.local.InsertToListUseCase
@@ -36,9 +38,14 @@ object DownloadManagerController {
 
     var _progressFile =
         MutableLiveData<StructureDownFile>().apply {
-            value = ServiceLocator.initializeStructureDownFile()
+            value = StructureDownFile()
         }
     val progressFile: LiveData<StructureDownFile> get() = _progressFile
+
+    val speedController = MutableLiveData<MutableMap<String, DownloadSpeedController>>().apply{
+        value = mutableMapOf()
+    }
+
 
 
     fun findNextQueueDownloadFile(context: Context) {

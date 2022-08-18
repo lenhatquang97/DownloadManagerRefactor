@@ -15,7 +15,6 @@ import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.databinding.DownloadItemBinding
 import com.quangln2.downloadmanagerrefactor.listener.EventListener
-import com.quangln2.downloadmanagerrefactor.util.LogicUtil
 import com.quangln2.downloadmanagerrefactor.util.LogicUtil.Companion.cutFileName
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
 import java.util.concurrent.Executors
@@ -30,10 +29,7 @@ class DownloadListAdapter(private var context: Context) :
 
     inner class DownloadItemViewHolder constructor(private val binding: DownloadItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        private var startTime = System.currentTimeMillis()
-        private var endTime: Long = 0L
-        private var startBytes = 0L
-        private var endBytes: Long = 0L
+
         private fun initialSetup(item: StructureDownFile) {
             binding.heading.text = cutFileName(item.fileName)
             binding.textView.text = if (binding.textView.text.isNullOrEmpty()) item.convertToSizeUnit() + " - " +
@@ -148,18 +144,8 @@ class DownloadListAdapter(private var context: Context) :
                 binding.progressBar.percentArr = item.listChunks.map { l ->
                     (l.curr - l.from).toDouble() / (l.to - l.from).toDouble()
                 }
-                endTime = System.currentTimeMillis()
-                endBytes = item.bytesCopied
-                val seconds = ((endTime.toDouble() - startTime.toDouble()) / 1000.0)
-                val result = LogicUtil.calculateDownloadSpeed(seconds, startBytes, endBytes)
-                if (seconds > 0.8 && result > 0 && item.downloadState == DownloadStatusState.DOWNLOADING) {
-                    binding.textView.text = String.format(
-                        "%.2f MB/s",
-                        result
-                    ) + " - " + item.convertToSizeUnit() + " - " + item.downloadState.toString()
-                    startBytes = endBytes
-                    startTime = endTime
-                }
+                binding.textView.text = item.textProgressFormat
+
             }
 
 
@@ -194,7 +180,6 @@ class DownloadListAdapter(private var context: Context) :
         val item = getItem(position)
         holder.bind(item, context)
     }
-
     fun updateProgress(file: StructureDownFile) {
         val index = currentList.indexOfFirst { it.id == file.id }
         val mutableList = currentList.toMutableList()

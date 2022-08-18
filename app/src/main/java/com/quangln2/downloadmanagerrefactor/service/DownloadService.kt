@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.quangln2.downloadmanagerrefactor.DownloadManagerApplication
@@ -17,7 +18,8 @@ import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.addToQueueList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.createFileAgain
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.findNextQueueDownloadFile
-import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.speedController
+import com.quangln2.downloadmanagerrefactor.controller.DownloadSpeedController
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.data.model.settings.GlobalSettings
@@ -25,6 +27,7 @@ import com.quangln2.downloadmanagerrefactor.domain.local.UpdateToListUseCase
 import com.quangln2.downloadmanagerrefactor.domain.remote.DownloadAFileUseCase
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
 import com.quangln2.downloadmanagerrefactor.util.LogicUtil
+import com.quangln2.downloadmanagerrefactor.util.LogicUtil.Companion.roundSize
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import java.io.File
@@ -43,7 +46,6 @@ class DownloadService : Service() {
         .setGroup(CHANNEL_ID)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
     private var job: Job? = null
-
 
     override fun onBind(intent: Intent?): IBinder {
         return binder
@@ -72,18 +74,17 @@ class DownloadService : Service() {
                 )
             }
 
-        builder = NotificationCompat.Builder(this@DownloadService, ConstantClass.CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_baseline_arrow_downward_24)
-            .setContentTitle(LogicUtil.cutFileName(item.fileName))
-            .setContentText(item.downloadState.toString() + " " + item.convertBytesCopiedToSizeUnit())
-            .setGroup(ConstantClass.CHANNEL_ID)
-            .setContentIntent(resultPendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
-
         val progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100).toInt()
+        val contentView = RemoteViews(packageName, R.layout.custom_notification)
+        contentView.setTextViewText(R.id.contentTitle, item.fileName)
+        contentView.setTextViewText(R.id.contentText, item.textProgressFormat)
+        contentView.setProgressBar(R.id.progressBar, 100, progress, false)
+
+        builder = NotificationCompat.Builder(this@DownloadService, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_baseline_arrow_downward_24)
+            .setContent(contentView)
+            .setContentIntent(resultPendingIntent)
         val manager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        builder.setProgress(100, progress, false)
         manager.notify(item.id.hashCode(), builder.build())
 
         if (item.bytesCopied >= item.size) {
@@ -101,13 +102,14 @@ class DownloadService : Service() {
         (0 until DownloadManagerController.numberOfChunks).forEach {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
             val fos = File(appSpecificExternalDir.absolutePath)
-            fin.write(fos.readBytes())
+            if(fos.exists()){
+                fin.write(fos.readBytes())
+            }
             if (fos.exists()) {
                 fos.delete()
             }
         }
         fin.close()
-
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -125,6 +127,8 @@ class DownloadService : Service() {
         context: Context,
         command: String
     ) {
+        val speed = DownloadSpeedController()
+        speedController.value?.put(file.id, speed.copy(startTimes = System.currentTimeMillis()))
         if (command == "WaitForDownload") {
             val currentList = DownloadManagerController.downloadList.value
             if (currentList != null) {
@@ -174,18 +178,19 @@ class DownloadService : Service() {
                 DownloadAFileUseCase(DownloadManagerApplication.downloadRepository)(
                     currentList[index],
                     context
-                ).collect {
-                    withContext(Dispatchers.IO) {
+                ).collect { it ->
+                    withContext(Dispatchers.IO){
                         DownloadManagerController._progressFile.postValue(it)
                     }
-                    withContext(Dispatchers.Main) {
+                    withContext(Dispatchers.Main){
                         onOpenNotification(it)
+                        onCalculateDownloadProgress(it)
                     }
                     if (!DownloadUtil.isNetworkAvailable(context)) {
-                        DownloadManagerController._downloadList.value?.forEach {
+                        DownloadManagerController._downloadList.value?.forEach {it ->
                             if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.DOWNLOADING) {
                                 it.downloadState = DownloadStatusState.FAILED
-                                DownloadManagerController._progressFile.value = it
+                                DownloadManagerController._progressFile.postValue(it)
                                 onOpenNotification(it)
                             }
                         }
@@ -197,6 +202,26 @@ class DownloadService : Service() {
             }
         }
     }
+
+    private fun onCalculateDownloadProgress(item: StructureDownFile) {
+        if(item.downloadState == DownloadStatusState.PAUSED || item.downloadState == DownloadStatusState.FAILED){
+            item.textProgressFormat = "${item.convertBytesCopiedToSizeUnit()} of ${item.convertToSizeUnit()}, ${item.downloadState}"
+            return
+        }
+        if(speedController.value != null && speedController.value?.containsKey(item.id)!!){
+            speedController.value!![item.id]?.endTimes = System.currentTimeMillis()
+            speedController.value!![item.id]?.endBytes = item.bytesCopied
+            val seconds = ((speedController.value!![item.id]?.endTimes?.toDouble()!! - (speedController.value!![item.id]?.startTimes?.toDouble()!!)) / 1000.0)
+            val result = LogicUtil.calculateDownloadSpeed(seconds, speedController.value!![item.id]?.startBytes!!, speedController.value!![item.id]?.endBytes!!)
+            if (seconds > 0.8 && result > 0 && item.downloadState == DownloadStatusState.DOWNLOADING) {
+                item.textProgressFormat = "${roundSize(result)} - ${item.convertBytesCopiedToSizeUnit()} of ${item.convertToSizeUnit()}, ${item.downloadState}"
+                speedController.value!![item.id]?.startBytes = speedController.value!![item.id]?.endBytes!!
+                speedController.value!![item.id]?.startTimes = speedController.value!![item.id]?.endTimes!!
+            }
+        }
+
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()

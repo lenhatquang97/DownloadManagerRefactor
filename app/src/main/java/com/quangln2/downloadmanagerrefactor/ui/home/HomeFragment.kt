@@ -197,16 +197,15 @@ class HomeFragment : Fragment() {
 
         progressFile.observe(viewLifecycleOwner) {
             it?.let {
-                if (it.size != -1L) {
-                    adapterVal.updateProgress(it)
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
-                        if (progress == 100) {
-                            it.downloadState = DownloadStatusState.COMPLETED
-                            viewModel.update(it)
-                        }
+                adapterVal.updateProgress(it)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
+                    if (progress == 100) {
+                        it.downloadState = DownloadStatusState.COMPLETED
+                        viewModel.update(it)
                     }
                 }
+
             }
         }
 
@@ -230,6 +229,8 @@ class HomeFragment : Fragment() {
                 R.id.chip5 -> viewModel.filterList(DownloadStatusState.QUEUED.toString())
             }
         }
+
+
     }
 
     override fun onDestroy() {

@@ -31,7 +31,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
         file.downloadLink = url
         file.downloadTo = downloadTo
         file.bytesCopied = 0
-        file.chunkNames = (0..numberOfChunks - 1).map { UUID.randomUUID().toString() }.toMutableList()
+        file.chunkNames = (0 until numberOfChunks).map { UUID.randomUUID().toString() }.toMutableList()
     }
 
     private fun getMimeType(url: String?): String {
@@ -126,9 +126,6 @@ class RemoteDataSourceImpl : RemoteDataSource {
                         }
                         deferred
                     }.awaitAll()
-//                    if (file.downloadState == DownloadStatusState.DOWNLOADING) {
-//                        send(file.copy(bytesCopied = file.size, downloadState = DownloadStatusState.COMPLETED))
-//                    }
                 }
             } catch (e: Exception) {
                 println(e)
@@ -144,7 +141,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
         val index = currentList?.indexOfFirst { it.id == file.id }
         if (index != null && index != -1) {
             val currentFile = currentList[index]
-            (0..numberOfChunks - 1).forEach {
+            (0 until numberOfChunks).forEach {
                 val doesFileExist = DownloadUtil.isFileExistingInFilesDir(currentFile.chunkNames[it], context)
                 if (!doesFileExist) {
                     currentFile.downloadState = DownloadStatusState.FAILED
