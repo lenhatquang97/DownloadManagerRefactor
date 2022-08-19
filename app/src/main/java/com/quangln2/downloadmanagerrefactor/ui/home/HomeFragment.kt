@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -119,8 +120,7 @@ class HomeFragment : Fragment() {
                 item: StructureDownFile,
                 context: Context
             ) {
-                item.downloadState = DownloadStatusState.COMPLETED
-                viewModel.update(item)
+                viewModel.update(item.copy(downloadState = DownloadStatusState.COMPLETED))
                 lifecycleScope.launch {
                     GlobalSettings.getVibrated(context).collect {
                         if (it) viewModel.vibratePhone(context)
@@ -145,10 +145,10 @@ class HomeFragment : Fragment() {
 
         binding.downloadLists.apply {
             adapter = adapterVal
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(requireContext())
         }
 
-        DownloadManagerController.downloadListSchema?.observe(viewLifecycleOwner) {
+        DownloadManagerApplication.database.downloadDao().getAll().asLiveData().observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty() && _downloadList.value != null &&
                     _downloadList.value?.size == 0
@@ -159,7 +159,7 @@ class HomeFragment : Fragment() {
                             item.downloadState = DownloadStatusState.PAUSED
                         }
                     }
-                    _downloadList.value = it.toMutableList()
+                    _downloadList.postValue(it.toMutableList())
                 }
             }
 
@@ -167,10 +167,7 @@ class HomeFragment : Fragment() {
 
         downloadList.observe(viewLifecycleOwner) {
             it?.let {
-                if (it.isNotEmpty()) {
-                    binding.stateGroup.check(R.id.chip0)
-                    viewModel._filterList.value = it.toMutableList()
-                }
+                viewModel._filterList.value = it.toMutableList()
             }
         }
 
@@ -197,7 +194,11 @@ class HomeFragment : Fragment() {
 
         progressFile.observe(viewLifecycleOwner) {
             it?.let {
-                adapterVal.updateProgress(it)
+                val visibleChild = binding.downloadLists.getChildAt(viewModel.filterList.value?.size?.minus(1) ?: 0)
+                val lastChild = binding.downloadLists.getChildAdapterPosition(visibleChild)
+                if (lastChild == viewModel.filterList.value?.size?.minus(1)) {
+                   adapterVal.updateProgress(it)
+                }
                 lifecycleScope.launch(Dispatchers.IO) {
                     val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
                     if (progress == 100) {

@@ -66,18 +66,17 @@ class HomeViewModel(
     }
 
     fun filterList(downloadStatusState: String) {
-        if (downloadStatusState == DownloadStatusState.ALL.toString()) {
-            viewModelScope.launch(Dispatchers.IO) {
-                _filterList.postValue(DownloadManagerController.downloadList.value?.toMutableList())
-            }
-            return
-        }
         val currentList = DownloadManagerController._downloadList.value
         if (currentList != null) {
             viewModelScope.launch(Dispatchers.IO) {
-                val newList =
-                    currentList.filter { it.downloadState.toString() == downloadStatusState }
-                _filterList.postValue(newList.toMutableList())
+                if(downloadStatusState == DownloadStatusState.ALL.toString()){
+                    _filterList.postValue(currentList.toMutableList())
+                } else {
+                    val newList =
+                        currentList.filter { it.downloadState.toString() == downloadStatusState }
+                    _filterList.postValue(newList.toMutableList())
+                }
+
             }
 
         }
@@ -123,8 +122,11 @@ class HomeViewModel(
             deleteFromListUseCase(file, context)
             val res = DownloadManagerController.downloadList.value?.filter { it.id != file.id }
                 ?.toMutableList()
-            DownloadManagerController._downloadList.postValue(res)
-            _filterList.postValue(res)
+
+            withContext(Dispatchers.Main){
+                DownloadManagerController._downloadList.value = res
+                _filterList.value = res
+            }
         }
     }
 
@@ -143,8 +145,12 @@ class HomeViewModel(
                         val res =
                             DownloadManagerController.downloadList.value?.filter { it.id != file.id }
                                 ?.toMutableList()
-                        DownloadManagerController._downloadList.postValue(res)
-                        _filterList.postValue(res)
+
+                        //Double removal
+                        withContext(Dispatchers.Main) {
+                            DownloadManagerController._downloadList.value = res
+                            _filterList.value = res
+                        }
                         a.dismiss()
 
                     }
@@ -187,10 +193,6 @@ class HomeViewModel(
     fun open(context: Context, item: StructureDownFile) = openDownloadFileUseCase(item, context)
 
     fun update(item: StructureDownFile) {
-        val currentList = DownloadManagerController._downloadList.value
-        DownloadManagerController._downloadList.postValue(currentList?.map { if (it.id == item.id) item else it }
-            ?.toMutableList())
-
         viewModelScope.launch(Dispatchers.IO) {
             updateToListUseCase(item)
         }

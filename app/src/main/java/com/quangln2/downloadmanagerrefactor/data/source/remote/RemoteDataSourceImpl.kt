@@ -6,6 +6,9 @@ import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import com.quangln2.downloadmanagerrefactor.ServiceLocator
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController._downloadList
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController._progressFile
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.downloadList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.numberOfChunks
 import com.quangln2.downloadmanagerrefactor.data.model.FromTo
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
@@ -28,6 +31,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
 
     override fun addNewDownloadInfo(url: String, downloadTo: String, file: StructureDownFile) {
         file.id = UUID.randomUUID().toString()
+        println(file.id)
         file.downloadLink = url
         file.downloadTo = downloadTo
         file.bytesCopied = 0
@@ -118,7 +122,7 @@ class RemoteDataSourceImpl : RemoteDataSource {
                                 if (file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED) {
                                     fos.close()
                                     connection.disconnect()
-                                    break
+                                    return@async
                                 }
                                 x = inp.read(data, 0, 1024)
                                 send(file)
@@ -132,7 +136,6 @@ class RemoteDataSourceImpl : RemoteDataSource {
                 send(file.copy(downloadState = DownloadStatusState.FAILED))
                 deleteTempFiles(file, context)
             }
-            //debounce(100)
         }.flowOn(Dispatchers.IO)
 
 
@@ -150,18 +153,13 @@ class RemoteDataSourceImpl : RemoteDataSource {
                 }
             }
             currentFile.downloadState = DownloadStatusState.DOWNLOADING
-            DownloadManagerController._progressFile.value = currentFile
+            _progressFile.value = currentFile
         }
     }
 
     override fun pauseDownload(file: StructureDownFile) {
-        val currentList = DownloadManagerController.downloadList.value
-        val index = currentList?.indexOfFirst { it.id == file.id }
-        if (index != null && index != -1) {
-            val currentFile = currentList[index]
-            currentFile.downloadState = DownloadStatusState.PAUSED
-            DownloadManagerController._progressFile.value = currentFile
-        }
+        file.downloadState = DownloadStatusState.PAUSED
+        _progressFile.value = file
     }
 
     override fun stopDownload(file: StructureDownFile, context: Context) {

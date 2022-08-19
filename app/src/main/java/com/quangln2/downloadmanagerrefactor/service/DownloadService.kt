@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Binder
 import android.os.IBinder
 import android.widget.RemoteViews
@@ -18,6 +19,7 @@ import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.addToQueueList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.createFileAgain
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.findNextQueueDownloadFile
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.numberOfChunks
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.speedController
 import com.quangln2.downloadmanagerrefactor.controller.DownloadSpeedController
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
@@ -32,11 +34,12 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import java.io.File
 import java.io.FileOutputStream
+import java.util.*
 
 
 class DownloadService : Service() {
     private val serviceJob = SupervisorJob()
-    private val scope = CoroutineScope(Dispatchers.Main + serviceJob)
+    private val scope = CoroutineScope(Dispatchers.IO + serviceJob)
     private val CHANNEL_ID = "download_notification"
     private val binder = MyLocalBinder()
     private var builder: NotificationCompat.Builder = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -76,9 +79,11 @@ class DownloadService : Service() {
 
         val progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100).toInt()
         val contentView = RemoteViews(packageName, R.layout.custom_notification)
-        contentView.setTextViewText(R.id.contentTitle, item.fileName)
-        contentView.setTextViewText(R.id.contentText, item.textProgressFormat)
-        contentView.setProgressBar(R.id.progressBar, 100, progress, false)
+        contentView.apply {
+            setTextViewText(R.id.contentTitle, item.fileName)
+            setTextViewText(R.id.contentText, item.textProgressFormat)
+            setProgressBar(R.id.progressBar, 100, progress, false)
+        }
 
         builder = NotificationCompat.Builder(this@DownloadService, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_arrow_downward_24)
@@ -89,8 +94,10 @@ class DownloadService : Service() {
 
         if (item.bytesCopied >= item.size) {
             manager.cancel(item.id.hashCode())
+            scope.launch {
+                combineFile(item, this@DownloadService)
+            }
             job?.cancelChildren()
-            combineFile(item, this@DownloadService)
             stopSelf()
             findNextQueueDownloadFile(this@DownloadService)
             return
@@ -99,17 +106,13 @@ class DownloadService : Service() {
 
     private fun combineFile(file: StructureDownFile, context: Context) {
         val fin = FileOutputStream(file.downloadTo + "/" + file.fileName)
-        (0 until DownloadManagerController.numberOfChunks).forEach {
+        (0 until numberOfChunks).forEach {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
             val fos = File(appSpecificExternalDir.absolutePath)
-            if(fos.exists()){
-                fin.write(fos.readBytes())
-            }
-            if (fos.exists()) {
-                fos.delete()
-            }
+            fin.write(fos.readBytes())
         }
         fin.close()
+        //TODO: Find a way to delete tmp files properly
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -155,7 +158,7 @@ class DownloadService : Service() {
                 currentList[index] = file.copy(downloadState = DownloadStatusState.DOWNLOADING)
                 DownloadManagerController._downloadList.postValue(currentList)
             }
-            CoroutineScope(Dispatchers.IO).launch {
+            scope.launch {
                 UpdateToListUseCase(DownloadManagerApplication.downloadRepository)(
                     file.copy()
                 )
@@ -164,7 +167,7 @@ class DownloadService : Service() {
             createFileAgain(file)
         } else if (!DownloadUtil.isFileExisting(file, context)) {
             createFileAgain(file)
-            addToDownloadList(file)
+            addToDownloadList(file.copy())
         }
         val currentList = DownloadManagerController.downloadList.value
         val index = currentList?.indexOfFirst { it.id == file.id }
@@ -221,7 +224,6 @@ class DownloadService : Service() {
         }
 
     }
-
 
     override fun onDestroy() {
         super.onDestroy()

@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 object DownloadManagerController {
 
     var numberOfChunks = 5
-    var downloadListSchema: LiveData<List<StructureDownFile>>? = null
 
     var _inputItem =
         MutableLiveData<StructureDownFile>().apply {

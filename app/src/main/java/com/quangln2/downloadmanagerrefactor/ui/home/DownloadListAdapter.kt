@@ -1,5 +1,6 @@
 package com.quangln2.downloadmanagerrefactor.ui.home
 
+import android.content.ClipData
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -163,9 +164,7 @@ class DownloadListAdapter(private var context: Context) :
                 eventListener?.onDownloadSuccess(binding, item, context)
             }
         }
-
     }
-
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -187,16 +186,9 @@ class DownloadListAdapter(private var context: Context) :
             return
         }
         mutableList[index] = file
-        submitList(mutableList.toMutableList())
+        submitList(mutableList)
         notifyItemChanged(index)
     }
-
-    override fun getItemId(position: Int): Long {
-        val item = currentList[position]
-        return item.id.hashCode().toLong()
-    }
-
-
 }
 
 class DownloadListDiffCallback : DiffUtil.ItemCallback<StructureDownFile>() {
@@ -208,8 +200,8 @@ class DownloadListDiffCallback : DiffUtil.ItemCallback<StructureDownFile>() {
         oldItem: StructureDownFile,
         newItem: StructureDownFile
     ): Boolean {
-        return oldItem.id == newItem.id && oldItem.downloadState == newItem.downloadState
-                && oldItem.fileName == newItem.fileName && oldItem.size == newItem.size
-                && oldItem.bytesCopied == newItem.bytesCopied
+        return oldItem.id == newItem.id && oldItem.fileName == newItem.fileName && oldItem.downloadLink == newItem.downloadLink
+                && oldItem.listChunks == newItem.listChunks
     }
+
 }

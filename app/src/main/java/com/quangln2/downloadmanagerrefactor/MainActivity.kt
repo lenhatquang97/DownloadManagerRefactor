@@ -26,6 +26,7 @@ import com.quangln2.downloadmanagerrefactor.data.repository.DefaultDownloadRepos
 import com.quangln2.downloadmanagerrefactor.data.source.local.LocalDataSourceImpl
 import com.quangln2.downloadmanagerrefactor.data.source.remote.RemoteDataSourceImpl
 import com.quangln2.downloadmanagerrefactor.databinding.ActivityMainBinding
+import com.quangln2.downloadmanagerrefactor.socket.SocketDownloadUtils
 import com.quangln2.downloadmanagerrefactor.ui.dialog.AddToDownloadDialog
 import com.quangln2.downloadmanagerrefactor.ui.home.HomeViewModel
 import kotlinx.coroutines.Dispatchers
@@ -49,11 +50,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
-
-        DownloadManagerController.downloadListSchema =
-            DownloadManagerApplication.database.downloadDao().getAll().asLiveData()
-
-
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
 
