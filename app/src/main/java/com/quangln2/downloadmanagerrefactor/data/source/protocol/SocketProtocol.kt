@@ -117,6 +117,7 @@ class SocketProtocol : ProtocolInterface, Serializable {
             }
             return file
         } catch (e: Exception) {
+            //Exception
             Log.d("FileError", e.toString())
             val initFile = ServiceLocator.initializeStructureDownFile()
             file.fileName = initFile.fileName
