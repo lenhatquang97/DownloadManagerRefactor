@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import java.io.Serializable
 
 //HTTP, Socket
-interface ProtocolInterface: Serializable {
+interface ProtocolInterface : Serializable {
     fun addNewDownloadInfo(url: String, downloadTo: String, file: StructureDownFile)
     fun fetchDownloadInfo(file: StructureDownFile): StructureDownFile
     fun downloadAFile(file: StructureDownFile, context: Context): Flow<StructureDownFile>

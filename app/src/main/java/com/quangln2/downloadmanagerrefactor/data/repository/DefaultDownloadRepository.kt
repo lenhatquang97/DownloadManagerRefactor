@@ -32,7 +32,7 @@ class DefaultDownloadRepository(
     @WorkerThread
     suspend fun deleteFromList(file: StructureDownFile, context: Context) {
         val intent = Intent(context, DownloadService::class.java)
-        DownloadManagerController.newItem.value = file
+        DownloadManagerController.newItem.postValue(file)
         intent.putExtra("command", "KillNotification")
         context.startService(intent)
         localDataSource.deleteFromDatabase(file)

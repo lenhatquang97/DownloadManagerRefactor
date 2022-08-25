@@ -46,8 +46,8 @@ class LocalDataSourceImpl(
             job.cancelChildren()
         }
 
-        //Delete temporary files
-        (0 until DownloadManagerController.numberOfChunks).forEach {
+        val numberOfChunks = if(file.protocol == "Socket") 1 else 5
+        (0 until numberOfChunks).forEach {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
             if (appSpecificExternalDir.exists()) {
                 appSpecificExternalDir.delete()
@@ -56,7 +56,7 @@ class LocalDataSourceImpl(
 
 
         val intent = Intent(context, DownloadService::class.java)
-        DownloadManagerController.newItem.value = file
+        DownloadManagerController.newItem.postValue(file)
         intent.putExtra("command", "KillNotification")
         context.startService(intent)
     }

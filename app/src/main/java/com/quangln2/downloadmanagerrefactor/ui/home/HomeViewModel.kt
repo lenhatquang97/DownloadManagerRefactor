@@ -52,7 +52,7 @@ class HomeViewModel(
             }
 
             override fun onNegativePress() {
-                if(file.protocol == "Socket"){
+                if (file.protocol == "Socket") {
                     (file.protocolInterface as SocketProtocol).closeConnection()
                 }
             }

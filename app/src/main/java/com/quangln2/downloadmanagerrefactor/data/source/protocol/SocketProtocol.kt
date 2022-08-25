@@ -4,27 +4,23 @@ import android.content.Context
 import android.util.Log
 import android.webkit.MimeTypeMap
 import com.quangln2.downloadmanagerrefactor.ServiceLocator
-import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.data.model.FromTo
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.Serializable
+import java.io.*
 import java.net.Socket
 import java.util.*
 
 class SocketProtocol : ProtocolInterface, Serializable {
-    var ip = ""
-    var port = 0
+    private var ip = ""
+    private var port = 0
     var socket: Socket? = null
     var inp: DataInputStream? = null
     var out: DataOutputStream? = null
@@ -52,7 +48,7 @@ class SocketProtocol : ProtocolInterface, Serializable {
 
     }
 
-    private suspend fun connectToServer(ip: String, port: Int) {
+    private fun connectToServer(ip: String, port: Int) {
         try {
             socket = Socket(ip, port)
             if (socket != null) {
@@ -63,8 +59,9 @@ class SocketProtocol : ProtocolInterface, Serializable {
             e.printStackTrace()
         }
     }
+
     fun closeConnection() {
-        try{
+        try {
             CoroutineScope(Dispatchers.IO).launch {
                 out?.write("${createJSONRule("exit", "bye")}\n".toByteArray())
                 out?.flush()
@@ -98,8 +95,8 @@ class SocketProtocol : ProtocolInterface, Serializable {
             CoroutineScope(Dispatchers.IO).launch {
                 sendMessageWithSyntaxCommandContent("getFileInfo|${file.fileName}")
                 var result = inp?.readLine()
-                while(result == null){
-                    result = inp?.readLine()
+                while (result == null) {
+
                     //Create timer for timeout
                 }
                 val jsonObj = JSONObject(result)
@@ -122,12 +119,12 @@ class SocketProtocol : ProtocolInterface, Serializable {
     }
 
     override fun downloadAFile(file: StructureDownFile, context: Context): Flow<StructureDownFile> = channelFlow {
-        try{
+        try {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[0])
             val fos = FileOutputStream(appSpecificExternalDir.absolutePath, true)
 
             val fileNameSegmented = file.downloadLink.split("/")[1]
-            if(file.bytesCopied > 0){
+            if (file.bytesCopied > 0) {
                 out?.write("${createJSONRule("resume", "$fileNameSegmented?${file.bytesCopied}")}\n".toByteArray())
                 out?.flush()
             } else {
@@ -144,7 +141,7 @@ class SocketProtocol : ProtocolInterface, Serializable {
                 send(file)
                 bytesRead = inp?.readBytes()
             }
-        } catch(e: Exception){
+        } catch (e: Exception) {
             send(file.copy(downloadState = DownloadStatusState.FAILED))
             deleteTempFiles(file, context)
         }
