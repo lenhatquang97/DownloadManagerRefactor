@@ -6,13 +6,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.quangln2.downloadmanagerrefactor.DownloadManagerApplication
 import com.quangln2.downloadmanagerrefactor.ServiceLocator
-import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController._downloadList
-import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.downloadList
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.domain.local.InsertToListUseCase
 import com.quangln2.downloadmanagerrefactor.domain.local.UpdateToListUseCase
-import com.quangln2.downloadmanagerrefactor.domain.local.WriteToFileAPI29BelowUseCase
+import com.quangln2.downloadmanagerrefactor.domain.local.WriteToFileUseCase
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,16 +33,19 @@ object DownloadManagerController {
         MutableLiveData<MutableList<StructureDownFile>>().apply { value = mutableListOf() }
     val downloadList: LiveData<MutableList<StructureDownFile>> get() = _downloadList
 
+    var _filterList =
+        MutableLiveData<MutableList<StructureDownFile>>().apply { value = mutableListOf() }
+    val filterList: LiveData<MutableList<StructureDownFile>> get() = _filterList
+
     var _progressFile =
         MutableLiveData<StructureDownFile>().apply {
             value = StructureDownFile()
         }
     val progressFile: LiveData<StructureDownFile> get() = _progressFile
 
-    val speedController = MutableLiveData<MutableMap<String, DownloadSpeedController>>().apply{
+    val speedController = MutableLiveData<MutableMap<String, DownloadSpeedController>>().apply {
         value = mutableMapOf()
     }
-
 
 
     fun findNextQueueDownloadFile(context: Context) {
@@ -116,7 +117,7 @@ object DownloadManagerController {
 
     fun createFileAgain(file: StructureDownFile) {
         if (file.downloadTo.isEmpty()) {
-            WriteToFileAPI29BelowUseCase(DownloadManagerApplication.downloadRepository)(file)
+            WriteToFileUseCase(DownloadManagerApplication.downloadRepository)(file)
         }
     }
 

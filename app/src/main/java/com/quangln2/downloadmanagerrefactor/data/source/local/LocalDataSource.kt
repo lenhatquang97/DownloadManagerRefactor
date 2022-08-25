@@ -5,7 +5,7 @@ import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 
 interface LocalDataSource {
     suspend fun deletePermanently(file: StructureDownFile, context: Context)
-    fun writeToFileAPI29Below(file: StructureDownFile)
+    fun writeToFile(file: StructureDownFile)
     fun openDownloadFile(item: StructureDownFile, context: Context)
     suspend fun insert(file: StructureDownFile)
     suspend fun update(file: StructureDownFile)

@@ -78,6 +78,7 @@ class UIComponentUtil {
                         a.dismiss()
                     }
                     .setNegativeButton(ConstantClass.NEGATIVE_BUTTON) { a, _ ->
+                        onAcceptPress.onNegativePress()
                         a.dismiss()
                     }
             builder.show()
@@ -98,6 +99,7 @@ class UIComponentUtil {
                         a.dismiss()
                     }
                     .setNegativeButton(ConstantClass.NEGATIVE_BUTTON) { a, _ ->
+                        onAcceptPress.onNegativePress()
                         a.dismiss()
                     }
             builder.show()

@@ -2,16 +2,20 @@ package com.quangln2.downloadmanagerrefactor.ui.home
 
 import android.content.Context
 import android.content.Intent
-import androidx.lifecycle.LiveData
+import android.webkit.URLUtil
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.downloadmanagerrefactor.R
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController._filterList
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController._inputItem
 import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
+import com.quangln2.downloadmanagerrefactor.data.source.protocol.HttpProtocol
+import com.quangln2.downloadmanagerrefactor.data.source.protocol.SocketProtocol
 import com.quangln2.downloadmanagerrefactor.domain.local.*
 import com.quangln2.downloadmanagerrefactor.domain.remote.*
 import com.quangln2.downloadmanagerrefactor.listener.OnAcceptPress
@@ -36,9 +40,6 @@ class HomeViewModel(
     val vibratePhoneUseCase: VibratePhoneUseCase
 ) : ViewModel() {
     var _isOpenDialog = MutableLiveData<Boolean>().apply { value = false }
-    var _filterList =
-        MutableLiveData<MutableList<StructureDownFile>>().apply { value = mutableListOf() }
-    val filterList: LiveData<MutableList<StructureDownFile>> get() = _filterList
     var textSearch = MutableLiveData<String>().apply { value = "" }
 
     fun preProcessingDownloadFile(context: Context, file: StructureDownFile) {
@@ -48,6 +49,12 @@ class HomeViewModel(
                 intent.putExtra("command", "WaitForDownload")
                 intent.putExtra("item", file)
                 context.startService(intent)
+            }
+
+            override fun onNegativePress() {
+                if(file.protocol == "Socket"){
+                    (file.protocolInterface as SocketProtocol).closeConnection()
+                }
             }
         }
 
@@ -69,7 +76,7 @@ class HomeViewModel(
         val currentList = DownloadManagerController._downloadList.value
         if (currentList != null) {
             viewModelScope.launch(Dispatchers.IO) {
-                if(downloadStatusState == DownloadStatusState.ALL.toString()){
+                if (downloadStatusState == DownloadStatusState.ALL.toString()) {
                     _filterList.postValue(currentList.toMutableList())
                 } else {
                     val newList =
@@ -82,23 +89,6 @@ class HomeViewModel(
         }
     }
 
-    fun filterCategories(categories: String) {
-        val currentList = DownloadManagerController.downloadList.value
-        if (categories == "All") {
-            viewModelScope.launch(Dispatchers.IO) {
-                _filterList.postValue(currentList?.toMutableList())
-            }
-            return
-        }
-        if (currentList != null) {
-            viewModelScope.launch(Dispatchers.IO) {
-                val newList = currentList.filter { it.kindOf == categories }
-                _filterList.postValue(newList.toMutableList())
-            }
-
-        }
-
-    }
 
     fun filterStartsWithNameCaseInsensitive(name: String) {
         val currentList = DownloadManagerController._downloadList.value
@@ -123,7 +113,7 @@ class HomeViewModel(
             val res = DownloadManagerController.downloadList.value?.filter { it.id != file.id }
                 ?.toMutableList()
 
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 DownloadManagerController._downloadList.value = res
                 _filterList.value = res
             }
@@ -162,10 +152,31 @@ class HomeViewModel(
         builder.show()
     }
 
-    fun addNewDownloadInfo(url: String, downloadTo: String) {
-        if (DownloadManagerController._inputItem.value != null) {
-            addNewDownloadInfo(url, downloadTo, DownloadManagerController._inputItem.value!!)
+    fun addNewDownloadInfo(url: String, downloadTo: String): Boolean {
+        try {
+            if (_inputItem.value != null) {
+                println(url)
+                val isValidIpPort = ConstantClass.CHECK_IP_PORT_PATH.toRegex().matches(url)
+                val isValidURL = URLUtil.isValidUrl(url)
+                println("Valid ip port: $isValidIpPort")
+                if (isValidIpPort) {
+                    val ip = url.split(":")[0]
+                    val port = url.split(":")[1].split("/")[0].toInt()
+                    _inputItem.value?.protocol = "Socket"
+                    _inputItem.value?.protocolInterface = SocketProtocol(ip, port)
+                } else if (isValidURL) {
+                    _inputItem.value?.protocol = "HTTP"
+                    _inputItem.value?.protocolInterface = HttpProtocol()
+                } else {
+                    return false
+                }
+                addNewDownloadInfo(url, downloadTo, _inputItem.value!!)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
         }
+        return true
     }
 
     fun fetchDownloadFileInfo() {

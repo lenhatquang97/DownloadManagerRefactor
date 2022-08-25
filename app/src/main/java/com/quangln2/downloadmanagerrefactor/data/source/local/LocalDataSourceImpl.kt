@@ -8,6 +8,7 @@ import android.os.*
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import com.quangln2.downloadmanagerrefactor.BuildConfig
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.data.database.DownloadDao
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
@@ -44,6 +45,16 @@ class LocalDataSourceImpl(
             }
             job.cancelChildren()
         }
+
+        //Delete temporary files
+        (0 until DownloadManagerController.numberOfChunks).forEach {
+            val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
+            if (appSpecificExternalDir.exists()) {
+                appSpecificExternalDir.delete()
+            }
+        }
+
+
         val intent = Intent(context, DownloadService::class.java)
         intent.putExtra("item", file)
         intent.putExtra("command", "KillNotification")
@@ -51,7 +62,7 @@ class LocalDataSourceImpl(
     }
 
 
-    override fun writeToFileAPI29Below(file: StructureDownFile) {
+    override fun writeToFile(file: StructureDownFile) {
         if (file.fileName.contains(".")) {
             val extension = file.fileName.substring(file.fileName.lastIndexOf("."))
             val name = file.fileName.substring(0, file.fileName.lastIndexOf("."))

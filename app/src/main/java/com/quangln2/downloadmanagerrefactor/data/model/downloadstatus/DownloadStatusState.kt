@@ -31,4 +31,9 @@ enum class DownloadStatusState {
             return "Queued"
         }
     },
+    RESUMED {
+        override fun toString(): String {
+            return "Resumed"
+        }
+    },
 }

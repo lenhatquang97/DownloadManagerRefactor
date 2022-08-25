@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.Flow
 
 
 class DefaultDownloadRepository(
-    private val localDataSource: LocalDataSource, private val remoteDataSource: RemoteDataSource
+    private val localDataSource: LocalDataSource,
+    private val remoteDataSource: RemoteDataSource
 ) {
 
     @Suppress("RedundantSuspendModifier")
@@ -55,11 +56,11 @@ class DefaultDownloadRepository(
     fun fetchDownloadInfo(file: StructureDownFile): StructureDownFile =
         remoteDataSource.fetchDownloadInfo(file)
 
-    fun writeToFileAPI29Below(file: StructureDownFile) =
-        localDataSource.writeToFileAPI29Below(file)
+    fun writeToFile(file: StructureDownFile) =
+        localDataSource.writeToFile(file)
 
     fun downloadAFile(file: StructureDownFile, context: Context): Flow<StructureDownFile> =
-        remoteDataSource.downloadAFileWithChunks(file, context)
+        remoteDataSource.downloadAFile(file, context)
 
     fun retryDownload(file: StructureDownFile, context: Context) {
         remoteDataSource.retryDownload(file, context)
@@ -68,9 +69,13 @@ class DefaultDownloadRepository(
     fun openDownloadFile(item: StructureDownFile, context: Context) =
         localDataSource.openDownloadFile(item, context)
 
-    fun resumeDownload(file: StructureDownFile, context: Context) = remoteDataSource.resumeDownload(file, context)
+    fun resumeDownload(file: StructureDownFile, context: Context) =
+        remoteDataSource.resumeDownload(file, context)
+
     fun pauseDownload(file: StructureDownFile) = remoteDataSource.pauseDownload(file)
-    fun stopDownload(file: StructureDownFile, context: Context) = remoteDataSource.stopDownload(file, context)
+    fun stopDownload(file: StructureDownFile, context: Context) =
+        remoteDataSource.stopDownload(file, context)
+
     fun vibratePhone(context: Context) = localDataSource.vibratePhone(context)
 
 }

@@ -38,8 +38,8 @@ import com.quangln2.downloadmanagerrefactor.listener.EventListener
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.io.File
 
 class HomeFragment : Fragment() {
 
@@ -50,11 +50,10 @@ class HomeFragment : Fragment() {
         ViewModelFactory(
             DefaultDownloadRepository(
                 LocalDataSourceImpl(DownloadManagerApplication.database.downloadDao()),
-                RemoteDataSourceImpl()
+                RemoteDataSourceImpl(),
             )
         )
     }
-
     var downloadService: DownloadService? = null
     var isBound = false
     private val connection = object : ServiceConnection {
@@ -167,11 +166,11 @@ class HomeFragment : Fragment() {
 
         downloadList.observe(viewLifecycleOwner) {
             it?.let {
-                viewModel._filterList.value = it.toMutableList()
+                DownloadManagerController._filterList.value = it.toMutableList()
             }
         }
 
-        viewModel.filterList.observe(viewLifecycleOwner) {
+        DownloadManagerController.filterList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isEmpty()) {
                     binding.downloadLists.visibility = View.INVISIBLE
@@ -194,10 +193,11 @@ class HomeFragment : Fragment() {
 
         progressFile.observe(viewLifecycleOwner) {
             it?.let {
-                val visibleChild = binding.downloadLists.getChildAt(viewModel.filterList.value?.size?.minus(1) ?: 0)
+                val visibleChild =
+                    binding.downloadLists.getChildAt(DownloadManagerController.filterList.value?.size?.minus(1) ?: 0)
                 val lastChild = binding.downloadLists.getChildAdapterPosition(visibleChild)
-                if (lastChild == viewModel.filterList.value?.size?.minus(1)) {
-                   adapterVal.updateProgress(it)
+                if (lastChild == DownloadManagerController.filterList.value?.size?.minus(1)) {
+                    adapterVal.updateProgress(it)
                 }
                 lifecycleScope.launch(Dispatchers.IO) {
                     val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
@@ -243,6 +243,20 @@ class HomeFragment : Fragment() {
                 requireContext().stopService(Intent(requireContext(), DownloadService::class.java))
                 requireContext().unbindService(connection)
                 isBound = false
+            }
+        }
+        _downloadList.value?.forEach {
+            if (it.downloadState == DownloadStatusState.COMPLETED && context != null) {
+                deleteTempFile(it, context!!)
+            }
+        }
+    }
+
+    private fun deleteTempFile(file: StructureDownFile, context: Context) {
+        (0 until DownloadManagerController.numberOfChunks).forEach {
+            val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
+            if (appSpecificExternalDir.exists()) {
+                appSpecificExternalDir.delete()
             }
         }
     }

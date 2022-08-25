@@ -6,6 +6,8 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
+import com.quangln2.downloadmanagerrefactor.data.source.protocol.HttpProtocol
+import com.quangln2.downloadmanagerrefactor.data.source.protocol.ProtocolInterface
 import java.io.Serializable
 
 @Entity(tableName = "download_list")
@@ -21,12 +23,19 @@ data class StructureDownFile(
     @ColumnInfo(name = "download_state") var downloadState: DownloadStatusState,
     @ColumnInfo(name = "mime_type") var mimeType: String,
     @ColumnInfo(name = "file_name") var fileName: String,
+
+    //Use for chunk downloader
     @ColumnInfo(name = "list_chunks") var listChunks: MutableList<FromTo>,
     @ColumnInfo(name = "chunk_names") var chunkNames: MutableList<String>,
 
+    //use for pass progress format
     @Ignore var textProgressFormat: String = "Loading...",
 
-    ) : Serializable {
+    //use for protocol extension
+    @ColumnInfo(name = "protocol") var protocol: String = "HTTP",
+    @Ignore var protocolInterface: ProtocolInterface = HttpProtocol()
+
+) : Serializable {
     constructor() :
             this(
                 "",

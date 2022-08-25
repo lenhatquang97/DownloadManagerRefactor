@@ -42,11 +42,13 @@ class Converters {
 
     @TypeConverter
     fun convertChunkNames(value: MutableList<String>): String {
+        if (value.size == 0) return ""
         return value.joinToString("?")
     }
 
     @TypeConverter
     fun convertChunkNames(value: String): MutableList<String> {
+        if (value.isEmpty()) return mutableListOf()
         return value.split("?").toMutableList()
     }
 }

@@ -10,7 +10,6 @@ import android.text.InputType
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -91,20 +90,16 @@ class AddToDownloadDialog : DialogFragment() {
 
         binding.addNewDownloadFileButton.setOnClickListener {
             val downloadLink = binding.linkTextField.editText?.text.toString()
-            val isValidURL = URLUtil.isValidUrl(downloadLink)
-            if (isValidURL) {
-                binding.addNewDownloadFileButton.icon = progressIndicatorDrawable
-                viewModel.addNewDownloadInfo(
-                    downloadLink,
-                    binding.downloadToTextField.editText?.text.toString()
-                )
+            val downloadTo = binding.downloadToTextField.editText?.text.toString()
+            binding.addNewDownloadFileButton.icon = progressIndicatorDrawable
+            val success = viewModel.addNewDownloadInfo(downloadLink, downloadTo)
+            if (success) {
                 viewModel.fetchDownloadFileInfo()
                 viewModel._isOpenDialog.value = true
-
                 closeKeyboard(binding.linkTextField)
             } else {
-                Toast.makeText(requireContext(), ConstantClass.INVALID_URL, Toast.LENGTH_SHORT)
-                    .show()
+                binding.addNewDownloadFileButton.icon = null
+                Toast.makeText(requireContext(), ConstantClass.INVALID_URL, Toast.LENGTH_SHORT).show()
             }
         }
         binding.cancelAddNewDownloadFileButton.setOnClickListener {

@@ -1,6 +1,5 @@
 package com.quangln2.downloadmanagerrefactor.ui.home
 
-import android.content.ClipData
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -179,6 +178,7 @@ class DownloadListAdapter(private var context: Context) :
         val item = getItem(position)
         holder.bind(item, context)
     }
+
     fun updateProgress(file: StructureDownFile) {
         val index = currentList.indexOfFirst { it.id == file.id }
         val mutableList = currentList.toMutableList()

@@ -21,5 +21,7 @@ class ConstantClass {
 
         const val INVALID_URL = "Invalid URL"
         const val INVALID_LINK = "This link cannot be downloaded"
+
+        const val CHECK_IP_PORT_PATH = """([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})\:[0-9]{1,5}(\/)(.*)"""
     }
 }

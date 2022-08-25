@@ -4,7 +4,9 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
+import kotlinx.coroutines.*
 import java.io.File
 
 class DownloadUtil {
@@ -48,6 +50,26 @@ class DownloadUtil {
                 }
             }
             return false
+        }
+
+
+        fun filterCategories(categories: String) {
+            val currentList = DownloadManagerController.downloadList.value
+            val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+            if (categories == "All") {
+                scope.launch(Dispatchers.IO) {
+                    DownloadManagerController._filterList.postValue(currentList?.toMutableList())
+                }
+                return
+            }
+            if (currentList != null) {
+                CoroutineScope(Dispatchers.IO).launch { }
+                scope.launch(Dispatchers.IO) {
+                    val newList = currentList.filter { it.kindOf == categories }
+                    DownloadManagerController._filterList.postValue(newList.toMutableList())
+                }
+            }
+            scope.cancel()
         }
     }
 }

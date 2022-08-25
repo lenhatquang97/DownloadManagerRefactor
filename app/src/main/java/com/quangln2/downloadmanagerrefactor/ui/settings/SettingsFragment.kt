@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.quangln2.downloadmanagerrefactor.data.model.settings.GlobalSettings
 import com.quangln2.downloadmanagerrefactor.databinding.FragmentSecondBinding
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 /**
