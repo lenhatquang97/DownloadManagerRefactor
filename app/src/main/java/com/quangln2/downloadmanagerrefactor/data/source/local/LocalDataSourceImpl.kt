@@ -56,7 +56,7 @@ class LocalDataSourceImpl(
 
 
         val intent = Intent(context, DownloadService::class.java)
-        intent.putExtra("item", file)
+        DownloadManagerController.newItem.value = file
         intent.putExtra("command", "KillNotification")
         context.startService(intent)
     }

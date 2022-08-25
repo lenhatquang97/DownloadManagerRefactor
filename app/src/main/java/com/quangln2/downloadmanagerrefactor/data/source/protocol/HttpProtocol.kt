@@ -18,11 +18,12 @@ import kotlinx.coroutines.flow.flowOn
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 
-class HttpProtocol : ProtocolInterface {
+class HttpProtocol : ProtocolInterface, Serializable {
     override fun addNewDownloadInfo(url: String, downloadTo: String, file: StructureDownFile) {
         file.id = UUID.randomUUID().toString()
         file.downloadLink = url

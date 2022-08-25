@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import android.webkit.MimeTypeMap
 import com.quangln2.downloadmanagerrefactor.ServiceLocator
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
+import com.quangln2.downloadmanagerrefactor.data.model.FromTo
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
@@ -15,10 +17,11 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.Serializable
 import java.net.Socket
 import java.util.*
 
-class SocketProtocol : ProtocolInterface {
+class SocketProtocol : ProtocolInterface, Serializable {
     var ip = ""
     var port = 0
     var socket: Socket? = null
@@ -87,8 +90,8 @@ class SocketProtocol : ProtocolInterface {
             file.fileName.substring(file.fileName.lastIndexOf(".") + 1)
         )
             .toString()
-        file.chunkNames = mutableListOf()
-        file.listChunks = mutableListOf()
+        file.chunkNames =
+            (0 until 1).map { UUID.randomUUID().toString() }.toMutableList()
         file.kindOf = UIComponentUtil.defineTypeOfCategoriesBasedOnFileName(file.mimeType)
     }
 
@@ -98,12 +101,19 @@ class SocketProtocol : ProtocolInterface {
 
             scope.launch {
                 sendMessageWithSyntaxCommandContent("getFileInfo|${file.fileName}")
-                val result = inp?.readLine()
+                var result = inp?.readLine()
                 while(result == null){
+                    result = inp?.readLine()
                     //Create timer for timeout
                 }
                 val jsonObj = JSONObject(result)
                 file.size = jsonObj.getLong("fileSize")
+                file.listChunks = (0 until 1).map {
+                    val tmp = file.size / 1
+                    val endVal =
+                        if (it == 0) file.size else tmp * (it + 1) - 1
+                    FromTo(tmp * it, endVal, tmp * it)
+                }.toMutableList()
             }
             return file
         } catch (e: Exception) {
@@ -116,19 +126,19 @@ class SocketProtocol : ProtocolInterface {
     }
 
     override fun downloadAFile(file: StructureDownFile, context: Context): Flow<StructureDownFile> = flow {
-        var howMany: Int
-        val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.fileName)
-        howMany = if (file.downloadState == DownloadStatusState.RESUMED && appSpecificExternalDir.exists()) {
-            file.downloadState = DownloadStatusState.DOWNLOADING
-            appSpecificExternalDir.length().toInt()
-        } else 0
+        val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[0])
         val fos = FileOutputStream(appSpecificExternalDir.absolutePath, true)
+
+        val fileNameSegmented = file.downloadLink.split("/")[1]
+        out?.write("${createJSONRule("sendFile", fileNameSegmented)}\n".toByteArray())
+        out?.flush()
+
         var bytesRead = inp?.readBytes()
 
         while (bytesRead != null && bytesRead.isNotEmpty()) {
-            howMany += bytesRead.size
-            Log.d("SocketUtility", "howMany: $howMany")
+            file.bytesCopied += bytesRead.size
             fos.write(bytesRead)
+            emit(file)
             bytesRead = inp?.readBytes()
         }
     }

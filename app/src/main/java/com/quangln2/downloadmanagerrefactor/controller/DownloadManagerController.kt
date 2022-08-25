@@ -47,6 +47,10 @@ object DownloadManagerController {
         value = mutableMapOf()
     }
 
+    val newItem = MutableLiveData<StructureDownFile>().apply {
+        value = StructureDownFile()
+    }
+
 
     fun findNextQueueDownloadFile(context: Context) {
         val currentList = downloadList.value
@@ -57,7 +61,7 @@ object DownloadManagerController {
                     currentList[index].copy(downloadState = DownloadStatusState.DOWNLOADING)
                 _downloadList.postValue(currentList)
                 val intent = Intent(context, DownloadService::class.java)
-                intent.putExtra("item", currentList[index])
+                DownloadManagerController.newItem.value = currentList[index]
                 intent.putExtra("command", "dequeue")
                 context.startService(intent)
 

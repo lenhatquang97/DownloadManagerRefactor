@@ -47,7 +47,7 @@ class HomeViewModel(
             override fun onAcceptPress() {
                 val intent = Intent(context, DownloadService::class.java)
                 intent.putExtra("command", "WaitForDownload")
-                intent.putExtra("item", file)
+                DownloadManagerController.newItem.value = file
                 context.startService(intent)
             }
 
@@ -215,7 +215,7 @@ class HomeViewModel(
 
     private fun sendToDownloadService(context: Context, currentFile: StructureDownFile) {
         val intent = Intent(context, DownloadService::class.java)
-        intent.putExtra("item", currentFile)
+        DownloadManagerController.newItem.value = currentFile
         context.startService(intent)
     }
 

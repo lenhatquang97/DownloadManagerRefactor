@@ -92,7 +92,7 @@ class DownloadService : Service() {
         if (item.bytesCopied >= item.size) {
             manager.cancel(item.id.hashCode())
             scope.launch {
-                combineFile(item, this@DownloadService)
+                combineFile(item, this@DownloadService, if(item.protocol == "Socket") 1 else 5)
             }
             job?.cancelChildren()
             stopSelf()
@@ -101,9 +101,9 @@ class DownloadService : Service() {
         }
     }
 
-    private fun combineFile(file: StructureDownFile, context: Context) {
+    private fun combineFile(file: StructureDownFile, context: Context, chunkNumbers: Int = 5) {
         val fin = FileOutputStream(file.downloadTo + "/" + file.fileName)
-        (0 until numberOfChunks).forEach {
+        (0 until chunkNumbers).forEach {
             val appSpecificExternalDir =
                 FileInputStream(context.getExternalFilesDir(null)?.absolutePath + '/' + file.chunkNames[it])
             appSpecificExternalDir.use { it ->
@@ -116,7 +116,7 @@ class DownloadService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null) {
-            val item = intent.getSerializableExtra("item") as StructureDownFile
+            val item = DownloadManagerController.newItem.value!!
             val command = intent.getStringExtra("command") ?: "nothing"
             downloadAFileWithCreating(item, this, command)
         }

@@ -3,6 +3,7 @@ package com.quangln2.downloadmanagerrefactor.data.repository
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.WorkerThread
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.source.local.LocalDataSource
 import com.quangln2.downloadmanagerrefactor.data.source.remote.RemoteDataSource
@@ -31,7 +32,7 @@ class DefaultDownloadRepository(
     @WorkerThread
     suspend fun deleteFromList(file: StructureDownFile, context: Context) {
         val intent = Intent(context, DownloadService::class.java)
-        intent.putExtra("item", file)
+        DownloadManagerController.newItem.value = file
         intent.putExtra("command", "KillNotification")
         context.startService(intent)
         localDataSource.deleteFromDatabase(file)

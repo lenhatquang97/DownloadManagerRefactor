@@ -31,10 +31,14 @@ class ChunkProgressBar
         val w = width.toFloat()
         val h = height.toFloat()
 
-
-        for (i in 1..chunkSize) {
-            drawLinePart(i, canvas, w, h, percentArr[i - 1].toFloat())
+        if(percentArr.size == 1){
+            drawLinePart(1, canvas, w, h, percentArr[0].toFloat())
+        } else {
+            for (i in 1..chunkSize) {
+                drawLinePart(i, canvas, w, h, percentArr[i - 1].toFloat())
+            }
         }
+
         postInvalidate()
         super.onDraw(canvas)
     }
