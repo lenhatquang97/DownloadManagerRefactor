@@ -127,8 +127,14 @@ class SocketProtocol : ProtocolInterface, Serializable {
             val fos = FileOutputStream(appSpecificExternalDir.absolutePath, true)
 
             val fileNameSegmented = file.downloadLink.split("/")[1]
-            out?.write("${createJSONRule("sendFile", fileNameSegmented)}\n".toByteArray())
-            out?.flush()
+            if(file.bytesCopied > 0){
+                out?.write("${createJSONRule("resume", "$fileNameSegmented?${file.bytesCopied}")}\n".toByteArray())
+                out?.flush()
+            } else {
+                out?.write("${createJSONRule("sendFile", fileNameSegmented)}\n".toByteArray())
+                out?.flush()
+            }
+
 
             var bytesRead = inp?.readBytes()
 
@@ -145,22 +151,18 @@ class SocketProtocol : ProtocolInterface, Serializable {
     }
 
     override fun resumeDownload(file: StructureDownFile, context: Context) {
+        file.downloadState = DownloadStatusState.DOWNLOADING
         CoroutineScope(Dispatchers.IO).launch {
             connectToServer(ip, port)
-            val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[0])
-            val actualFileName = file.downloadLink.split("/")[1]
-            out?.write("${createJSONRule("resume", "$actualFileName?${appSpecificExternalDir.length()}")}\n".toByteArray())
-            out?.flush()
-            file.downloadState = DownloadStatusState.RESUMED
-            downloadAFile(file, context)
         }
     }
 
     override fun pauseDownload(file: StructureDownFile) {
+        file.downloadState = DownloadStatusState.PAUSED
         CoroutineScope(Dispatchers.IO).launch {
-            socket?.close()
             val actualFileName = file.downloadLink.split("/")[1]
-            sendMessageWithSyntaxCommandContent("pause|$actualFileName")
+            out?.write("${createJSONRule("pause", actualFileName)}\n".toByteArray())
+            out?.flush()
         }
     }
 
