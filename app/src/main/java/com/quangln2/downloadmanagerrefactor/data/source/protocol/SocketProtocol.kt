@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.DataInputStream
@@ -99,7 +100,6 @@ class SocketProtocol : ProtocolInterface {
 
     override fun fetchDownloadInfo(file: StructureDownFile): StructureDownFile {
         try {
-            //Thread.sleep(1000)
             out?.write("${createJSONRule("getFileInfo", file.fileName)}\n".toByteArray())
             out?.flush()
             var result = inp?.readLine()
@@ -139,13 +139,20 @@ class SocketProtocol : ProtocolInterface {
                 out?.flush()
             }
 
-            val data = ByteArray(1024)
-            var x = inp?.read(data, 0, 1024)
+            val bufferSize = 4 * 1024
+
+            val data = ByteArray(bufferSize)
+            var x = inp?.read(data, 0, bufferSize)
             while(x!= null && x >= 0){
                 fos.write(data, 0, x)
                 file.bytesCopied += x.toLong()
                 file.listChunks[0].curr += x.toLong()
-                x = inp?.read(data, 0, 1024)
+                if (file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED) {
+                    fos.close()
+                    socket?.close()
+                    return@channelFlow
+                }
+                x = inp?.read(data, 0, bufferSize)
                 send(file)
             }
 
@@ -153,7 +160,7 @@ class SocketProtocol : ProtocolInterface {
             send(file.copy(downloadState = DownloadStatusState.FAILED))
             deleteTempFiles(file, context)
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override fun resumeDownload(file: StructureDownFile, context: Context) {
         file.downloadState = DownloadStatusState.DOWNLOADING
@@ -168,19 +175,24 @@ class SocketProtocol : ProtocolInterface {
     }
 
     override fun stopDownload(item: StructureDownFile, context: Context) {
-        item.bytesCopied = 0
-        item.listChunks = item.listChunks.map { it.copy(curr = it.from) }.toMutableList()
-        item.downloadState = DownloadStatusState.FAILED
-
-        scope.launch {
+        try{
+            scope.launch {
+                val file = File(context.getExternalFilesDir(null), item.chunkNames[0])
+                if (file.exists()) {
+                    file.delete()
+                }
+            }
+            item.bytesCopied = 0
+            item.listChunks = item.listChunks.map { it.copy(curr = it.from) }.toMutableList()
+            item.downloadState = DownloadStatusState.FAILED
             val actualFileName = item.downloadLink.split("/")[1]
             out?.write("${createJSONRule("stop", actualFileName)}\n".toByteArray())
             out?.flush()
-            val file = File(context.getExternalFilesDir(null), item.chunkNames[0])
-            if (file.exists()) {
-                file.delete()
-            }
+
+        } catch (e: Exception) {
+            Log.d("SocketProtocol", "stopDownload: " + e.message)
         }
+
 
 
     }

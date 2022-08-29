@@ -19,6 +19,7 @@
 
 
     <application
+        android:largeHeap="true"
         android:name="com.quangln2.downloadmanagerrefactor.DownloadManagerApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"

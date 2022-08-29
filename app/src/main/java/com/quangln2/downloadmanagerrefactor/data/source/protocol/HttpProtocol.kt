@@ -53,10 +53,6 @@ class HttpProtocol : ProtocolInterface {
 
     override fun fetchDownloadInfo(file: StructureDownFile): StructureDownFile {
         val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
-        connection.setRequestProperty(
-            "User-Agent",
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (HTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
-        )
         connection.doInput = true
         connection.requestMethod = "GET"
         try {
@@ -111,8 +107,9 @@ class HttpProtocol : ProtocolInterface {
                             appSpecificExternalDir.absolutePath,
                             true
                         )
-                        val data = ByteArray(1024)
-                        var x = inp.read(data, 0, 1024)
+                        val bufferSize = 4*1024
+                        val data = ByteArray(bufferSize)
+                        var x = inp.read(data, 0, bufferSize)
                         while (x >= 0) {
                             fos.write(data, 0, x)
                             file.listChunks[it].curr += x.toLong()
@@ -124,7 +121,7 @@ class HttpProtocol : ProtocolInterface {
                                 connection.disconnect()
                                 return@async
                             }
-                            x = inp.read(data, 0, 1024)
+                            x = inp.read(data, 0, bufferSize)
                             send(file)
                         }
                     }

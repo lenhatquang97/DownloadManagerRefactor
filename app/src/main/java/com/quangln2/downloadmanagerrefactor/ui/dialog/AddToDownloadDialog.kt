@@ -87,12 +87,13 @@ class AddToDownloadDialog : DialogFragment() {
             binding.addNewDownloadFileButton.icon = progressIndicatorDrawable
             val success = viewModel.addNewDownloadInfo(downloadLink, downloadTo)
             if (success) {
+                closeKeyboard(binding.linkTextField)
                 val onHandle: (StructureDownFile) -> Unit = {
                     dismiss()
                     openDownloadDialog(it)
                 }
                 viewModel.fetchDownloadFileInfo(onHandle)
-                closeKeyboard(binding.linkTextField)
+
             } else {
                 binding.addNewDownloadFileButton.icon = null
                 Toast.makeText(requireContext(), ConstantClass.INVALID_URL, Toast.LENGTH_SHORT).show()
