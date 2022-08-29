@@ -7,28 +7,35 @@ import com.quangln2.downloadmanagerrefactor.ServiceLocator
 import com.quangln2.downloadmanagerrefactor.data.model.FromTo
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
+import com.quangln2.downloadmanagerrefactor.data.source.protocol.SocketProtocol.Companion.createJSONRule
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.io.*
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.net.Socket
 import java.util.*
 
-class SocketProtocol : ProtocolInterface, Serializable {
+class SocketProtocol : ProtocolInterface {
     private var ip = ""
     private var port = 0
     var socket: Socket? = null
     var inp: DataInputStream? = null
     var out: DataOutputStream? = null
+    val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     constructor(ip: String, port: Int) {
         this.ip = ip
         this.port = port
-        CoroutineScope(Dispatchers.IO).launch { connectToServer(ip, port) }
+        connectToServer(ip, port)
+
     }
 
     companion object {
@@ -58,17 +65,17 @@ class SocketProtocol : ProtocolInterface, Serializable {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
     }
 
     fun closeConnection() {
         try {
-            CoroutineScope(Dispatchers.IO).launch {
-                out?.write("${createJSONRule("exit", "bye")}\n".toByteArray())
-                out?.flush()
-                socket?.close()
-                inp?.close()
-                out?.close()
-            }
+            socket?.close()
+            inp?.close()
+            out?.close()
+//            out?.write("${createJSONRule("exit", "bye")}\n".toByteArray())
+//            out?.flush()
+
         } catch (e: Exception) {
             Log.d("SocketProtocol", "closeConnection: " + e.message)
         }
@@ -92,25 +99,25 @@ class SocketProtocol : ProtocolInterface, Serializable {
 
     override fun fetchDownloadInfo(file: StructureDownFile): StructureDownFile {
         try {
-            CoroutineScope(Dispatchers.IO).launch {
-                sendMessageWithSyntaxCommandContent("getFileInfo|${file.fileName}")
-                var result = inp?.readLine()
-                while (result == null) {
-
-                    //Create timer for timeout
-                }
-                val jsonObj = JSONObject(result)
-                file.size = jsonObj.getLong("fileSize")
-                file.listChunks = (0 until 1).map {
-                    val tmp = file.size / 1
-                    val endVal =
-                        if (it == 0) file.size else tmp * (it + 1) - 1
-                    FromTo(tmp * it, endVal, tmp * it)
-                }.toMutableList()
-            }
+            //Thread.sleep(1000)
+            out?.write("${createJSONRule("getFileInfo", file.fileName)}\n".toByteArray())
+            out?.flush()
+            var result = inp?.readLine()
+            val start = System.currentTimeMillis()
+            val end = start + 5 * 1000
+            while (result == null && System.currentTimeMillis() < end) {}
+            println("result: $result")
+            val jsonObj = JSONObject(result)
+            file.size = jsonObj.getLong("fileSize")
+            file.listChunks = (0 until 1).map {
+                val tmp = file.size / 1
+                val endVal =
+                    if (it == 0) file.size else tmp * (it + 1) - 1
+                FromTo(tmp * it, endVal, tmp * it)
+            }.toMutableList()
             return file
         } catch (e: Exception) {
-            Log.d("FileError", e.toString())
+            println(e.message)
             val initFile = ServiceLocator.initializeStructureDownFile()
             file.fileName = initFile.fileName
             file.size = initFile.size
@@ -137,6 +144,7 @@ class SocketProtocol : ProtocolInterface, Serializable {
 
             while (bytesRead != null && bytesRead.isNotEmpty()) {
                 file.bytesCopied += bytesRead.size
+                file.listChunks[0].curr += bytesRead.size
                 fos.write(bytesRead)
                 send(file)
                 bytesRead = inp?.readBytes()
@@ -149,18 +157,14 @@ class SocketProtocol : ProtocolInterface, Serializable {
 
     override fun resumeDownload(file: StructureDownFile, context: Context) {
         file.downloadState = DownloadStatusState.DOWNLOADING
-        CoroutineScope(Dispatchers.IO).launch {
-            connectToServer(ip, port)
-        }
+        connectToServer(ip, port)
     }
 
     override fun pauseDownload(file: StructureDownFile) {
         file.downloadState = DownloadStatusState.PAUSED
-        CoroutineScope(Dispatchers.IO).launch {
-            val actualFileName = file.downloadLink.split("/")[1]
-            out?.write("${createJSONRule("pause", actualFileName)}\n".toByteArray())
-            out?.flush()
-        }
+        val actualFileName = file.downloadLink.split("/")[1]
+        out?.write("${createJSONRule("pause", actualFileName)}\n".toByteArray())
+        out?.flush()
     }
 
     override fun stopDownload(item: StructureDownFile, context: Context) {
@@ -168,7 +172,7 @@ class SocketProtocol : ProtocolInterface, Serializable {
         item.listChunks = item.listChunks.map { it.copy(curr = it.from) }.toMutableList()
         item.downloadState = DownloadStatusState.FAILED
 
-        CoroutineScope(Dispatchers.IO).launch {
+        scope.launch {
             val actualFileName = item.downloadLink.split("/")[1]
             out?.write("${createJSONRule("stop", actualFileName)}\n".toByteArray())
             out?.flush()
@@ -182,7 +186,7 @@ class SocketProtocol : ProtocolInterface, Serializable {
     }
 
     override fun retryDownload(file: StructureDownFile, context: Context) {
-        CoroutineScope(Dispatchers.IO).launch {
+        scope.launch {
             connectToServer(ip, port)
             file.downloadState = DownloadStatusState.DOWNLOADING
             file.bytesCopied = 0

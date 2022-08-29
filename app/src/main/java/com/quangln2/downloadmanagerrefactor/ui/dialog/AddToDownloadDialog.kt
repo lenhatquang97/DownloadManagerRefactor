@@ -51,13 +51,6 @@ class AddToDownloadDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DownloadManagerController.fetchedFileInfo.observe(this) { file ->
-            if (file != null && file.downloadLink != ConstantClass.FILE_NAME_DEFAULT && viewModel._isOpenDialog.value!!) {
-                dismiss()
-                openDownloadDialog(file)
-            }
-            viewModel._isOpenDialog.value = false
-        }
 
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -94,8 +87,11 @@ class AddToDownloadDialog : DialogFragment() {
             binding.addNewDownloadFileButton.icon = progressIndicatorDrawable
             val success = viewModel.addNewDownloadInfo(downloadLink, downloadTo)
             if (success) {
-                viewModel.fetchDownloadFileInfo()
-                viewModel._isOpenDialog.value = true
+                val onHandle: (StructureDownFile) -> Unit = {
+                    dismiss()
+                    openDownloadDialog(it)
+                }
+                viewModel.fetchDownloadFileInfo(onHandle)
                 closeKeyboard(binding.linkTextField)
             } else {
                 binding.addNewDownloadFileButton.icon = null
@@ -120,6 +116,8 @@ class AddToDownloadDialog : DialogFragment() {
         return AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog)
             .setView(binding.root).create()
     }
+
+
 
     private fun closeKeyboard(view: View) {
         val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

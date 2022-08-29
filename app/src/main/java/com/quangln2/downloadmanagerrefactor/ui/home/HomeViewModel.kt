@@ -21,6 +21,7 @@ import com.quangln2.downloadmanagerrefactor.domain.remote.*
 import com.quangln2.downloadmanagerrefactor.listener.OnAcceptPress
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,7 +40,6 @@ class HomeViewModel(
     val stopDownloadUseCase: StopDownloadUseCase,
     val vibratePhoneUseCase: VibratePhoneUseCase
 ) : ViewModel() {
-    var _isOpenDialog = MutableLiveData<Boolean>().apply { value = false }
     var textSearch = MutableLiveData<String>().apply { value = "" }
 
     fun preProcessingDownloadFile(context: Context, file: StructureDownFile) {
@@ -50,9 +50,11 @@ class HomeViewModel(
                 DownloadManagerController.newItem.value = file
                 context.startService(intent)
             }
+            //192.168.1.2:32587/hello.mp4
 
             override fun onNegativePress() {
                 if (file.protocol == "Socket") {
+                    println(file.protocol)
                     (file.protocolInterface as SocketProtocol).closeConnection()
                 }
             }
@@ -154,23 +156,27 @@ class HomeViewModel(
 
     fun addNewDownloadInfo(url: String, downloadTo: String): Boolean {
         try {
-            if (_inputItem.value != null) {
-                println(url)
-                val isValidIpPort = ConstantClass.CHECK_IP_PORT_PATH.toRegex().matches(url)
-                val isValidURL = URLUtil.isValidUrl(url)
-                println("Valid ip port: $isValidIpPort")
-                if (isValidIpPort) {
-                    val ip = url.split(":")[0]
-                    val port = url.split(":")[1].split("/")[0].toInt()
-                    _inputItem.value?.protocol = "Socket"
-                    _inputItem.value?.protocolInterface = SocketProtocol(ip, port)
-                } else if (isValidURL) {
-                    _inputItem.value?.protocol = "HTTP"
-                    _inputItem.value?.protocolInterface = HttpProtocol()
-                } else {
+            val item = StructureDownFile()
+            val isValidIpPort = ConstantClass.CHECK_IP_PORT_PATH.toRegex().matches(url)
+            val isValidURL = URLUtil.isValidUrl(url)
+            if (isValidIpPort) {
+                val ip = url.split(":")[0]
+                val port = url.split(":")[1].split("/")[0].toInt()
+                item.protocol = "Socket"
+                try{
+                    item.protocolInterface = SocketProtocol(ip, port)
+                } catch (e: Exception){
                     return false
                 }
-                addNewDownloadInfo(url, downloadTo, _inputItem.value!!)
+                addNewDownloadInfo(url, downloadTo, item)
+                _inputItem.value = item.copy()
+            } else if (isValidURL) {
+                item.protocol = "HTTP"
+                item.protocolInterface = HttpProtocol()
+                addNewDownloadInfo(url, downloadTo, item)
+                _inputItem.value = item.copy()
+            } else {
+                return false
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -179,13 +185,11 @@ class HomeViewModel(
         return true
     }
 
-    fun fetchDownloadFileInfo() {
+     fun fetchDownloadFileInfo(onHandle: (StructureDownFile) -> Unit) {
         val file = DownloadManagerController.inputItem.value
-        viewModelScope.launch(Dispatchers.IO) {
-            if (file != null) {
-                fetchDownloadInfo(file)
-                DownloadManagerController._fetchedFileInfo.postValue(file)
-            }
+        if (file != null) {
+            val res = fetchDownloadInfo(file)
+            onHandle(res)
         }
     }
 
