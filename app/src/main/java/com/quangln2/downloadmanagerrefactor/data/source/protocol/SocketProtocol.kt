@@ -139,16 +139,16 @@ class SocketProtocol : ProtocolInterface {
                 out?.flush()
             }
 
-
-            var bytesRead = inp?.readBytes()
-
-            while (bytesRead != null && bytesRead.isNotEmpty()) {
-                file.bytesCopied += bytesRead.size
-                file.listChunks[0].curr += bytesRead.size
-                fos.write(bytesRead)
+            val data = ByteArray(1024)
+            var x = inp?.read(data, 0, 1024)
+            while(x!= null && x >= 0){
+                fos.write(data, 0, x)
+                file.bytesCopied += x.toLong()
+                file.listChunks[0].curr += x.toLong()
+                x = inp?.read(data, 0, 1024)
                 send(file)
-                bytesRead = inp?.readBytes()
             }
+
         } catch (e: Exception) {
             send(file.copy(downloadState = DownloadStatusState.FAILED))
             deleteTempFiles(file, context)

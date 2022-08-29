@@ -145,7 +145,6 @@ class DownloadListAdapter(private var context: Context) :
                     (l.curr - l.from).toDouble() / (l.to - l.from).toDouble()
                 }
                 binding.textView.text = item.textProgressFormat
-
             }
 
 

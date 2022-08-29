@@ -30,9 +30,8 @@ class ChunkProgressBar
     override fun onDraw(canvas: Canvas?) {
         val w = width.toFloat()
         val h = height.toFloat()
-
         if (percentArr.size == 1) {
-            drawLinePart(1, canvas, w, h, percentArr[0].toFloat())
+            drawOneLine(1, canvas, w, h, percentArr[0].toFloat())
         } else {
             for (i in 1..chunkSize) {
                 drawLinePart(i, canvas, w, h, percentArr[i - 1].toFloat())
@@ -41,6 +40,18 @@ class ChunkProgressBar
 
         postInvalidate()
         super.onDraw(canvas)
+    }
+
+    private fun drawOneLine(i: Int, canvas: Canvas?, width: Float, height: Float, percent: Float){
+        val left = 0f
+        val rectf = RectF(
+            left + (width * (i - 1)),
+            0f + padding,
+            width * (i - 1 + percent),
+            height
+        )
+        paint.color = Color.RED
+        canvas?.drawRoundRect(rectf, 0f, 0f, paint)
     }
 
     private fun drawLinePart(i: Int, canvas: Canvas?, width: Float, height: Float, percent: Float) {
