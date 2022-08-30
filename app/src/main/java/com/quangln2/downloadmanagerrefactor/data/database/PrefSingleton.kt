@@ -3,21 +3,21 @@ package com.quangln2.downloadmanagerrefactor.data.database
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import com.tencent.mmkv.MMKV
 
 class PrefSingleton private constructor() {
     private var mContext: Context? = null
-    private var mMyPreferences: SharedPreferences? = null
+    private var mMyPreferences: MMKV? = null
     fun initialize(ctx: Context?) {
         mContext = ctx
-        mMyPreferences = mContext?.getSharedPreferences("preferences", Application.MODE_PRIVATE)
+        MMKV.initialize(ctx)
+        mMyPreferences = MMKV.defaultMMKV()
     }
     fun writeString(key: String, value: String) {
-        val editor = mMyPreferences?.edit()
-        editor?.putString(key, value)
-        editor?.apply()
+        mMyPreferences?.encode(key, value)
     }
-    fun getString(key: String): String? {
-        return mMyPreferences?.getString(key, "")
+    fun getString(key: String): String {
+        return mMyPreferences?.decodeString(key) ?: ""
     }
 
     companion object {
