@@ -1,41 +1,59 @@
 package com.quangln2.downloadmanagerrefactor.data.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
+
 import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass
+import com.quangln2.downloadmanagerrefactor.data.converter.Converters
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.data.source.protocol.HttpProtocol
 import com.quangln2.downloadmanagerrefactor.data.source.protocol.ProtocolInterface
+import org.json.JSONObject
 import java.io.Serializable
 
-@Entity(tableName = "download_list")
 data class StructureDownFile(
 
-    @PrimaryKey var id: String,
-    @ColumnInfo(name = "download_link") var downloadLink: String,
-    @ColumnInfo(name = "download_to") var downloadTo: String,
-    @ColumnInfo(name = "kind_of") var kindOf: String,
-    @ColumnInfo(name = "size") var size: Long,
+    var id: String,
+    var downloadLink: String,
+    var downloadTo: String,
+    var kindOf: String,
+    var size: Long,
 
-    @ColumnInfo(name = "bytes_copied") var bytesCopied: Long,
-    @ColumnInfo(name = "download_state") var downloadState: DownloadStatusState,
-    @ColumnInfo(name = "mime_type") var mimeType: String,
-    @ColumnInfo(name = "file_name") var fileName: String,
+    var bytesCopied: Long,
+    var downloadState: DownloadStatusState,
+    var mimeType: String,
+    var fileName: String,
 
-    //Use for chunk downloader
-    @ColumnInfo(name = "list_chunks") var listChunks: MutableList<FromTo>,
-    @ColumnInfo(name = "chunk_names") var chunkNames: MutableList<String>,
 
-    //use for pass progress format
-    @Ignore var textProgressFormat: String = "Loading...",
+    var listChunks: MutableList<FromTo>,
+    var chunkNames: MutableList<String>,
+    var protocol: String = "HTTP",
 
-    //use for protocol extension
-    @ColumnInfo(name = "protocol") var protocol: String = "HTTP",
-    @Ignore var protocolInterface: ProtocolInterface = HttpProtocol()
+
+    //Ignored
+    var textProgressFormat: String = "Loading...",
+    var protocolInterface: ProtocolInterface = HttpProtocol()
 
 ) : Serializable {
+    companion object{
+        fun convertStringToClass(jsonString: String): StructureDownFile{
+            val converters = Converters()
+            val jsonObject = JSONObject(jsonString)
+            return StructureDownFile(
+                jsonObject.getString("id"),
+                jsonObject.getString("download_link"),
+                jsonObject.getString("download_to"),
+                jsonObject.getString("kind_of"),
+                jsonObject.getLong("size"),
+                jsonObject.getLong("bytes_copied"),
+                converters.convertDownloadState(jsonObject.getString("download_state")),
+                jsonObject.getString("mime_type"),
+                jsonObject.getString("file_name"),
+                converters.convertListChunks(jsonObject.getString("list_chunks")),
+                converters.convertChunkNames(jsonObject.getString("chunk_names")),
+                jsonObject.getString("protocol"),
+            )
+        }
+    }
+
     constructor() :
             this(
                 "",
@@ -82,4 +100,25 @@ data class StructureDownFile(
             String.format("%.2f", sizeGB) + "GB"
         }
     }
+    fun convertToJsonStringForKeyValueDB(): String {
+        val converters = Converters()
+        val jsonObject = JSONObject()
+        jsonObject.apply {
+            put("id", id)
+            put("download_link", downloadLink)
+            put("download_to", downloadTo)
+            put("kind_of", kindOf)
+            put("size", size)
+            put("bytes_copied", bytesCopied)
+            put("download_state", converters.convertDownloadState(downloadState))
+            put("mime_type", mimeType)
+            put("file_name", fileName)
+            put("list_chunks", converters.convertListChunks(listChunks))
+            put("chunk_names", converters.convertChunkNames(chunkNames))
+            put("protocol", protocol)
+        }
+        return jsonObject.toString()
+    }
+
+
 }

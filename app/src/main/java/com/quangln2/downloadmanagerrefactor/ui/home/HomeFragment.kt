@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.asLiveData
@@ -26,6 +27,7 @@ import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController._downloadList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.downloadList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.progressFile
+import com.quangln2.downloadmanagerrefactor.data.database.DownloadDao
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.data.model.settings.GlobalSettings
@@ -49,7 +51,7 @@ class HomeFragment : Fragment() {
     private val viewModel: HomeViewModel by activityViewModels {
         ViewModelFactory(
             DefaultDownloadRepository(
-                LocalDataSourceImpl(DownloadManagerApplication.database.downloadDao()),
+                LocalDataSourceImpl(DownloadDao()),
                 RemoteDataSourceImpl(),
             )
         )
@@ -147,8 +149,7 @@ class HomeFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
         }
 
-        DownloadManagerApplication.database.downloadDao().getAll().asLiveData().observe(viewLifecycleOwner) {
-            it?.let {
+        DownloadDao().getAll().let {
                 if (it.isNotEmpty() && _downloadList.value != null &&
                     _downloadList.value?.size == 0
                 ) {
@@ -160,8 +161,6 @@ class HomeFragment : Fragment() {
                     }
                     _downloadList.postValue(it.toMutableList())
                 }
-            }
-
         }
 
         downloadList.observe(viewLifecycleOwner) {

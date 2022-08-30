@@ -4,6 +4,9 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.os.Build.VERSION_CODES.S
+import android.os.Environment
+import android.os.StatFs
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import kotlinx.coroutines.*
@@ -11,6 +14,11 @@ import java.io.File
 
 class DownloadUtil {
     companion object {
+        fun checkAvailableSpace(): Long{
+            val stat = StatFs(Environment.getExternalStorageDirectory().path)
+            val bytesAvailable = stat.blockSizeLong * stat.availableBlocksLong
+            return bytesAvailable
+        }
 
         fun isFileExisting(file: StructureDownFile, context: Context): Boolean {
             val filePath = File(file.downloadTo + '/' + file.fileName)
@@ -20,6 +28,10 @@ class DownloadUtil {
         fun isFileExistingInFilesDir(fileName: String, context: Context): Boolean {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), fileName)
             return appSpecificExternalDir.exists()
+        }
+        fun sizeOfFilesDir(fileName: String, context: Context): Long {
+            val appSpecificExternalDir = File(context.getExternalFilesDir(null), fileName)
+            return appSpecificExternalDir.length()
         }
 
 

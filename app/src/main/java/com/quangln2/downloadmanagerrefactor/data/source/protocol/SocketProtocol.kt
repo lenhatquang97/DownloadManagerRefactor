@@ -104,7 +104,7 @@ class SocketProtocol : ProtocolInterface {
             out?.flush()
             var result = inp?.readLine()
             val start = System.currentTimeMillis()
-            val end = start + 5 * 1000
+            val end = start + 3 * 1000
             while (result == null && System.currentTimeMillis() < end) {}
             println("result: $result")
             val jsonObj = JSONObject(result)

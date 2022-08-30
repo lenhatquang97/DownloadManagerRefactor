@@ -4,13 +4,15 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.ViewModelProvider.NewInstanceFactory.Companion.instance
 import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass
-import com.quangln2.downloadmanagerrefactor.data.database.DownloadDatabase
+import com.quangln2.downloadmanagerrefactor.data.database.DownloadDao
 
 class DownloadManagerApplication : Application() {
     init {
@@ -22,14 +24,13 @@ class DownloadManagerApplication : Application() {
         private fun applicationContext(): Context {
             return instance!!.applicationContext
         }
-
         val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-        val database by lazy { DownloadDatabase.getDatabase(applicationContext()) }
-        val downloadRepository by lazy { ServiceLocator.provideDownloadRepository(database.downloadDao()) }
+        val downloadRepository by lazy { ServiceLocator.provideDownloadRepository(DownloadDao()) }
     }
 
     override fun onCreate() {
         super.onCreate()
+
         createNotificationChannel(this)
     }
 

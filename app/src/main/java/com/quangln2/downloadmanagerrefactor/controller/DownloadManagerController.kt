@@ -26,8 +26,6 @@ object DownloadManagerController {
         }
     val inputItem: LiveData<StructureDownFile> get() = _inputItem
 
-    var _fetchedFileInfo = MutableLiveData<StructureDownFile>()
-    val fetchedFileInfo: LiveData<StructureDownFile> get() = _fetchedFileInfo
 
     var _downloadList =
         MutableLiveData<MutableList<StructureDownFile>>().apply { value = mutableListOf() }

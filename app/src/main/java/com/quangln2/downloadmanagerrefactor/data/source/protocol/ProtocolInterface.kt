@@ -4,7 +4,6 @@ import android.content.Context
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import kotlinx.coroutines.flow.Flow
 
-//HTTP, Socket
 interface ProtocolInterface {
     fun addNewDownloadInfo(url: String, downloadTo: String, file: StructureDownFile)
     fun fetchDownloadInfo(file: StructureDownFile): StructureDownFile

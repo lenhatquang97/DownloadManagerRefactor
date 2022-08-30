@@ -148,6 +148,10 @@ class HttpProtocol : ProtocolInterface {
                     return
                 }
             }
+
+            file.listChunks = currentFile.listChunks.mapIndexed { index, value ->
+                value.copy(curr = value.from + DownloadUtil.sizeOfFilesDir(file.chunkNames[index], context))
+            }.toMutableList()
             currentFile.downloadState = DownloadStatusState.DOWNLOADING
             DownloadManagerController._progressFile.value = currentFile
         }

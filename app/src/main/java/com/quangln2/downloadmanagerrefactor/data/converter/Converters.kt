@@ -1,11 +1,29 @@
 package com.quangln2.downloadmanagerrefactor.data.converter
 
-import androidx.room.TypeConverter
 import com.quangln2.downloadmanagerrefactor.data.model.FromTo
+import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 
 class Converters {
-    @TypeConverter
+    companion object{
+        fun convertDownloadList(ls: List<StructureDownFile>): String {
+            val arr = mutableListOf<String>()
+            for (item in ls){
+                arr.add(item.convertToJsonStringForKeyValueDB())
+            }
+            return arr.joinToString(separator = "%"){it}
+        }
+        fun convertDownloadList(json: String): MutableList<StructureDownFile> {
+            val arr = mutableListOf<StructureDownFile>()
+            val ls = json.split("%")
+            for (item in ls){
+                arr.add(StructureDownFile.convertStringToClass(item))
+            }
+            return arr
+        }
+
+    }
+
     fun convertDownloadState(value: String): DownloadStatusState {
         return when (value) {
             DownloadStatusState.DOWNLOADING.toString() -> DownloadStatusState.DOWNLOADING
@@ -16,12 +34,10 @@ class Converters {
         }
     }
 
-    @TypeConverter
     fun convertDownloadState(value: DownloadStatusState): String {
         return value.toString()
     }
 
-    @TypeConverter
     fun convertListChunks(value: MutableList<FromTo>?): String {
         if (value != null) {
             return value.joinToString("@") { "${it.from} ${it.to} ${it.curr}" }
@@ -29,7 +45,6 @@ class Converters {
         return ""
     }
 
-    @TypeConverter
     fun convertListChunks(value: String): MutableList<FromTo> {
         if (value.isNotEmpty()) {
             return value.split("@").map {
@@ -40,15 +55,14 @@ class Converters {
         return mutableListOf()
     }
 
-    @TypeConverter
     fun convertChunkNames(value: MutableList<String>): String {
         if (value.size == 0) return ""
         return value.joinToString("?")
     }
 
-    @TypeConverter
     fun convertChunkNames(value: String): MutableList<String> {
         if (value.isEmpty()) return mutableListOf()
         return value.split("?").toMutableList()
     }
+
 }

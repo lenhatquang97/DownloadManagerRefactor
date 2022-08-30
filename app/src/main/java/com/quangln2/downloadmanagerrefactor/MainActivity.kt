@@ -1,5 +1,6 @@
 package com.quangln2.downloadmanagerrefactor
 
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -18,6 +19,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.quangln2.downloadmanagerrefactor.data.database.PrefSingleton
 import com.quangln2.downloadmanagerrefactor.data.model.settings.GlobalSettings
 import com.quangln2.downloadmanagerrefactor.databinding.ActivityMainBinding
 import com.quangln2.downloadmanagerrefactor.ui.dialog.AddToDownloadDialog
@@ -30,14 +32,19 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    public lateinit var sharedPreferences: SharedPreferences
     private val navController by lazy { findNavController(R.id.nav_host_fragment_content_main) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
+        PrefSingleton.instance?.initialize(applicationContext)
+
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
+
+        sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 

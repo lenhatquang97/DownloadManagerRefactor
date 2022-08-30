@@ -22,15 +22,15 @@ import com.google.android.material.progressindicator.IndeterminateDrawable
 import com.quangln2.downloadmanagerrefactor.R
 import com.quangln2.downloadmanagerrefactor.ServiceLocator
 import com.quangln2.downloadmanagerrefactor.ViewModelFactory
-import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass
-import com.quangln2.downloadmanagerrefactor.data.database.DownloadDatabase
+import com.quangln2.downloadmanagerrefactor.data.database.DownloadDao
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.repository.DefaultDownloadRepository
 import com.quangln2.downloadmanagerrefactor.data.source.local.LocalDataSourceImpl
 import com.quangln2.downloadmanagerrefactor.data.source.remote.RemoteDataSourceImpl
 import com.quangln2.downloadmanagerrefactor.databinding.AddDownloadDialogBinding
 import com.quangln2.downloadmanagerrefactor.ui.home.HomeViewModel
+import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil.Companion.getRealPath
 
 class AddToDownloadDialog : DialogFragment() {
@@ -38,12 +38,11 @@ class AddToDownloadDialog : DialogFragment() {
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
 
 
-    private val database by lazy { DownloadDatabase.getDatabase(requireContext()) }
-    val downloadRepository by lazy { ServiceLocator.provideDownloadRepository(database.downloadDao()) }
+    val downloadRepository by lazy { ServiceLocator.provideDownloadRepository(DownloadDao()) }
     private val viewModel: HomeViewModel by activityViewModels {
         ViewModelFactory(
             DefaultDownloadRepository(
-                LocalDataSourceImpl(database.downloadDao()),
+                LocalDataSourceImpl(DownloadDao()),
                 RemoteDataSourceImpl()
             )
         )
@@ -89,8 +88,15 @@ class AddToDownloadDialog : DialogFragment() {
             if (success) {
                 closeKeyboard(binding.linkTextField)
                 val onHandle: (StructureDownFile) -> Unit = {
-                    dismiss()
-                    openDownloadDialog(it)
+                    val spaceRemained = DownloadUtil.checkAvailableSpace() - it.size
+                    if(spaceRemained <= 0){
+                        dismiss()
+                        Toast.makeText(requireContext(), ConstantClass.NOT_ENOUGH_SPACE, Toast.LENGTH_SHORT).show()
+                    } else {
+                        dismiss()
+                        openDownloadDialog(it)
+                    }
+
                 }
                 viewModel.fetchDownloadFileInfo(onHandle)
 
