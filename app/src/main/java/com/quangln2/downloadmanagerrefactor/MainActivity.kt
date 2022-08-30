@@ -32,7 +32,6 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    public lateinit var sharedPreferences: SharedPreferences
     private val navController by lazy { findNavController(R.id.nav_host_fragment_content_main) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,10 +43,9 @@ class MainActivity : AppCompatActivity() {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
 
-        sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.blue)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
         setSupportActionBar(binding.toolbar)
         appBarConfiguration = AppBarConfiguration(navController.graph, binding.drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)

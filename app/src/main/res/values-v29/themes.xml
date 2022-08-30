@@ -67,4 +67,18 @@
         <!-- background color of the Tooltip -->
         <item name="backgroundTint">@color/blue</item>
     </style>
+
+    <style name="CustomTextStyle">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="MoreButtonStyle">
+        <item name="tint">@color/black</item>
+    </style>
+    <style name="DialogBackground">
+        <item name="android:background">@color/white</item>
+    </style>
+    <style name="EndIconStyle">
+        <item name="android:drawableTint">@color/black</item>
+    </style>
 </resources>

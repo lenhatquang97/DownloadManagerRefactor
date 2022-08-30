@@ -23,8 +23,9 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:text="896 KB of 30.1 MB, Paused"
-        android:textColor="#000"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        style="@style/CustomTextStyle"
+        />
 
     <ProgressBar
         android:id="@+id/progressBar"

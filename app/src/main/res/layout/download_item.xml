@@ -62,7 +62,7 @@
             android:src="@drawable/ic_baseline_more_vert_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/black" />
+            style="@style/MoreButtonStyle" />
 
         <com.quangln2.downloadmanagerrefactor.ui.customview.ChunkProgressBar
             android:id="@+id/progressBar"
