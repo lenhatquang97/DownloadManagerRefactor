@@ -61,6 +61,9 @@ class UIComponentUtil {
                     }
                 }
             }
+            if(path1 == ConstantClass.MEDIA_TREE_FORMAT_DOWNLOAD_PATH){
+                return ConstantClass.DOWNLOAD_FOLDER_INTERNAL_PATH
+            }
             return path1
         }
 

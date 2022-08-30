@@ -24,5 +24,8 @@ class ConstantClass {
         const val NOT_ENOUGH_SPACE = "Not enough space to download"
 
         const val CHECK_IP_PORT_PATH = """([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})\:[0-9]{1,5}(\/)(.*)"""
+
+        const val DOWNLOAD_FOLDER_INTERNAL_PATH = "/storage/emulated/0/Download"
+        const val MEDIA_TREE_FORMAT_DOWNLOAD_PATH = "/tree/downloads/document/downloads"
     }
 }
