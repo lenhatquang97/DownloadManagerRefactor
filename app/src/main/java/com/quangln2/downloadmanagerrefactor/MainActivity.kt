@@ -68,17 +68,22 @@ class MainActivity : AppCompatActivity() {
 
         binding.fab.setOnClickListener {
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+                val permissionCheck = ContextCompat.checkSelfPermission(
+                    applicationContext,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+                if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(
+                        this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        1
+                    )
+                }
+            }
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
                 if (doesHaveWriteExternalPermission()) {
                     val dialog = AddToDownloadDialog()
                     dialog.show(supportFragmentManager, "AddToDownloadDialog")
-                } else {
-                    Toast.makeText(
-                        applicationContext,
-                        "You must grant permission to use this feature!!",
-                        Toast.LENGTH_LONG
-                    ).show()
                 }
-
             } else {
                 val dialog = AddToDownloadDialog()
                 dialog.show(supportFragmentManager, "AddToDownloadDialog")
