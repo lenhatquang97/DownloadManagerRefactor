@@ -139,10 +139,10 @@ class HomeFragment : Fragment() {
             override fun onUpdateToDatabase(item: StructureDownFile) = viewModel.update(item)
         }
 
-        val animator: ItemAnimator = binding.downloadLists.itemAnimator!!
-        if (animator is DefaultItemAnimator) {
-            animator.supportsChangeAnimations = false
-        }
+//        val animator: ItemAnimator = binding.downloadLists.itemAnimator!!
+//        if (animator is DefaultItemAnimator) {
+//            animator.supportsChangeAnimations = false
+//        }
 
         binding.downloadLists.apply {
             adapter = adapterVal
@@ -192,10 +192,14 @@ class HomeFragment : Fragment() {
 
         progressFile.observe(viewLifecycleOwner) {
             it?.let {
-                val visibleChild =
-                    binding.downloadLists.getChildAt(DownloadManagerController.filterList.value?.size?.minus(1) ?: 0)
-                val lastChild = binding.downloadLists.getChildAdapterPosition(visibleChild)
-                if (lastChild == DownloadManagerController.filterList.value?.size?.minus(1)) {
+                if(DownloadManagerController.filterName == "All"){
+                    val visibleChild =
+                        binding.downloadLists.getChildAt(DownloadManagerController.filterList.value?.size?.minus(1) ?: 0)
+                    val lastChild = binding.downloadLists.getChildAdapterPosition(visibleChild)
+                    if (lastChild == DownloadManagerController.filterList.value?.size?.minus(1)) {
+                        adapterVal.updateProgress(it)
+                    }
+                } else {
                     adapterVal.updateProgress(it)
                 }
                 lifecycleScope.launch(Dispatchers.IO) {

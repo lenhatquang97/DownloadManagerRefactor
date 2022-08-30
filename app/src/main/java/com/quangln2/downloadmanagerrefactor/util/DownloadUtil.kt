@@ -66,6 +66,7 @@ class DownloadUtil {
 
 
         fun filterCategories(categories: String) {
+            DownloadManagerController.filterName = categories
             val currentList = DownloadManagerController.downloadList.value
             val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
             if (categories == "All") {
@@ -75,13 +76,12 @@ class DownloadUtil {
                 return
             }
             if (currentList != null) {
-                CoroutineScope(Dispatchers.IO).launch { }
                 scope.launch(Dispatchers.IO) {
                     val newList = currentList.filter { it.kindOf == categories }
                     DownloadManagerController._filterList.postValue(newList.toMutableList())
                 }
+                return
             }
-            scope.cancel()
         }
     }
 }

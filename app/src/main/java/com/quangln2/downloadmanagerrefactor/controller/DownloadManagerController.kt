@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 
 object DownloadManagerController {
 
+    var filterName = "All"
     var numberOfChunks = 5
 
     var _inputItem =
