@@ -50,7 +50,7 @@ class ChunkProgressBar
             width * (i - 1 + percent),
             height
         )
-        paint.color = Color.RED
+        paint.color = Color.rgb(0, 145, 255)
         canvas?.drawRoundRect(rectf, 0f, 0f, paint)
     }
 
@@ -63,7 +63,7 @@ class ChunkProgressBar
             width / chunkSize * (i - 1 + percent),
             height
         )
-        paint.color = if (i % 2 == 0) Color.BLACK else Color.RED
+        paint.color = Color.rgb(0, 145, 255)
         canvas?.drawRoundRect(rectf, 0f, 0f, paint)
 
     }
