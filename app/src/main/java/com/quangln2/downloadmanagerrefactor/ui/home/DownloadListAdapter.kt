@@ -88,7 +88,7 @@ class DownloadListAdapter(private var context: Context) :
                 val popup = PopupMenu(wrapper, binding.moreButton)
                 popup.inflate(R.menu.viewholder_more_menu)
                 popup.setOnMenuItemClickListener {
-                    eventListener?.onHandleDelete(it, binding, item, context) ?: false
+                    eventListener?.onHandleMore(it, binding, item, context) ?: false
                 }
                 popup.show()
             }

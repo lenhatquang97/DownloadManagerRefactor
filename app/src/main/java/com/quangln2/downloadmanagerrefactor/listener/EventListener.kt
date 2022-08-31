@@ -6,7 +6,7 @@ import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.databinding.DownloadItemBinding
 
 interface EventListener {
-    fun onHandleDelete(
+    fun onHandleMore(
         menuItem: MenuItem,
         binding: DownloadItemBinding,
         item: StructureDownFile,

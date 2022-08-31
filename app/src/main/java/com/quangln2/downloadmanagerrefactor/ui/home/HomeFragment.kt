@@ -88,7 +88,7 @@ class HomeFragment : Fragment() {
         adapterVal = DownloadListAdapter(requireContext())
         adapterVal.eventListener = object : EventListener {
 
-            override fun onHandleDelete(
+            override fun onHandleMore(
                 menuItem: MenuItem,
                 binding: DownloadItemBinding,
                 item: StructureDownFile,
@@ -102,9 +102,7 @@ class HomeFragment : Fragment() {
                     }
                     R.id.delete_permanently_option -> {
                         val onHandle = fun(flag: Boolean) {
-                            if (flag) {
-                                binding.textView.text = ""
-                            }
+                            if (flag) binding.textView.text = ""
                         }
                         viewModel.deletePermanently(context, item, onHandle)
                         true
