@@ -86,6 +86,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapterVal = DownloadListAdapter(requireContext())
+        adapterVal.setHasStableIds(true)
         adapterVal.eventListener = object : EventListener {
 
             override fun onHandleDelete(

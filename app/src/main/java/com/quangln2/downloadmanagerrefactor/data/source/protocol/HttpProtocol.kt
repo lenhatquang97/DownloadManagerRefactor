@@ -14,6 +14,7 @@ import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flowOn
 import java.io.BufferedInputStream
 import java.io.File
@@ -136,7 +137,7 @@ class HttpProtocol : ProtocolInterface {
             send(file.copy(downloadState = DownloadStatusState.FAILED))
             deleteTempFiles(file, context)
         }
-    }.flowOn(Dispatchers.IO)
+    }.debounce(100).flowOn(Dispatchers.IO)
 
     override fun resumeDownload(file: StructureDownFile, context: Context) {
         val currentList = DownloadManagerController.downloadList.value
