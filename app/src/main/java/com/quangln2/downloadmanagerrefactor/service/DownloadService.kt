@@ -195,7 +195,7 @@ class DownloadService : Service() {
     private fun onCalculateDownloadProgress(item: StructureDownFile) {
         if (item.downloadState == DownloadStatusState.PAUSED || item.downloadState == DownloadStatusState.FAILED) {
             item.textProgressFormat =
-                "${item.convertBytesCopiedToSizeUnit()} of ${item.convertToSizeUnit()}, ${item.downloadState}"
+                "${item.convertBytesCopiedToSizeUnit()} of ${item.convertToSizeUnit()}"
             return
         }
         if (speedController.value != null && speedController.value?.containsKey(item.id)!!) {
@@ -210,7 +210,7 @@ class DownloadService : Service() {
             )
             if (seconds > 0.8 && result > 0 && item.downloadState == DownloadStatusState.DOWNLOADING) {
                 item.textProgressFormat =
-                    "${roundSize(result)} - ${item.convertBytesCopiedToSizeUnit()} of ${item.convertToSizeUnit()}, ${item.downloadState}"
+                    "${roundSize(result)} - ${item.convertBytesCopiedToSizeUnit()} of ${item.convertToSizeUnit()}"
                 speedController.value!![item.id]?.startBytes = speedController.value!![item.id]?.endBytes!!
                 speedController.value!![item.id]?.startTimes = speedController.value!![item.id]?.endTimes!!
             }
