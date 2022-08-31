@@ -46,7 +46,7 @@ class LocalDataSourceImpl(
             job.cancelChildren()
         }
 
-        val numberOfChunks = if (file.protocol == "Socket") 1 else 5
+        val numberOfChunks = if (file.protocol == "Socket") DownloadManagerController.numberOfSocketChunks else DownloadManagerController.numberOfHTTPChunks
         (0 until numberOfChunks).forEach {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
             if (appSpecificExternalDir.exists()) {

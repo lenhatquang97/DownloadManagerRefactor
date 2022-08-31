@@ -258,7 +258,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun deleteTempFile(file: StructureDownFile, context: Context) {
-        (0 until DownloadManagerController.numberOfChunks).forEach {
+        val chunkNum = if(file.protocol == "Socket") DownloadManagerController.numberOfSocketChunks else DownloadManagerController.numberOfHTTPChunks
+        (0 until chunkNum).forEach {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
             if (appSpecificExternalDir.exists()) {
                 appSpecificExternalDir.delete()

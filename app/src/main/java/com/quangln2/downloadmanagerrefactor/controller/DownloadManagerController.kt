@@ -19,7 +19,8 @@ import kotlinx.coroutines.launch
 object DownloadManagerController {
 
     var filterName = "All"
-    var numberOfChunks = 5
+    var numberOfHTTPChunks = 5
+    var numberOfSocketChunks = 1
 
     var _inputItem =
         MutableLiveData<StructureDownFile>().apply {

@@ -29,7 +29,7 @@ class HttpProtocol : ProtocolInterface {
         file.downloadTo = downloadTo
         file.bytesCopied = 0
         file.chunkNames =
-            (0 until DownloadManagerController.numberOfChunks).map { UUID.randomUUID().toString() }.toMutableList()
+            (0 until DownloadManagerController.numberOfHTTPChunks).map { UUID.randomUUID().toString() }.toMutableList()
     }
 
     private fun getMimeType(url: String?): String {
@@ -42,7 +42,7 @@ class HttpProtocol : ProtocolInterface {
     }
 
     private fun deleteTempFiles(file: StructureDownFile, context: Context) {
-        (0 until DownloadManagerController.numberOfChunks).forEach {
+        (0 until DownloadManagerController.numberOfHTTPChunks).forEach {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
             val fos = File(appSpecificExternalDir.absolutePath)
             if (fos.exists()) {
@@ -65,10 +65,10 @@ class HttpProtocol : ProtocolInterface {
                 file.size = connection.contentLength.toLong()
                 file.kindOf = UIComponentUtil.defineTypeOfCategoriesBasedOnFileName(file.mimeType)
                 connection.disconnect()
-                file.listChunks = (0 until DownloadManagerController.numberOfChunks).map {
-                    val tmp = file.size / DownloadManagerController.numberOfChunks
+                file.listChunks = (0 until DownloadManagerController.numberOfHTTPChunks).map {
+                    val tmp = file.size / DownloadManagerController.numberOfHTTPChunks
                     val endVal =
-                        if (it == DownloadManagerController.numberOfChunks - 1) file.size else tmp * (it + 1) - 1
+                        if (it == DownloadManagerController.numberOfHTTPChunks - 1) file.size else tmp * (it + 1) - 1
                     FromTo(tmp * it, endVal, tmp * it)
                 }.toMutableList()
                 file
@@ -90,7 +90,7 @@ class HttpProtocol : ProtocolInterface {
     override fun downloadAFile(file: StructureDownFile, context: Context): Flow<StructureDownFile> = channelFlow {
         try {
             withContext(Dispatchers.IO) {
-                (0 until DownloadManagerController.numberOfChunks).map {
+                (0 until DownloadManagerController.numberOfHTTPChunks).map {
                     val deferred = async(Dispatchers.IO) {
                         val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
                         connection.setRequestProperty("Connection", "Keep-Alive")
@@ -140,7 +140,7 @@ class HttpProtocol : ProtocolInterface {
         val index = currentList?.indexOfFirst { it.id == file.id }
         if (index != null && index != -1) {
             val currentFile = currentList[index]
-            (0 until DownloadManagerController.numberOfChunks).forEach {
+            (0 until DownloadManagerController.numberOfHTTPChunks).forEach {
                 val doesFileExist = DownloadUtil.isFileExistingInFilesDir(currentFile.chunkNames[it], context)
                 if (!doesFileExist) {
                     currentFile.downloadState = DownloadStatusState.FAILED
