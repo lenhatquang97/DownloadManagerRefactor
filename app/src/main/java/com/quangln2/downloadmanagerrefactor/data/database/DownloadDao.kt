@@ -12,7 +12,7 @@ class DownloadDao {
     fun getAll(): List<StructureDownFile> {
         val pref = PrefSingleton.instance
         val str = pref?.getString(DOWNLOAD_LIST) ?: ""
-        return if(str.isEmpty()) {
+        return if (str.isEmpty()) {
             emptyList()
         } else {
             Converters.convertDownloadList(str)
@@ -30,7 +30,7 @@ class DownloadDao {
     fun update(file: StructureDownFile) {
         val pref = PrefSingleton.instance
         val str = pref?.getString(DOWNLOAD_LIST)
-        if(str != null && str.isNotEmpty()){
+        if (str != null && str.isNotEmpty()) {
             val list = Converters.convertDownloadList(str)
             for (i in list.indices) {
                 if (list[i].id == file.id) {
@@ -46,7 +46,7 @@ class DownloadDao {
     fun delete(file: StructureDownFile) {
         val pref = PrefSingleton.instance
         val str = pref?.getString(DOWNLOAD_LIST)
-        if(str != null && str.isNotEmpty()){
+        if (str != null && str.isNotEmpty()) {
             val list = Converters.convertDownloadList(str)
             for (i in list.indices) {
                 if (list[i].id == file.id) {
@@ -59,25 +59,19 @@ class DownloadDao {
 
     }
 
-    //    @Query(
-//        "SELECT CASE WHEN EXISTS " +
-//                "(SELECT * FROM download_list " +
-//                "WHERE download_link = :downloadLink AND (download_state = \"Downloading\" OR download_state = \"Completed\")) " +
-//                "THEN 1 ELSE 0 END"
-//    )
-    fun doesDownloadLinkExist(downloadLink: String): Int {
+    fun doesDownloadLinkExist(downloadLink: String): Boolean {
         val pref = PrefSingleton.instance
         val str = pref?.getString(DOWNLOAD_LIST)
-        if(str.isNullOrEmpty()) {
-            return 0
+        if (str.isNullOrEmpty()) {
+            return false
         }
         val list = Converters.convertDownloadList(str)
         for (i in list.indices) {
             if (list[i].downloadLink == downloadLink && (list[i].downloadState == DownloadStatusState.DOWNLOADING || list[i].downloadState == DownloadStatusState.COMPLETED)) {
-                return 1
+                return true
             }
         }
-        return 0
+        return false
     }
 
 }

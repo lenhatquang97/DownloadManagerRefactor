@@ -9,7 +9,6 @@ import com.quangln2.downloadmanagerrefactor.ServiceLocator
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.domain.local.InsertToListUseCase
-import com.quangln2.downloadmanagerrefactor.domain.local.UpdateToListUseCase
 import com.quangln2.downloadmanagerrefactor.domain.local.WriteToFileUseCase
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import kotlinx.coroutines.CoroutineScope
@@ -61,7 +60,7 @@ object DownloadManagerController {
                     currentList[index].copy(downloadState = DownloadStatusState.DOWNLOADING)
                 _downloadList.postValue(currentList)
                 val intent = Intent(context, DownloadService::class.java)
-                DownloadManagerController.newItem.value = currentList[index]
+                newItem.value = currentList[index]
                 intent.putExtra("command", "dequeue")
                 context.startService(intent)
 
@@ -88,26 +87,9 @@ object DownloadManagerController {
         val currentList = downloadList.value
         if (currentList != null) {
             val availableValue = currentList.find { it.id == file.id }
-            if (availableValue != null) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    UpdateToListUseCase(DownloadManagerApplication.downloadRepository)(
-                        file.copy(
-                            downloadState = DownloadStatusState.DOWNLOADING
-                        )
-                    )
-                }
-                return
-            } else {
+            if (availableValue == null) {
                 currentList.add(file.copy(downloadState = DownloadStatusState.DOWNLOADING))
                 _downloadList.postValue(currentList.toMutableList())
-                CoroutineScope(Dispatchers.IO).launch {
-                    InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
-                        file.copy(
-                            downloadState = DownloadStatusState.DOWNLOADING
-                        )
-                    )
-                }
-                return
             }
         }
         CoroutineScope(Dispatchers.IO).launch {

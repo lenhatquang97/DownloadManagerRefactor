@@ -25,8 +25,8 @@ class RemoteDataSourceImpl : RemoteDataSource {
     ): Flow<StructureDownFile> = file.protocolInterface.downloadAFile(file, context)
 
 
-    override fun resumeDownload(file: StructureDownFile, context: Context){
-        if(file.protocol == "Socket"){
+    override fun resumeDownload(file: StructureDownFile, context: Context) {
+        if (file.protocol == "Socket") {
             val ip = file.downloadLink.split(":")[0]
             val port = file.downloadLink.split(":")[1].split("/")[0]
             file.protocolInterface = SocketProtocol(ip, port.toInt())

@@ -23,13 +23,16 @@ import java.net.URL
 import java.util.*
 
 class HttpProtocol : ProtocolInterface {
+    companion object {
+        const val numberOfHTTPChunks = 5
+    }
+
     override fun addNewDownloadInfo(url: String, downloadTo: String, file: StructureDownFile) {
         file.id = UUID.randomUUID().toString()
         file.downloadLink = url
         file.downloadTo = downloadTo
         file.bytesCopied = 0
-        file.chunkNames =
-            (0 until DownloadManagerController.numberOfHTTPChunks).map { UUID.randomUUID().toString() }.toMutableList()
+        file.chunkNames = (0 until numberOfHTTPChunks).map { UUID.randomUUID().toString() }.toMutableList()
     }
 
     private fun getMimeType(url: String?): String {
@@ -42,7 +45,7 @@ class HttpProtocol : ProtocolInterface {
     }
 
     private fun deleteTempFiles(file: StructureDownFile, context: Context) {
-        (0 until DownloadManagerController.numberOfHTTPChunks).forEach {
+        (0 until numberOfHTTPChunks).forEach {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
             val fos = File(appSpecificExternalDir.absolutePath)
             if (fos.exists()) {
@@ -65,10 +68,10 @@ class HttpProtocol : ProtocolInterface {
                 file.size = connection.contentLength.toLong()
                 file.kindOf = UIComponentUtil.defineTypeOfCategoriesBasedOnFileName(file.mimeType)
                 connection.disconnect()
-                file.listChunks = (0 until DownloadManagerController.numberOfHTTPChunks).map {
-                    val tmp = file.size / DownloadManagerController.numberOfHTTPChunks
+                file.listChunks = (0 until numberOfHTTPChunks).map {
+                    val tmp = file.size / numberOfHTTPChunks
                     val endVal =
-                        if (it == DownloadManagerController.numberOfHTTPChunks - 1) file.size else tmp * (it + 1) - 1
+                        if (it == numberOfHTTPChunks - 1) file.size else tmp * (it + 1) - 1
                     FromTo(tmp * it, endVal, tmp * it)
                 }.toMutableList()
                 file
@@ -90,7 +93,7 @@ class HttpProtocol : ProtocolInterface {
     override fun downloadAFile(file: StructureDownFile, context: Context): Flow<StructureDownFile> = channelFlow {
         try {
             withContext(Dispatchers.IO) {
-                (0 until DownloadManagerController.numberOfHTTPChunks).map {
+                (0 until numberOfHTTPChunks).map {
                     val deferred = async(Dispatchers.IO) {
                         val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
                         connection.setRequestProperty("Connection", "Keep-Alive")
@@ -107,7 +110,7 @@ class HttpProtocol : ProtocolInterface {
                             appSpecificExternalDir.absolutePath,
                             true
                         )
-                        val bufferSize = 4*1024
+                        val bufferSize = 4 * 1024
                         val data = ByteArray(bufferSize)
                         var x = inp.read(data, 0, bufferSize)
                         while (x >= 0) {
@@ -129,7 +132,7 @@ class HttpProtocol : ProtocolInterface {
                 }.awaitAll()
             }
         } catch (e: Exception) {
-            println(e)
+            Log.d("HttpProtocol", e.toString())
             send(file.copy(downloadState = DownloadStatusState.FAILED))
             deleteTempFiles(file, context)
         }
@@ -140,7 +143,7 @@ class HttpProtocol : ProtocolInterface {
         val index = currentList?.indexOfFirst { it.id == file.id }
         if (index != null && index != -1) {
             val currentFile = currentList[index]
-            (0 until DownloadManagerController.numberOfHTTPChunks).forEach {
+            (0 until numberOfHTTPChunks).forEach {
                 val doesFileExist = DownloadUtil.isFileExistingInFilesDir(currentFile.chunkNames[it], context)
                 if (!doesFileExist) {
                     currentFile.downloadState = DownloadStatusState.FAILED

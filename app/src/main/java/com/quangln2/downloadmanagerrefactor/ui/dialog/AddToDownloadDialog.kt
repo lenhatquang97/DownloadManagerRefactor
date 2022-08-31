@@ -2,14 +2,11 @@ package com.quangln2.downloadmanagerrefactor.ui.dialog
 
 import android.app.Activity
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,6 +28,7 @@ import com.quangln2.downloadmanagerrefactor.data.source.remote.RemoteDataSourceI
 import com.quangln2.downloadmanagerrefactor.databinding.AddDownloadDialogBinding
 import com.quangln2.downloadmanagerrefactor.ui.home.HomeViewModel
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
+import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil.Companion.closeKeyboard
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil.Companion.getRealPath
 
 class AddToDownloadDialog : DialogFragment() {
@@ -89,7 +87,7 @@ class AddToDownloadDialog : DialogFragment() {
                 closeKeyboard(binding.linkTextField)
                 val onHandle: (StructureDownFile) -> Unit = {
                     val spaceRemained = DownloadUtil.checkAvailableSpace() - it.size
-                    if(spaceRemained <= 0){
+                    if (spaceRemained <= 0) {
                         dismiss()
                         Toast.makeText(requireContext(), ConstantClass.NOT_ENOUGH_SPACE, Toast.LENGTH_SHORT).show()
                     } else {
@@ -125,14 +123,6 @@ class AddToDownloadDialog : DialogFragment() {
     }
 
 
-
-    private fun closeKeyboard(view: View) {
-        val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        if (view.windowToken != null) {
-            imm.hideSoftInputFromWindow(view.windowToken, 0)
-        }
-    }
-
     private fun getFilePath() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         resultLauncher.launch(intent)
@@ -140,7 +130,6 @@ class AddToDownloadDialog : DialogFragment() {
 
     private fun openDownloadDialog(file: StructureDownFile) {
         if (file.size == -1L) {
-            Log.d("DownloadDialog", "File size is -1")
             binding.addNewDownloadFileButton.icon = null
             Toast.makeText(context, ConstantClass.INVALID_LINK, Toast.LENGTH_SHORT).show()
             return

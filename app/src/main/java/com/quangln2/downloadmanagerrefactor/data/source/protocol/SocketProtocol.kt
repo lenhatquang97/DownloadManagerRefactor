@@ -7,7 +7,6 @@ import com.quangln2.downloadmanagerrefactor.ServiceLocator
 import com.quangln2.downloadmanagerrefactor.data.model.FromTo
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
-import com.quangln2.downloadmanagerrefactor.data.source.protocol.SocketProtocol.Companion.createJSONRule
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -74,8 +73,6 @@ class SocketProtocol : ProtocolInterface {
             socket?.close()
             inp?.close()
             out?.close()
-//            out?.write("${createJSONRule("exit", "bye")}\n".toByteArray())
-//            out?.flush()
 
         } catch (e: Exception) {
             Log.d("SocketProtocol", "closeConnection: " + e.message)
@@ -93,8 +90,7 @@ class SocketProtocol : ProtocolInterface {
             file.fileName.substring(file.fileName.lastIndexOf(".") + 1)
         )
             .toString()
-        file.chunkNames =
-            (0 until 1).map { UUID.randomUUID().toString() }.toMutableList()
+        file.chunkNames = mutableListOf(UUID.randomUUID().toString())
         file.kindOf = UIComponentUtil.defineTypeOfCategoriesBasedOnFileName(file.mimeType)
     }
 
@@ -105,8 +101,8 @@ class SocketProtocol : ProtocolInterface {
             var result = inp?.readLine()
             val start = System.currentTimeMillis()
             val end = start + 3 * 1000
-            while (result == null && System.currentTimeMillis() < end) {}
-            println("result: $result")
+            while (result == null && System.currentTimeMillis() < end) {
+            }
             val jsonObj = JSONObject(result)
             file.size = jsonObj.getLong("fileSize")
             file.listChunks = (0 until 1).map {
@@ -117,7 +113,7 @@ class SocketProtocol : ProtocolInterface {
             }.toMutableList()
             return file
         } catch (e: Exception) {
-            println(e.message)
+            Log.d("SocketProtocol", "fetchDownloadInfo: " + e.message)
             val initFile = ServiceLocator.initializeStructureDownFile()
             file.fileName = initFile.fileName
             file.size = initFile.size
@@ -143,7 +139,7 @@ class SocketProtocol : ProtocolInterface {
 
             val data = ByteArray(bufferSize)
             var x = inp?.read(data, 0, bufferSize)
-            while(x!= null && x >= 0){
+            while (x != null && x >= 0) {
                 fos.write(data, 0, x)
                 file.bytesCopied += x.toLong()
                 file.listChunks[0].curr += x.toLong()
@@ -175,7 +171,7 @@ class SocketProtocol : ProtocolInterface {
     }
 
     override fun stopDownload(item: StructureDownFile, context: Context) {
-        try{
+        try {
             scope.launch {
                 val file = File(context.getExternalFilesDir(null), item.chunkNames[0])
                 if (file.exists()) {
@@ -192,7 +188,6 @@ class SocketProtocol : ProtocolInterface {
         } catch (e: Exception) {
             Log.d("SocketProtocol", "stopDownload: " + e.message)
         }
-
 
 
     }

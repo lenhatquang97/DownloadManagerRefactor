@@ -12,15 +12,12 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.ItemAnimator
-import com.quangln2.downloadmanagerrefactor.DownloadManagerApplication
 import com.quangln2.downloadmanagerrefactor.R
 import com.quangln2.downloadmanagerrefactor.ViewModelFactory
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
@@ -150,17 +147,17 @@ class HomeFragment : Fragment() {
         }
 
         DownloadDao().getAll().let {
-                if (it.isNotEmpty() && _downloadList.value != null &&
-                    _downloadList.value?.size == 0
-                ) {
-                    val currentList = it
-                    for (item in currentList) {
-                        if (item.downloadState == DownloadStatusState.DOWNLOADING) {
-                            item.downloadState = DownloadStatusState.PAUSED
-                        }
+            if (it.isNotEmpty() && _downloadList.value != null &&
+                _downloadList.value?.size == 0
+            ) {
+                val currentList = it
+                for (item in currentList) {
+                    if (item.downloadState == DownloadStatusState.DOWNLOADING) {
+                        item.downloadState = DownloadStatusState.PAUSED
                     }
-                    _downloadList.postValue(it.toMutableList())
                 }
+                _downloadList.postValue(it.toMutableList())
+            }
         }
 
         downloadList.observe(viewLifecycleOwner) {
@@ -192,7 +189,7 @@ class HomeFragment : Fragment() {
 
         progressFile.observe(viewLifecycleOwner) {
             it?.let {
-                if(DownloadManagerController.filterName == "All") {
+                if (DownloadManagerController.filterName == "All") {
                     val visibleChild =
                         binding.downloadLists.getChildAt(
                             DownloadManagerController.filterList.value?.size?.minus(1) ?: 0
@@ -258,7 +255,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun deleteTempFile(file: StructureDownFile, context: Context) {
-        val chunkNum = if(file.protocol == "Socket") DownloadManagerController.numberOfSocketChunks else DownloadManagerController.numberOfHTTPChunks
+        val chunkNum =
+            if (file.protocol == "Socket") DownloadManagerController.numberOfSocketChunks else DownloadManagerController.numberOfHTTPChunks
         (0 until chunkNum).forEach {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
             if (appSpecificExternalDir.exists()) {

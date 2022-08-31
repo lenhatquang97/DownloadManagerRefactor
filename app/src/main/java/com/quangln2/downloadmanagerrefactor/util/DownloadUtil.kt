@@ -4,17 +4,22 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import android.os.Build.VERSION_CODES.S
 import android.os.Environment
 import android.os.StatFs
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 class DownloadUtil {
     companion object {
-        fun checkAvailableSpace(): Long{
+        //Related to storage
+        fun checkAvailableSpace(): Long {
             val stat = StatFs(Environment.getExternalStorageDirectory().path)
             val bytesAvailable = stat.blockSizeLong * stat.availableBlocksLong
             return bytesAvailable
@@ -29,12 +34,13 @@ class DownloadUtil {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), fileName)
             return appSpecificExternalDir.exists()
         }
+
         fun sizeOfFilesDir(fileName: String, context: Context): Long {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), fileName)
             return appSpecificExternalDir.length()
         }
 
-
+        //Check whether network is good
         fun isNetworkAvailable(context: Context?): Boolean {
             if (context == null) return false
             val connectivityManager =
@@ -64,7 +70,7 @@ class DownloadUtil {
             return false
         }
 
-
+        //Filter with categories
         fun filterCategories(categories: String) {
             DownloadManagerController.filterName = categories
             val currentList = DownloadManagerController.downloadList.value
@@ -82,6 +88,31 @@ class DownloadUtil {
                 }
                 return
             }
+        }
+
+        //Merge multiple file into one file
+        fun combineFile(file: StructureDownFile, context: Context, chunkNumbers: Int = 5) {
+            val fout = FileOutputStream(file.downloadTo + "/" + file.fileName)
+            (0 until chunkNumbers).forEach {
+                val fin =
+                    FileInputStream(context.getExternalFilesDir(null)?.absolutePath + '/' + file.chunkNames[it])
+                fin.use { it ->
+                    readByteByByte(it, fout)
+                }
+                fin.close()
+            }
+            fout.close()
+        }
+
+        private fun readByteByByte(fin: FileInputStream, fout: FileOutputStream) {
+            val bufferSize = 4 * 1024
+            val data = ByteArray(bufferSize)
+            var x = fin.read(data, 0, bufferSize)
+            while (x >= 0) {
+                fout.write(data, 0, x)
+                x = fin.read(data, 0, bufferSize)
+            }
+
         }
     }
 }

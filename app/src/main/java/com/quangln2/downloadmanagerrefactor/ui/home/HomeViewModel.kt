@@ -21,7 +21,6 @@ import com.quangln2.downloadmanagerrefactor.domain.remote.*
 import com.quangln2.downloadmanagerrefactor.listener.OnAcceptPress
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,6 +42,8 @@ class HomeViewModel(
     var textSearch = MutableLiveData<String>().apply { value = "" }
 
     fun preProcessingDownloadFile(context: Context, file: StructureDownFile) {
+
+
         val onAcceptPress = object : OnAcceptPress {
             override fun onAcceptPress() {
                 val intent = Intent(context, DownloadService::class.java)
@@ -50,11 +51,9 @@ class HomeViewModel(
                 DownloadManagerController.newItem.value = file
                 context.startService(intent)
             }
-            //192.168.1.2:32587/hello.mp4
 
             override fun onNegativePress() {
                 if (file.protocol == "Socket") {
-                    println(file.protocol)
                     (file.protocolInterface as SocketProtocol).closeConnection()
                 }
             }
@@ -163,9 +162,9 @@ class HomeViewModel(
                 val ip = url.split(":")[0]
                 val port = url.split(":")[1].split("/")[0].toInt()
                 item.protocol = "Socket"
-                try{
+                try {
                     item.protocolInterface = SocketProtocol(ip, port)
-                } catch (e: Exception){
+                } catch (e: Exception) {
                     return false
                 }
                 addNewDownloadInfo(url, downloadTo, item)
@@ -185,7 +184,7 @@ class HomeViewModel(
         return true
     }
 
-     fun fetchDownloadFileInfo(onHandle: (StructureDownFile) -> Unit) {
+    fun fetchDownloadFileInfo(onHandle: (StructureDownFile) -> Unit) {
         val file = DownloadManagerController.inputItem.value
         if (file != null) {
             val res = fetchDownloadInfo(file)

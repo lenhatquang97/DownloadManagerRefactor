@@ -9,14 +9,13 @@ import android.widget.Toast
 import androidx.core.content.FileProvider
 import com.quangln2.downloadmanagerrefactor.BuildConfig
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
+import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass
 import com.quangln2.downloadmanagerrefactor.data.database.DownloadDao
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
@@ -29,24 +28,21 @@ class LocalDataSourceImpl(
         downloadDao.delete(StructureDownFile)
 
     override suspend fun doesDownloadLinkExist(file: StructureDownFile): Boolean =
-        downloadDao.doesDownloadLinkExist(file.downloadLink) > 0
+        downloadDao.doesDownloadLinkExist(file.downloadLink)
 
     override suspend fun deletePermanently(file: StructureDownFile, context: Context) {
         val filePath = File(file.downloadTo + '/' + file.fileName)
         if (filePath.exists()) {
             filePath.delete()
         } else {
-            val job = CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(
-                    context,
-                    "File not found so we'll delete from list",
-                    Toast.LENGTH_SHORT
-                ).show()
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, ConstantClass.FILE_NOT_FOUND_DELETE_FROM_LIST, Toast.LENGTH_SHORT).show()
             }
-            job.cancelChildren()
         }
 
-        val numberOfChunks = if (file.protocol == "Socket") DownloadManagerController.numberOfSocketChunks else DownloadManagerController.numberOfHTTPChunks
+        val numberOfChunks = if (file.protocol == "Socket") DownloadManagerController.numberOfSocketChunks
+        else DownloadManagerController.numberOfHTTPChunks
+
         (0 until numberOfChunks).forEach {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
             if (appSpecificExternalDir.exists()) {
@@ -93,7 +89,7 @@ class LocalDataSourceImpl(
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         if (intent.resolveActivity(context.packageManager) == null) {
-            Toast.makeText(context, "There is no application to open this file", Toast.LENGTH_SHORT)
+            Toast.makeText(context, ConstantClass.NO_APPLICATION_TO_OPEN, Toast.LENGTH_SHORT)
                 .show()
             val extension = item.fileName.substring(item.fileName.lastIndexOf("."))
             try {

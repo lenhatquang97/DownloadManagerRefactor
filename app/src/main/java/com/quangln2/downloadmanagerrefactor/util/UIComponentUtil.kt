@@ -1,6 +1,8 @@
 package com.quangln2.downloadmanagerrefactor.util
 
 import android.content.Context
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.quangln2.downloadmanagerrefactor.R
@@ -61,7 +63,7 @@ class UIComponentUtil {
                     }
                 }
             }
-            if(path1 == ConstantClass.MEDIA_TREE_FORMAT_DOWNLOAD_PATH){
+            if (path1 == ConstantClass.MEDIA_TREE_FORMAT_DOWNLOAD_PATH) {
                 return ConstantClass.DOWNLOAD_FOLDER_INTERNAL_PATH
             }
             return path1
@@ -108,5 +110,11 @@ class UIComponentUtil {
             builder.show()
         }
 
+        fun closeKeyboard(view: View) {
+            val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            if (view.windowToken != null) {
+                imm.hideSoftInputFromWindow(view.windowToken, 0)
+            }
+        }
     }
 }

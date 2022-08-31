@@ -42,7 +42,7 @@ class ChunkProgressBar
         super.onDraw(canvas)
     }
 
-    private fun drawOneLine(i: Int, canvas: Canvas?, width: Float, height: Float, percent: Float){
+    private fun drawOneLine(i: Int, canvas: Canvas?, width: Float, height: Float, percent: Float) {
         val left = 0f
         val rectf = RectF(
             left + (width * (i - 1)),

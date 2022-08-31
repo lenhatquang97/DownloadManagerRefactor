@@ -5,18 +5,19 @@ import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 
 class Converters {
-    companion object{
+    companion object {
         fun convertDownloadList(ls: List<StructureDownFile>): String {
             val arr = mutableListOf<String>()
-            for (item in ls){
+            for (item in ls) {
                 arr.add(item.convertToJsonStringForKeyValueDB())
             }
-            return arr.joinToString(separator = "%"){it}
+            return arr.joinToString(separator = "%") { it }
         }
+
         fun convertDownloadList(json: String): MutableList<StructureDownFile> {
             val arr = mutableListOf<StructureDownFile>()
             val ls = json.split("%")
-            for (item in ls){
+            for (item in ls) {
                 arr.add(StructureDownFile.convertStringToClass(item))
             }
             return arr

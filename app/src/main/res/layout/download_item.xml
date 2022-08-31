@@ -57,12 +57,12 @@
 
         <ImageView
             android:id="@+id/more_button"
+            style="@style/MoreButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_more_vert_24"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            style="@style/MoreButtonStyle" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.quangln2.downloadmanagerrefactor.ui.customview.ChunkProgressBar
             android:id="@+id/progressBar"

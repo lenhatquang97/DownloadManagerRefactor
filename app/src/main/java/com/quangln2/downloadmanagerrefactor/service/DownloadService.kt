@@ -20,28 +20,28 @@ import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.findNextQueueDownloadFile
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.speedController
 import com.quangln2.downloadmanagerrefactor.controller.DownloadSpeedController
+import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass
+import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass.Companion.CHANNEL_ID
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.data.model.settings.GlobalSettings
 import com.quangln2.downloadmanagerrefactor.domain.local.UpdateToListUseCase
 import com.quangln2.downloadmanagerrefactor.domain.remote.DownloadAFileUseCase
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
+import com.quangln2.downloadmanagerrefactor.util.DownloadUtil.Companion.combineFile
 import com.quangln2.downloadmanagerrefactor.util.LogicUtil
 import com.quangln2.downloadmanagerrefactor.util.LogicUtil.Companion.roundSize
 import kotlinx.coroutines.*
-import java.io.FileInputStream
-import java.io.FileOutputStream
 
 
 class DownloadService : Service() {
     private val serviceJob = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + serviceJob)
-    private val CHANNEL_ID = "download_notification"
     private val binder = MyLocalBinder()
     private var builder: NotificationCompat.Builder = NotificationCompat.Builder(this, CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_baseline_arrow_downward_24)
-        .setContentTitle("DownloadManager")
-        .setContentText("Welcome to DownloadManager")
+        .setContentTitle(ConstantClass.WELCOME_TITLE)
+        .setContentText(ConstantClass.WELCOME_CONTENT)
         .setGroup(CHANNEL_ID)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
     private var job: Job? = null
@@ -100,28 +100,6 @@ class DownloadService : Service() {
         }
     }
 
-    private fun combineFile(file: StructureDownFile, context: Context, chunkNumbers: Int = 5) {
-        val fout = FileOutputStream(file.downloadTo + "/" + file.fileName)
-        (0 until chunkNumbers).forEach {
-            val fin =
-                FileInputStream(context.getExternalFilesDir(null)?.absolutePath + '/' + file.chunkNames[it])
-            fin.use { it ->
-                readByteByByte(it, fout)
-            }
-            fin.close()
-        }
-        fout.close()
-    }
-    private fun readByteByByte(fin: FileInputStream, fout: FileOutputStream){
-        val bufferSize = 4*1024
-        val data = ByteArray(bufferSize)
-        var x = fin.read(data, 0, bufferSize)
-        while (x >= 0) {
-            fout.write(data, 0, x)
-            x = fin.read(data, 0, bufferSize)
-        }
-
-    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null) {

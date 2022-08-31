@@ -33,8 +33,8 @@ data class StructureDownFile(
     var protocolInterface: ProtocolInterface = HttpProtocol()
 
 ) : Serializable {
-    companion object{
-        fun convertStringToClass(jsonString: String): StructureDownFile{
+    companion object {
+        fun convertStringToClass(jsonString: String): StructureDownFile {
             val converters = Converters()
             val jsonObject = JSONObject(jsonString)
             return StructureDownFile(
@@ -100,6 +100,7 @@ data class StructureDownFile(
             String.format("%.2f", sizeGB) + "GB"
         }
     }
+
     fun convertToJsonStringForKeyValueDB(): String {
         val converters = Converters()
         val jsonObject = JSONObject()

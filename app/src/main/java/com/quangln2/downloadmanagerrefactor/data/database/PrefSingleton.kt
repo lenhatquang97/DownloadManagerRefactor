@@ -11,11 +11,13 @@ class PrefSingleton private constructor() {
         mContext = ctx
         mMyPreferences = mContext?.getSharedPreferences("preferences", Application.MODE_PRIVATE)
     }
+
     fun writeString(key: String, value: String) {
         val editor = mMyPreferences?.edit()
         editor?.putString(key, value)
         editor?.apply()
     }
+
     fun getString(key: String): String? {
         return mMyPreferences?.getString(key, "")
     }

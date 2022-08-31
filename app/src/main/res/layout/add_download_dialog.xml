@@ -80,12 +80,11 @@
                 app:layout_constraintTop_toBottomOf="@id/linkTextField">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    style="@style/EndIconStyle"
                     android:id="@+id/endIcon"
+                    style="@style/EndIconStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:drawableEnd="@drawable/ic_baseline_folder_24"
-                    />
+                    android:drawableEnd="@drawable/ic_baseline_folder_24" />
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
