@@ -101,16 +101,26 @@ class DownloadService : Service() {
     }
 
     private fun combineFile(file: StructureDownFile, context: Context, chunkNumbers: Int = 5) {
-        val fin = FileOutputStream(file.downloadTo + "/" + file.fileName)
+        val fout = FileOutputStream(file.downloadTo + "/" + file.fileName)
         (0 until chunkNumbers).forEach {
-            val appSpecificExternalDir =
+            val fin =
                 FileInputStream(context.getExternalFilesDir(null)?.absolutePath + '/' + file.chunkNames[it])
-            appSpecificExternalDir.use { it ->
-                fin.write(it.readBytes())
+            fin.use { it ->
+                readByteByByte(it, fout)
             }
-            appSpecificExternalDir.close()
+            fin.close()
         }
-        fin.close()
+        fout.close()
+    }
+    private fun readByteByByte(fin: FileInputStream, fout: FileOutputStream){
+        val bufferSize = 4*1024
+        val data = ByteArray(bufferSize)
+        var x = fin.read(data, 0, bufferSize)
+        while (x >= 0) {
+            fout.write(data, 0, x)
+            x = fin.read(data, 0, bufferSize)
+        }
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
