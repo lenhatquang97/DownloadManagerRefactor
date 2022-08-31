@@ -189,16 +189,12 @@ class HomeFragment : Fragment() {
 
         progressFile.observe(viewLifecycleOwner) {
             it?.let {
-                if (DownloadManagerController.filterName == "All") {
-                    val visibleChild =
-                        binding.downloadLists.getChildAt(
-                            DownloadManagerController.filterList.value?.size?.minus(1) ?: 0
-                        )
-                    val lastChild = binding.downloadLists.getChildAdapterPosition(visibleChild)
-                    if (lastChild == DownloadManagerController.filterList.value?.size?.minus(1)) {
-                        adapterVal.updateProgress(it)
-                    }
-                } else {
+                val visibleChild =
+                    binding.downloadLists.getChildAt(
+                        DownloadManagerController.filterList.value?.size?.minus(1) ?: 0
+                    )
+                val lastChild = binding.downloadLists.getChildAdapterPosition(visibleChild)
+                if (lastChild == DownloadManagerController.filterList.value?.size?.minus(1)) {
                     adapterVal.updateProgress(it)
                 }
                 lifecycleScope.launch(Dispatchers.IO) {

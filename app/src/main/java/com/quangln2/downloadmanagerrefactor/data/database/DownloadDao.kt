@@ -67,7 +67,8 @@ class DownloadDao {
         }
         val list = Converters.convertDownloadList(str)
         for (i in list.indices) {
-            if (list[i].downloadLink == downloadLink && (list[i].downloadState == DownloadStatusState.DOWNLOADING || list[i].downloadState == DownloadStatusState.COMPLETED)) {
+            if (list[i].downloadLink == downloadLink && (list[i].downloadState == DownloadStatusState.DOWNLOADING ||
+                        list[i].downloadState == DownloadStatusState.COMPLETED)) {
                 return true
             }
         }

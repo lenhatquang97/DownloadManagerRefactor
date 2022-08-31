@@ -185,7 +185,7 @@ class DownloadListAdapter(private var context: Context) :
             return
         }
         mutableList[index] = file
-        submitList(mutableList)
+        submitList(mutableList.toMutableList())
         notifyItemChanged(index)
     }
 }

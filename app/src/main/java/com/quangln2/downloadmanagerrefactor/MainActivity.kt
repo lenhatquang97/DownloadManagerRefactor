@@ -15,13 +15,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
 import com.quangln2.downloadmanagerrefactor.data.database.PrefSingleton
 import com.quangln2.downloadmanagerrefactor.data.model.settings.GlobalSettings
 import com.quangln2.downloadmanagerrefactor.databinding.ActivityMainBinding
 import com.quangln2.downloadmanagerrefactor.ui.dialog.AddToDownloadDialog
-import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -45,9 +42,6 @@ class MainActivity : AppCompatActivity() {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setSupportActionBar(binding.toolbar)
-        appBarConfiguration = AppBarConfiguration(navController.graph, binding.drawerLayout)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        binding.navView.setupWithNavController(navController)
 
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
             val permissionCheck = ContextCompat.checkSelfPermission(
@@ -87,26 +81,6 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-
-        supportActionBar?.apply {
-            setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24)
-        }
-
-
-        binding.navView.setNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.all -> DownloadUtil.filterCategories("All")
-                R.id.compressed -> DownloadUtil.filterCategories("Compressed")
-                R.id.documents -> DownloadUtil.filterCategories("Documents")
-                R.id.packages -> DownloadUtil.filterCategories("Packages")
-                R.id.music -> DownloadUtil.filterCategories("Music")
-                R.id.video -> DownloadUtil.filterCategories("Video")
-                R.id.others -> DownloadUtil.filterCategories("Others")
-            }
-            binding.drawerLayout.closeDrawers()
-            binding.fab.show()
-            true
-        }
         lifecycleScope.launch {
             GlobalSettings.getMaximumDownloadThread(applicationContext).collect {
                 GlobalSettings.numsOfMaxDownloadThreadExported = it.toInt()

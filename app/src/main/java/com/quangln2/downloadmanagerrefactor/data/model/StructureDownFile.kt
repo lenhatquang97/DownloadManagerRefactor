@@ -27,7 +27,6 @@ data class StructureDownFile(
     var chunkNames: MutableList<String>,
     var protocol: String = "HTTP",
 
-
     //Ignored
     var textProgressFormat: String = "Loading...",
     var protocolInterface: ProtocolInterface = HttpProtocol()

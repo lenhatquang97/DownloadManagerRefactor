@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DownloadManagerRefactor</string>
+    <string name="app_name">Download Manager</string>
     <string name="action_settings">Settings</string>
     <string name="no_files_download_yet">No files download yet</string>
     <string name="no_download_dataset_description">Your downloaded files in will be shown here!!!</string>
