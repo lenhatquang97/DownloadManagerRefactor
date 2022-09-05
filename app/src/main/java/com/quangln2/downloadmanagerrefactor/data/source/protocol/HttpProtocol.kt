@@ -137,7 +137,7 @@ class HttpProtocol : ProtocolInterface {
             send(file.copy(downloadState = DownloadStatusState.FAILED))
             deleteTempFiles(file, context)
         }
-    }.debounce(100).flowOn(Dispatchers.IO)
+    }.flowOn(Dispatchers.IO)
 
     override fun resumeDownload(file: StructureDownFile, context: Context) {
         val currentList = DownloadManagerController.downloadList.value
