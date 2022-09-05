@@ -12,17 +12,20 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView.GONE
 import androidx.recyclerview.widget.RecyclerView.ItemAnimator
 import com.quangln2.downloadmanagerrefactor.R
 import com.quangln2.downloadmanagerrefactor.ViewModelFactory
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController._downloadList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.downloadList
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.filterList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.progressFile
 import com.quangln2.downloadmanagerrefactor.data.database.DownloadDao
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
@@ -30,6 +33,7 @@ import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadSt
 import com.quangln2.downloadmanagerrefactor.data.model.settings.GlobalSettings
 import com.quangln2.downloadmanagerrefactor.data.repository.DefaultDownloadRepository
 import com.quangln2.downloadmanagerrefactor.data.source.local.LocalDataSourceImpl
+import com.quangln2.downloadmanagerrefactor.data.source.protocol.HttpProtocol
 import com.quangln2.downloadmanagerrefactor.data.source.remote.RemoteDataSourceImpl
 import com.quangln2.downloadmanagerrefactor.databinding.DownloadItemBinding
 import com.quangln2.downloadmanagerrefactor.databinding.FragmentFirstBinding
@@ -192,13 +196,12 @@ class HomeFragment : Fragment() {
             it?.let {
                 if (DownloadManagerController.filterName == "All" || it.kindOf == DownloadManagerController.filterName) {
                     val visibleChild =
-                        binding.downloadLists.getChildAt(
-                            DownloadManagerController.filterList.value?.size?.minus(1) ?: 0
-                        )
+                        binding.downloadLists.getChildAt(filterList.value?.size?.minus(1) ?: 0)
                     val lastChild = binding.downloadLists.getChildAdapterPosition(visibleChild)
-                    if (lastChild == DownloadManagerController.filterList.value?.size?.minus(1)) {
+                    if (lastChild == filterList.value?.size?.minus(1)) {
                         adapterVal.updateProgress(it)
                     }
+
                 }
                 lifecycleScope.launch(Dispatchers.IO) {
                     val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
@@ -255,7 +258,7 @@ class HomeFragment : Fragment() {
 
     private fun deleteTempFile(file: StructureDownFile, context: Context) {
         val chunkNum =
-            if (file.protocol == "Socket") DownloadManagerController.numberOfSocketChunks else DownloadManagerController.numberOfHTTPChunks
+            if (file.protocol == "Socket") DownloadManagerController.numberOfSocketChunks else HttpProtocol.numberOfHTTPChunks
         (0 until chunkNum).forEach {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
             if (appSpecificExternalDir.exists()) {

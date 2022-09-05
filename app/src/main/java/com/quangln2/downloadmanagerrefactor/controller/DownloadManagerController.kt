@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 object DownloadManagerController {
 
     var filterName = "All"
-    var numberOfHTTPChunks = 5
     var numberOfSocketChunks = 1
 
     var _inputItem =

@@ -188,7 +188,6 @@ class DownloadListAdapter(private var context: Context) :
         submitList(mutableList)
         notifyItemChanged(index)
     }
-
     override fun getItemId(position: Int): Long {
         return getItem(position).id.hashCode().toLong()
     }

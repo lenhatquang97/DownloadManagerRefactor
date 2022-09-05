@@ -17,7 +17,6 @@ class ChunkProgressBar
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val chunkSize = 5
     private val padding = 16f
     var percentArr = listOf(0.0, 0.0, 0.0, 0.0, 0.0)
 
@@ -33,7 +32,7 @@ class ChunkProgressBar
         if (percentArr.size == 1) {
             drawOneLine(1, canvas, w, h, percentArr[0].toFloat())
         } else {
-            for (i in 1..chunkSize) {
+            for (i in 1..percentArr.size) {
                 drawLinePart(i, canvas, w, h, percentArr[i - 1].toFloat())
             }
         }
@@ -56,6 +55,7 @@ class ChunkProgressBar
 
     private fun drawLinePart(i: Int, canvas: Canvas?, width: Float, height: Float, percent: Float) {
         val left = 0f
+        val chunkSize = percentArr.size
 
         val rectf = RectF(
             left + (width / chunkSize * (i - 1)),

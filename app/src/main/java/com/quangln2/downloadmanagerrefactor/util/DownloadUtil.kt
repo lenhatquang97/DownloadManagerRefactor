@@ -91,17 +91,22 @@ class DownloadUtil {
         }
 
         //Merge multiple file into one file
-        fun combineFile(file: StructureDownFile, context: Context, chunkNumbers: Int = 5) {
-            val fout = FileOutputStream(file.downloadTo + "/" + file.fileName)
-            (0 until chunkNumbers).forEach {
-                val fin =
-                    FileInputStream(context.getExternalFilesDir(null)?.absolutePath + '/' + file.chunkNames[it])
-                fin.use { it ->
-                    readByteByByte(it, fout)
+        fun combineFile(file: StructureDownFile, context: Context, chunkNumbers: Int) {
+            try{
+                val fout = FileOutputStream(file.downloadTo + "/" + file.fileName)
+                (0 until chunkNumbers).forEach {
+                    val fin =
+                        FileInputStream(context.getExternalFilesDir(null)?.absolutePath + '/' + file.chunkNames[it])
+                    fin.use { it ->
+                        readByteByByte(it, fout)
+                    }
+                    fin.close()
                 }
-                fin.close()
+                fout.close()
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-            fout.close()
+
         }
 
         private fun readByteByByte(fin: FileInputStream, fout: FileOutputStream) {

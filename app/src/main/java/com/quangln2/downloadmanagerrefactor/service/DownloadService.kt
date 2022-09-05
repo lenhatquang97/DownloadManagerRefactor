@@ -25,6 +25,7 @@ import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass.Compani
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.data.model.settings.GlobalSettings
+import com.quangln2.downloadmanagerrefactor.data.source.protocol.HttpProtocol
 import com.quangln2.downloadmanagerrefactor.domain.local.UpdateToListUseCase
 import com.quangln2.downloadmanagerrefactor.domain.remote.DownloadAFileUseCase
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
@@ -92,7 +93,7 @@ class DownloadService : Service() {
         if (item.bytesCopied >= item.size) {
             manager.cancel(item.id.hashCode())
             scope.launch {
-                combineFile(item, this@DownloadService, if (item.protocol == "Socket") 1 else 5)
+                combineFile(item, this@DownloadService, if (item.protocol == "Socket") 1 else HttpProtocol.numberOfHTTPChunks)
             }
             job?.cancelChildren()
             stopSelf()

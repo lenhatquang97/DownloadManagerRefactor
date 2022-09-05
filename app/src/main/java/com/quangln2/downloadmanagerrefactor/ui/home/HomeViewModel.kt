@@ -133,14 +133,13 @@ class HomeViewModel(
                             onHandle(true)
                         }
                         deletePermanentlyUseCase(file, context)
-                        val res =
-                            DownloadManagerController.downloadList.value?.filter { it.id != file.id }
-                                ?.toMutableList()
 
                         //Double removal
                         withContext(Dispatchers.Main) {
+                            val res =
+                                DownloadManagerController.downloadList.value?.filter { it.id != file.id }
+                                    ?.toMutableList()
                             DownloadManagerController._downloadList.value = res
-                            _filterList.value = res
                         }
                         a.dismiss()
 
