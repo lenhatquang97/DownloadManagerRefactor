@@ -16,6 +16,7 @@ import com.quangln2.downloadmanagerrefactor.data.source.protocol.HttpProtocol
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
@@ -23,13 +24,13 @@ import java.util.*
 class LocalDataSourceImpl(
     private val downloadDao: DownloadDao
 ) : LocalDataSource {
-    override suspend fun insert(file: StructureDownFile) = downloadDao.insert(file)
-    override suspend fun update(file: StructureDownFile) = downloadDao.update(file)
-    override suspend fun deleteFromDatabase(StructureDownFile: StructureDownFile) =
-        downloadDao.delete(StructureDownFile)
+    override suspend fun insert(file: StructureDownFile, context: Context) = downloadDao.insert(file, context)
+    override suspend fun update(file: StructureDownFile, context: Context) = downloadDao.update(file, context)
+    override suspend fun deleteFromDatabase(StructureDownFile: StructureDownFile, context: Context) =
+        downloadDao.delete(StructureDownFile, context)
 
-    override suspend fun doesDownloadLinkExist(file: StructureDownFile): Boolean =
-        downloadDao.doesDownloadLinkExist(file.downloadLink)
+    override fun doesDownloadLinkExist(file: StructureDownFile, context: Context): Flow<Boolean> =
+        downloadDao.doesDownloadLinkExist(file.downloadLink, context)
 
     override suspend fun deletePermanently(file: StructureDownFile, context: Context) {
         val filePath = File(file.downloadTo + '/' + file.fileName)

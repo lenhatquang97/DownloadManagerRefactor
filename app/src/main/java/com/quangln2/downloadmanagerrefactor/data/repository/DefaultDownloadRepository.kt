@@ -18,14 +18,14 @@ class DefaultDownloadRepository(
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insert(StructureDownFile: StructureDownFile) {
-        localDataSource.insert(StructureDownFile)
+    suspend fun insert(StructureDownFile: StructureDownFile, context: Context) {
+        localDataSource.insert(StructureDownFile, context)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun update(StructureDownFile: StructureDownFile) {
-        localDataSource.update(StructureDownFile)
+    suspend fun update(StructureDownFile: StructureDownFile, context: Context) {
+        localDataSource.update(StructureDownFile,context)
     }
 
     @Suppress("RedundantSuspendModifier")
@@ -35,20 +35,18 @@ class DefaultDownloadRepository(
         DownloadManagerController.newItem.postValue(file)
         intent.putExtra("command", "KillNotification")
         context.startService(intent)
-        localDataSource.deleteFromDatabase(file)
+        localDataSource.deleteFromDatabase(file, context)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun deletePermanently(file: StructureDownFile, context: Context) {
         localDataSource.deletePermanently(file, context)
-        localDataSource.deleteFromDatabase(file)
+        localDataSource.deleteFromDatabase(file, context)
     }
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun doesDownloadLinkExist(file: StructureDownFile): Boolean {
-        return localDataSource.doesDownloadLinkExist(file)
+    fun doesDownloadLinkExist(file: StructureDownFile, context: Context): Flow<Boolean> {
+        return localDataSource.doesDownloadLinkExist(file, context)
     }
 
     fun addNewDownloadInfo(url: String, downloadTo: String, file: StructureDownFile) =

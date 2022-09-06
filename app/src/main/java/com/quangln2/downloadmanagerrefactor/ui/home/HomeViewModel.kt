@@ -22,6 +22,8 @@ import com.quangln2.downloadmanagerrefactor.listener.OnAcceptPress
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -60,16 +62,20 @@ class HomeViewModel(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            val result = doesDownloadLinkExistUseCase(file)
-            if (result) {
-                withContext(Dispatchers.Main) {
+            withContext(Dispatchers.Main){
+                val result = doesDownloadLinkExistUseCase(file, context).first()
+                if (result) {
                     UIComponentUtil.showDownloadDialogAgain(context, file, onAcceptPress)
-                }
-            } else {
-                withContext(Dispatchers.Main) {
+                    return@withContext
+                } else {
                     UIComponentUtil.showDownloadAlertDialog(context, file, onAcceptPress)
+                    return@withContext
                 }
             }
+
+
+
+
         }
     }
 
@@ -205,9 +211,9 @@ class HomeViewModel(
 
     fun open(context: Context, item: StructureDownFile) = openDownloadFileUseCase(item, context)
 
-    fun update(item: StructureDownFile) {
+    fun update(item: StructureDownFile, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            updateToListUseCase(item)
+            updateToListUseCase(item, context)
         }
     }
 

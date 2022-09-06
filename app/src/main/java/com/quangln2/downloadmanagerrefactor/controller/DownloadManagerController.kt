@@ -67,7 +67,7 @@ object DownloadManagerController {
         }
     }
 
-    fun addToQueueList(file: StructureDownFile) {
+    fun addToQueueList(file: StructureDownFile, context: Context) {
         val currentList = downloadList.value
         if (currentList != null) {
             currentList.add(file.copy(downloadState = DownloadStatusState.QUEUED))
@@ -77,12 +77,13 @@ object DownloadManagerController {
             InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
                 file.copy(
                     downloadState = DownloadStatusState.QUEUED
-                )
+                ),
+                context
             )
         }
     }
 
-    fun addToDownloadList(file: StructureDownFile) {
+    fun addToDownloadList(file: StructureDownFile, context: Context) {
         val currentList = downloadList.value
         if (currentList != null) {
             val availableValue = currentList.find { it.id == file.id }
@@ -95,7 +96,8 @@ object DownloadManagerController {
             InsertToListUseCase(DownloadManagerApplication.downloadRepository)(
                 file.copy(
                     downloadState = DownloadStatusState.DOWNLOADING
-                )
+                ),
+                context
             )
         }
     }

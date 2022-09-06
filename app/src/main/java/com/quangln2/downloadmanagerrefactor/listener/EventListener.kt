@@ -19,5 +19,5 @@ interface EventListener {
     fun onOpen(item: StructureDownFile)
     fun onRetry(item: StructureDownFile)
     fun onStop(item: StructureDownFile, binding: DownloadItemBinding, context: Context)
-    fun onUpdateToDatabase(item: StructureDownFile)
+    fun onUpdateToDatabase(item: StructureDownFile, context: Context)
 }

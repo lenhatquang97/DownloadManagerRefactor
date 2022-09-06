@@ -12,13 +12,11 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.GONE
 import androidx.recyclerview.widget.RecyclerView.ItemAnimator
 import com.quangln2.downloadmanagerrefactor.R
 import com.quangln2.downloadmanagerrefactor.ViewModelFactory
@@ -41,6 +39,7 @@ import com.quangln2.downloadmanagerrefactor.listener.EventListener
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -123,7 +122,7 @@ class HomeFragment : Fragment() {
                 item: StructureDownFile,
                 context: Context
             ) {
-                viewModel.update(item.copy(downloadState = DownloadStatusState.COMPLETED))
+                viewModel.update(item.copy(downloadState = DownloadStatusState.COMPLETED), context)
                 lifecycleScope.launch {
                     GlobalSettings.getVibrated(context).collect {
                         if (it) viewModel.vibratePhone(context)
@@ -138,7 +137,7 @@ class HomeFragment : Fragment() {
                 viewModel.stop(item, context)
 
             override fun onOpen(item: StructureDownFile) = viewModel.open(requireContext(), item)
-            override fun onUpdateToDatabase(item: StructureDownFile) = viewModel.update(item)
+            override fun onUpdateToDatabase(item: StructureDownFile, context: Context) = viewModel.update(item, context)
         }
 
         val animator: ItemAnimator = binding.downloadLists.itemAnimator!!
@@ -150,8 +149,8 @@ class HomeFragment : Fragment() {
             adapter = adapterVal
             layoutManager = LinearLayoutManager(requireContext())
         }
-
-        DownloadDao().getAll().let {
+        lifecycleScope.launch {
+            val it = DownloadDao().getAll(requireContext()).first()
             if (it.isNotEmpty() && _downloadList.value != null &&
                 _downloadList.value?.size == 0
             ) {
@@ -163,7 +162,9 @@ class HomeFragment : Fragment() {
                 }
                 _downloadList.postValue(it.toMutableList())
             }
+
         }
+
 
         downloadList.observe(viewLifecycleOwner) {
             it?.let {
@@ -207,7 +208,7 @@ class HomeFragment : Fragment() {
                     val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
                     if (progress == 100) {
                         it.downloadState = DownloadStatusState.COMPLETED
-                        viewModel.update(it)
+                        viewModel.update(it, requireContext())
                     }
                 }
 

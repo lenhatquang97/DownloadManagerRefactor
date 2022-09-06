@@ -124,7 +124,7 @@ class DownloadListAdapter(private var context: Context) :
                 }
 
                 binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
-                eventListener?.onUpdateToDatabase(item)
+                eventListener?.onUpdateToDatabase(item, context)
             }
             binding.stopButton.setOnClickListener {
                 if (item.downloadState == DownloadStatusState.DOWNLOADING || item.downloadState == DownloadStatusState.PAUSED) {
@@ -150,7 +150,7 @@ class DownloadListAdapter(private var context: Context) :
 
             if (item.downloadState == DownloadStatusState.FAILED) {
                 eventListener?.onStop(item, binding, context)
-                eventListener?.onUpdateToDatabase(item)
+                eventListener?.onUpdateToDatabase(item, context)
 
             }
             if (item.bytesCopied == item.size && item.downloadState != DownloadStatusState.FAILED) {

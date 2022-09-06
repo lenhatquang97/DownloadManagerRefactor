@@ -1,9 +1,11 @@
 package com.quangln2.downloadmanagerrefactor.data.model.settings
 
 import android.content.Context
+import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
+import com.quangln2.downloadmanagerrefactor.DownloadManagerApplication
 import com.quangln2.downloadmanagerrefactor.DownloadManagerApplication.Companion.dataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

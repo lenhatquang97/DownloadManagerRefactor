@@ -126,7 +126,7 @@ class DownloadService : Service() {
                 val numsOfDownloading =
                     currentList.count { it.downloadState == DownloadStatusState.DOWNLOADING }
                 if (numsOfDownloading >= GlobalSettings.numsOfMaxDownloadThreadExported) {
-                    addToQueueList(file)
+                    addToQueueList(file, context)
                     return
                 }
             }
@@ -148,14 +148,15 @@ class DownloadService : Service() {
             }
             scope.launch {
                 UpdateToListUseCase(DownloadManagerApplication.downloadRepository)(
-                    file.copy()
+                    file.copy(),
+                    context
                 )
             }
         } else if (!DownloadUtil.isFileExisting(file, context) && command == "dequeue") {
             createFileAgain(file)
         } else if (!DownloadUtil.isFileExisting(file, context)) {
             createFileAgain(file)
-            addToDownloadList(file.copy())
+            addToDownloadList(file.copy(), context)
         }
         val currentList = DownloadManagerController.downloadList.value
         val index = currentList?.indexOfFirst { it.id == file.id }

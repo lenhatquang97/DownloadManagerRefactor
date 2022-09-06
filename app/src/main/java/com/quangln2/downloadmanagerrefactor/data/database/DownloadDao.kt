@@ -1,36 +1,44 @@
 package com.quangln2.downloadmanagerrefactor.data.database
 
+import android.content.Context
 import com.quangln2.downloadmanagerrefactor.data.converter.Converters
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.launch
 
 class DownloadDao {
     companion object {
         const val DOWNLOAD_LIST = "download_list"
     }
 
-    fun getAll(): List<StructureDownFile> {
-        val pref = PrefSingleton.instance
-        val str = pref?.getString(DOWNLOAD_LIST) ?: ""
-        return if (str.isEmpty()) {
-            emptyList()
+    fun getAll(context: Context): Flow<List<StructureDownFile>> = flow {
+        val it = DownloadDataStore.getDownloadList(context).first()
+        val result = if (it.isEmpty()) {
+            emptyList<StructureDownFile>()
         } else {
-            Converters.convertDownloadList(str)
+            Converters.convertDownloadList(it)
+        }
+        emit(result)
+    }
+
+    suspend fun insert(file: StructureDownFile, context: Context) {
+        val it = DownloadDataStore.getDownloadList(context).first()
+        val list = if (it.isEmpty()) mutableListOf<StructureDownFile>() else Converters.convertDownloadList(it)
+        list.add(file)
+        CoroutineScope(Dispatchers.IO).launch {
+            DownloadDataStore.setDownloadList(context, Converters.convertDownloadList(list))
         }
     }
 
-    fun insert(file: StructureDownFile) {
-        val pref = PrefSingleton.instance
-        val str = pref?.getString(DOWNLOAD_LIST)
-        val list = if (str.isNullOrEmpty()) mutableListOf() else Converters.convertDownloadList(str)
-        list.add(file)
-        pref?.writeString(DOWNLOAD_LIST, Converters.convertDownloadList(list))
-    }
-
-    fun update(file: StructureDownFile) {
-        val pref = PrefSingleton.instance
-        val str = pref?.getString(DOWNLOAD_LIST)
-        if (str != null && str.isNotEmpty()) {
+    suspend fun update(file: StructureDownFile, context: Context) {
+        val str = DownloadDataStore.getDownloadList(context).first()
+        if (str.isNotEmpty()) {
             val list = Converters.convertDownloadList(str)
             for (i in list.indices) {
                 if (list[i].id == file.id) {
@@ -38,15 +46,16 @@ class DownloadDao {
                     break
                 }
             }
-            pref.writeString(DOWNLOAD_LIST, Converters.convertDownloadList(list))
+            CoroutineScope(Dispatchers.IO).launch {
+                DownloadDataStore.setDownloadList(context, Converters.convertDownloadList(list))
+            }
         }
 
     }
 
-    fun delete(file: StructureDownFile) {
-        val pref = PrefSingleton.instance
-        val str = pref?.getString(DOWNLOAD_LIST)
-        if (str != null && str.isNotEmpty()) {
+    suspend fun delete(file: StructureDownFile, context: Context) {
+        val str = DownloadDataStore.getDownloadList(context).first()
+        if (str.isNotEmpty()) {
             val list = Converters.convertDownloadList(str)
             for (i in list.indices) {
                 if (list[i].id == file.id) {
@@ -54,24 +63,26 @@ class DownloadDao {
                     break
                 }
             }
-            pref.writeString(DOWNLOAD_LIST, Converters.convertDownloadList(list))
+            CoroutineScope(Dispatchers.IO).launch {
+                DownloadDataStore.setDownloadList(context, Converters.convertDownloadList(list))
+            }
         }
 
     }
 
-    fun doesDownloadLinkExist(downloadLink: String): Boolean {
-        val pref = PrefSingleton.instance
-        val str = pref?.getString(DOWNLOAD_LIST)
-        if (str.isNullOrEmpty()) {
-            return false
-        }
-        val list = Converters.convertDownloadList(str)
-        for (i in list.indices) {
-            if (list[i].downloadLink == downloadLink && (list[i].downloadState == DownloadStatusState.DOWNLOADING || list[i].downloadState == DownloadStatusState.COMPLETED)) {
-                return true
-            }
-        }
-        return false
+     fun doesDownloadLinkExist(downloadLink: String, context: Context): Flow<Boolean> = flow {
+         val str = DownloadDataStore.getDownloadList(context).first()
+         if (str.isEmpty()) {
+             println("B")
+             emit(false)
+         }
+         val list = Converters.convertDownloadList(str)
+         for (i in list.indices) {
+             if (list[i].downloadLink == downloadLink && (list[i].downloadState == DownloadStatusState.DOWNLOADING || list[i].downloadState == DownloadStatusState.COMPLETED)) {
+                 emit(true)
+             }
+         }
+         emit(false)
     }
 
 }
