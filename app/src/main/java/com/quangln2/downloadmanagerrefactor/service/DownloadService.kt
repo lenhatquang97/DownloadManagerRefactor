@@ -85,8 +85,8 @@ class DownloadService : Service() {
         builder = NotificationCompat.Builder(this@DownloadService, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_arrow_downward_24)
             .setContent(contentView)
-            .setContentIntent(resultPendingIntent)
             .setOngoing(true)
+        //            .setContentIntent(resultPendingIntent)
         val manager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         manager.notify(item.id.hashCode(), builder.build())
 

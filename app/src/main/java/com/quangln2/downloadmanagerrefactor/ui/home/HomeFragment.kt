@@ -141,10 +141,10 @@ class HomeFragment : Fragment() {
             override fun onUpdateToDatabase(item: StructureDownFile) = viewModel.update(item)
         }
 
-//        val animator: ItemAnimator = binding.downloadLists.itemAnimator!!
-//        if (animator is DefaultItemAnimator) {
-//            animator.supportsChangeAnimations = false
-//        }
+        val animator: ItemAnimator = binding.downloadLists.itemAnimator!!
+        if (animator is DefaultItemAnimator) {
+            animator.supportsChangeAnimations = false
+        }
 
         binding.downloadLists.apply {
             adapter = adapterVal
