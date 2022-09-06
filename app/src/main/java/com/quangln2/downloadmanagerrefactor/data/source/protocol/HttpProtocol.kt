@@ -56,10 +56,11 @@ class HttpProtocol : ProtocolInterface {
     }
 
     override fun fetchDownloadInfo(file: StructureDownFile): StructureDownFile {
-        val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
-        connection.doInput = true
-        connection.requestMethod = "GET"
         try {
+            val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
+            connection.connectTimeout = 3000
+            connection.doInput = true
+            connection.requestMethod = "GET"
             val responseCode = connection.responseCode
             return if (responseCode == 200) {
                 file.fileName =
@@ -99,7 +100,6 @@ class HttpProtocol : ProtocolInterface {
                         val connection = URL(file.downloadLink).openConnection() as HttpURLConnection
                         connection.setRequestProperty("Connection", "Keep-Alive")
                         connection.doInput = true
-                        connection.connectTimeout = 5000
                         val from = if (file.listChunks[it].curr == 0L) file.listChunks[it].from
                         else file.listChunks[it].curr
                         val to = file.listChunks[it].to

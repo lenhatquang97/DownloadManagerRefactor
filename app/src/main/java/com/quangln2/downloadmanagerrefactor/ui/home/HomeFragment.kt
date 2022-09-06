@@ -181,12 +181,22 @@ class HomeFragment : Fragment() {
                     binding.downloadLists.visibility = View.VISIBLE
                     binding.emptyDataParent.visibility = View.GONE
                     if (viewModel.textSearch.value != null) {
-                        val result = it.filter { itr ->
-                            itr.fileName.lowercase().contains(
-                                viewModel.textSearch.value!!.lowercase()
-                            )
+                        if(DownloadManagerController.filterName == "All"){
+                            val result = it.filter { itr ->
+                                itr.fileName.lowercase().contains(
+                                    viewModel.textSearch.value!!.lowercase()
+                                )
+                            }
+                            adapterVal.submitList(result.toMutableList())
+                        } else {
+                            val result = it.filter { itr ->
+                                itr.fileName.lowercase().contains(
+                                    viewModel.textSearch.value!!.lowercase()
+                                ) && itr.kindOf == DownloadManagerController.filterName
+                            }
+                            adapterVal.submitList(result.toMutableList())
                         }
-                        adapterVal.submitList(result.toMutableList())
+
                     }
                 }
 
@@ -199,6 +209,7 @@ class HomeFragment : Fragment() {
                     val visibleChild =
                         binding.downloadLists.getChildAt(filterList.value?.size?.minus(1) ?: 0)
                     val lastChild = binding.downloadLists.getChildAdapterPosition(visibleChild)
+                    println(DownloadManagerController.filterName)
                     if (lastChild == filterList.value?.size?.minus(1)) {
                         adapterVal.updateProgress(it)
                     }

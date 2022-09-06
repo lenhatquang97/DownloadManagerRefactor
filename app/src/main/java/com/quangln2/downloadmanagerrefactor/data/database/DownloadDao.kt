@@ -73,7 +73,6 @@ class DownloadDao {
      fun doesDownloadLinkExist(downloadLink: String, context: Context): Flow<Boolean> = flow {
          val str = DownloadDataStore.getDownloadList(context).first()
          if (str.isEmpty()) {
-             println("B")
              emit(false)
          }
          val list = Converters.convertDownloadList(str)
