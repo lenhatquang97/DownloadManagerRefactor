@@ -209,7 +209,6 @@ class HomeFragment : Fragment() {
                     val visibleChild =
                         binding.downloadLists.getChildAt(filterList.value?.size?.minus(1) ?: 0)
                     val lastChild = binding.downloadLists.getChildAdapterPosition(visibleChild)
-                    println(DownloadManagerController.filterName)
                     if (lastChild == filterList.value?.size?.minus(1)) {
                         adapterVal.updateProgress(it)
                     }

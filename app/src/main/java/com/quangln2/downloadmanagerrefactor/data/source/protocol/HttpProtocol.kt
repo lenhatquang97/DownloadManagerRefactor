@@ -14,7 +14,6 @@ import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flowOn
 import java.io.BufferedInputStream
 import java.io.File
@@ -113,20 +112,22 @@ class HttpProtocol : ProtocolInterface {
                         )
                         val bufferSize = 4 * 1024
                         val data = ByteArray(bufferSize)
-                        var x = inp.read(data, 0, bufferSize)
-                        while (x >= 0) {
+                        var x: Int
+                        while (run {
+                                x = inp.read(data, 0, bufferSize)
+                                x
+                            } >= 0) {
                             fos.write(data, 0, x)
                             file.listChunks[it].curr += x.toLong()
                             file.bytesCopied = file.listChunks.map {
                                 minOf(it.curr, it.to) - it.from + 1
                             }.reduce { a, b -> a + b } - 1
+                            send(file)
                             if (file.downloadState == DownloadStatusState.PAUSED || file.downloadState == DownloadStatusState.FAILED) {
                                 fos.close()
                                 connection.disconnect()
                                 return@async
                             }
-                            x = inp.read(data, 0, bufferSize)
-                            send(file)
                         }
                     }
                     deferred
