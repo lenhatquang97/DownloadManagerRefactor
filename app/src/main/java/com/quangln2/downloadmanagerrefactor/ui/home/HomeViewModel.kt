@@ -49,6 +49,7 @@ class HomeViewModel(
                 val intent = Intent(context, DownloadService::class.java)
                 intent.putExtra("command", "WaitForDownload")
                 DownloadManagerController.newItem.value = file
+                DownloadManagerController.commandDownload = "insert"
                 context.startService(intent)
             }
 
@@ -111,10 +112,11 @@ class HomeViewModel(
     fun deleteFromList(file: StructureDownFile, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             deleteFromListUseCase(file, context)
-            val res = DownloadManagerController.downloadList.value?.filter { it.id != file.id }
-                ?.toMutableList()
+
 
             withContext(Dispatchers.Main) {
+                val res = DownloadManagerController.downloadList.value?.filter { it.id != file.id }
+                    ?.toMutableList()
                 DownloadManagerController._downloadList.value = res
                 _filterList.value = res
             }
@@ -134,12 +136,12 @@ class HomeViewModel(
                         }
                         deletePermanentlyUseCase(file, context)
 
-                        //Double removal
                         withContext(Dispatchers.Main) {
                             val res =
                                 DownloadManagerController.downloadList.value?.filter { it.id != file.id }
                                     ?.toMutableList()
                             DownloadManagerController._downloadList.value = res
+                            _filterList.value = res
                         }
                         a.dismiss()
 

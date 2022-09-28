@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 object DownloadManagerController {
 
     var filterName = "All"
-    var numberOfSocketChunks = 1
 
     var _inputItem =
         MutableLiveData<StructureDownFile>().apply {
@@ -48,6 +47,8 @@ object DownloadManagerController {
     val newItem = MutableLiveData<StructureDownFile>().apply {
         value = StructureDownFile()
     }
+
+    var commandDownload = "nothing"
 
 
     fun findNextQueueDownloadFile(context: Context) {

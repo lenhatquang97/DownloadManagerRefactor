@@ -1,6 +1,7 @@
 package com.quangln2.downloadmanagerrefactor.ui.home
 
 import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.quangln2.downloadmanagerrefactor.R
+import com.quangln2.downloadmanagerrefactor.data.converter.Converters
+import com.quangln2.downloadmanagerrefactor.data.model.FromTo
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.databinding.DownloadItemBinding
@@ -151,7 +154,73 @@ class DownloadListAdapter(private var context: Context) :
             if (item.downloadState == DownloadStatusState.FAILED) {
                 eventListener?.onStop(item, binding, context)
                 eventListener?.onUpdateToDatabase(item)
+            }
+            if (item.bytesCopied == item.size && item.downloadState != DownloadStatusState.FAILED) {
+                binding.moreButton.visibility = View.VISIBLE
+                binding.stopButton.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
+                binding.textView.text = item.convertToSizeUnit() + " - " + DownloadStatusState.COMPLETED.toString()
+                binding.downloadStateButton.setImageResource(R.drawable.ic_open)
+                eventListener?.onDownloadSuccess(binding, item, context)
+            }
+        }
 
+        fun bindProgress(item: StructureDownFile, listChunks: MutableList<FromTo>){
+            binding.downloadStateButton.setOnClickListener {
+                when (item.downloadState) {
+                    DownloadStatusState.DOWNLOADING -> {
+                        binding.moreButton.visibility = View.VISIBLE
+                        binding.downloadStateButton.setImageResource(R.drawable.ic_start)
+                        eventListener?.onPause(item)
+                    }
+                    DownloadStatusState.PAUSED -> {
+                        binding.moreButton.visibility = View.GONE
+                        binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
+                        eventListener?.onResume(item)
+                    }
+                    DownloadStatusState.COMPLETED -> {
+                        binding.moreButton.visibility = View.VISIBLE
+                        binding.stopButton.visibility = View.GONE
+                        binding.downloadStateButton.setImageResource(R.drawable.ic_open)
+                        eventListener?.onOpen(item)
+                    }
+                    DownloadStatusState.FAILED -> {
+                        binding.moreButton.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.downloadStateButton.setImageResource(R.drawable.ic_pause)
+                        eventListener?.onRetry(item)
+                    }
+                    else -> {}
+                }
+
+                binding.textView.text = item.convertToSizeUnit() + " - " + item.downloadState.toString()
+                eventListener?.onUpdateToDatabase(item)
+            }
+            binding.stopButton.setOnClickListener {
+                if (item.downloadState == DownloadStatusState.DOWNLOADING || item.downloadState == DownloadStatusState.PAUSED) {
+                    binding.moreButton.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                    binding.stopButton.visibility = View.GONE
+                    binding.downloadStateButton.setImageResource(R.drawable.ic_retry)
+                    binding.textView.text = item.convertToSizeUnit() + " - " + DownloadStatusState.FAILED.toString()
+                    eventListener?.onStop(item, binding, context)
+                }
+            }
+
+
+            if (item.downloadState == DownloadStatusState.DOWNLOADING) {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.heading.text = cutFileName(item.fileName)
+                binding.progressBar.percentArr = listChunks.map { l ->
+                    (l.curr - l.from).toDouble() / (l.to - l.from).toDouble()
+                }
+                binding.textView.text = item.textProgressFormat
+            }
+
+
+            if (item.downloadState == DownloadStatusState.FAILED) {
+                eventListener?.onStop(item, binding, context)
+                eventListener?.onUpdateToDatabase(item)
             }
             if (item.bytesCopied == item.size && item.downloadState != DownloadStatusState.FAILED) {
                 binding.moreButton.visibility = View.VISIBLE
@@ -163,6 +232,7 @@ class DownloadListAdapter(private var context: Context) :
             }
         }
     }
+
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -178,15 +248,25 @@ class DownloadListAdapter(private var context: Context) :
         holder.bind(item, context)
     }
 
+    override fun onBindViewHolder(holder: DownloadItemViewHolder, position: Int, payloads: MutableList<Any>) {
+        super.onBindViewHolder(holder, position, payloads)
+        if(payloads.isNotEmpty()){
+            val listChunksStr = (payloads.first() as Bundle).getString("listChunks")
+            if(listChunksStr != null){
+                val tmp = Converters.convertListChunksOuter(listChunksStr)
+                val item = getItem(position)
+                holder.bindProgress(item, tmp)
+            }
+        }
+
+
+    }
+
     fun updateProgress(file: StructureDownFile) {
         val index = currentList.indexOfFirst { it.id == file.id }
-        val mutableList = currentList.toMutableList()
-        if (index == -1) {
-            return
-        }
-        mutableList[index] = file
-        submitList(mutableList)
-        notifyItemChanged(index)
+        notifyItemChanged(index, Bundle().apply {
+            putString("listChunks", Converters.convertListChunksOuter(file.listChunks))
+        })
     }
     override fun getItemId(position: Int): Long {
         return getItem(position).id.hashCode().toLong()

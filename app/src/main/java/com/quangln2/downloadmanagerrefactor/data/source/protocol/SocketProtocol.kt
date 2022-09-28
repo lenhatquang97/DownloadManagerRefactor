@@ -7,6 +7,7 @@ import com.quangln2.downloadmanagerrefactor.ServiceLocator
 import com.quangln2.downloadmanagerrefactor.data.model.FromTo
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
+import com.quangln2.downloadmanagerrefactor.data.source.protocol.SocketProtocol.Companion.createJSONRule
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,7 @@ class SocketProtocol : ProtocolInterface {
     var out: DataOutputStream? = null
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
+
     constructor(ip: String, port: Int) {
         this.ip = ip
         this.port = port
@@ -39,6 +41,7 @@ class SocketProtocol : ProtocolInterface {
     }
 
     companion object {
+        const val numberOfSocketChunks = 1
         fun createJSONRule(command: String, content: String): String {
             val obj = JSONObject()
             obj.put("command", command)

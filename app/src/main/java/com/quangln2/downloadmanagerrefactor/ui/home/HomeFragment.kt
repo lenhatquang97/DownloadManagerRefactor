@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Build.VERSION_CODES.P
 import android.os.Bundle
 import android.os.IBinder
 import android.text.Editable
@@ -24,6 +25,7 @@ import com.quangln2.downloadmanagerrefactor.R
 import com.quangln2.downloadmanagerrefactor.ViewModelFactory
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController._downloadList
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.commandDownload
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.downloadList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.filterList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.progressFile
@@ -34,6 +36,7 @@ import com.quangln2.downloadmanagerrefactor.data.model.settings.GlobalSettings
 import com.quangln2.downloadmanagerrefactor.data.repository.DefaultDownloadRepository
 import com.quangln2.downloadmanagerrefactor.data.source.local.LocalDataSourceImpl
 import com.quangln2.downloadmanagerrefactor.data.source.protocol.HttpProtocol
+import com.quangln2.downloadmanagerrefactor.data.source.protocol.SocketProtocol
 import com.quangln2.downloadmanagerrefactor.data.source.remote.RemoteDataSourceImpl
 import com.quangln2.downloadmanagerrefactor.databinding.DownloadItemBinding
 import com.quangln2.downloadmanagerrefactor.databinding.FragmentFirstBinding
@@ -41,8 +44,12 @@ import com.quangln2.downloadmanagerrefactor.listener.EventListener
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.*
+import kotlin.math.abs
 
 class HomeFragment : Fragment() {
 
@@ -103,6 +110,7 @@ class HomeFragment : Fragment() {
                     R.id.delete_from_list_option -> {
                         viewModel.deleteFromList(item, context)
                         binding.textView.text = ""
+                        commandDownload = "delete"
                         true
                     }
                     R.id.delete_permanently_option -> {
@@ -112,6 +120,7 @@ class HomeFragment : Fragment() {
                             }
                         }
                         viewModel.deletePermanently(context, item, onHandle)
+                        commandDownload = "delete"
                         true
                     }
                     else -> false
@@ -141,10 +150,6 @@ class HomeFragment : Fragment() {
             override fun onUpdateToDatabase(item: StructureDownFile) = viewModel.update(item)
         }
 
-        val animator: ItemAnimator = binding.downloadLists.itemAnimator!!
-        if (animator is DefaultItemAnimator) {
-            animator.supportsChangeAnimations = false
-        }
 
         binding.downloadLists.apply {
             adapter = adapterVal
@@ -161,6 +166,7 @@ class HomeFragment : Fragment() {
                         item.downloadState = DownloadStatusState.PAUSED
                     }
                 }
+                commandDownload = "getAll"
                 _downloadList.postValue(it.toMutableList())
             }
         }
@@ -185,7 +191,25 @@ class HomeFragment : Fragment() {
                                 viewModel.textSearch.value!!.lowercase()
                             )
                         }
-                        adapterVal.submitList(result.toMutableList())
+                        if(commandDownload == "insert"){
+                            if(it.size - binding.downloadLists.size == 1){
+                                adapterVal.submitList(it.toMutableList())
+                                commandDownload = "nothing"
+                            } else if(binding.downloadLists.size == 0){
+                                adapterVal.submitList(it.toMutableList())
+                                commandDownload = "nothing"
+                            }
+                        } else if(commandDownload == "filter"){
+                            adapterVal.submitList(result.toMutableList())
+                            commandDownload = "nothing"
+                        } else if(commandDownload == "getAll"){
+                            adapterVal.submitList(it.toMutableList())
+                            commandDownload = "nothing"
+                        } else if(commandDownload == "delete"){
+                            adapterVal.submitList(it.toMutableList())
+                            commandDownload = "nothing"
+                        }
+
                     }
                 }
 
@@ -194,15 +218,7 @@ class HomeFragment : Fragment() {
 
         progressFile.observe(viewLifecycleOwner) {
             it?.let {
-                if (DownloadManagerController.filterName == "All" || it.kindOf == DownloadManagerController.filterName) {
-                    val visibleChild =
-                        binding.downloadLists.getChildAt(filterList.value?.size?.minus(1) ?: 0)
-                    val lastChild = binding.downloadLists.getChildAdapterPosition(visibleChild)
-                    if (lastChild == filterList.value?.size?.minus(1)) {
-                        adapterVal.updateProgress(it)
-                    }
-
-                }
+                adapterVal.updateProgress(it)
                 lifecycleScope.launch(Dispatchers.IO) {
                     val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
                     if (progress == 100) {
@@ -220,6 +236,7 @@ class HomeFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 viewModel.filterStartsWithNameCaseInsensitive(s.toString())
                 viewModel.textSearch.value = s.toString()
+                commandDownload = "filter"
             }
         })
 
@@ -258,7 +275,7 @@ class HomeFragment : Fragment() {
 
     private fun deleteTempFile(file: StructureDownFile, context: Context) {
         val chunkNum =
-            if (file.protocol == "Socket") DownloadManagerController.numberOfSocketChunks else HttpProtocol.numberOfHTTPChunks
+            if (file.protocol == "Socket") SocketProtocol.numberOfSocketChunks else HttpProtocol.numberOfHTTPChunks
         (0 until chunkNum).forEach {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
             if (appSpecificExternalDir.exists()) {

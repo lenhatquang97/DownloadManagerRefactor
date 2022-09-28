@@ -33,6 +33,7 @@ import com.quangln2.downloadmanagerrefactor.util.DownloadUtil.Companion.combineF
 import com.quangln2.downloadmanagerrefactor.util.LogicUtil
 import com.quangln2.downloadmanagerrefactor.util.LogicUtil.Companion.roundSize
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 
 
 class DownloadService : Service() {

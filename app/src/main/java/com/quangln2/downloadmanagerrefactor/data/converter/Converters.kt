@@ -23,6 +23,23 @@ class Converters {
             return arr
         }
 
+        fun convertListChunksOuter(value: MutableList<FromTo>?): String {
+            if (value != null) {
+                return value.joinToString("@") { "${it.from} ${it.to} ${it.curr}" }
+            }
+            return ""
+        }
+
+        fun convertListChunksOuter(value: String): MutableList<FromTo> {
+            if (value.isNotEmpty()) {
+                return value.split("@").map {
+                    val split = it.split(" ")
+                    FromTo(split[0].toLong(), split[1].toLong(), split[2].toLong())
+                }.toMutableList()
+            }
+            return mutableListOf()
+        }
+
     }
 
     fun convertDownloadState(value: String): DownloadStatusState {

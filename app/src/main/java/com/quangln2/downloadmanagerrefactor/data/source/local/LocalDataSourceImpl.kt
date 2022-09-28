@@ -13,6 +13,7 @@ import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass
 import com.quangln2.downloadmanagerrefactor.data.database.DownloadDao
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.source.protocol.HttpProtocol
+import com.quangln2.downloadmanagerrefactor.data.source.protocol.SocketProtocol
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +42,7 @@ class LocalDataSourceImpl(
             }
         }
 
-        val numberOfChunks = if (file.protocol == "Socket") DownloadManagerController.numberOfSocketChunks
+        val numberOfChunks = if (file.protocol == "Socket") SocketProtocol.numberOfSocketChunks
         else HttpProtocol.numberOfHTTPChunks
 
         (0 until numberOfChunks).forEach {
