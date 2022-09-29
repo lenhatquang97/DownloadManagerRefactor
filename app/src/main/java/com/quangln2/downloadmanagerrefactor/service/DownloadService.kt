@@ -37,8 +37,6 @@ import kotlinx.coroutines.flow.collect
 
 
 class DownloadService : Service() {
-    private val serviceJob = SupervisorJob()
-    private val scope = CoroutineScope(Dispatchers.IO + serviceJob)
     private val binder = MyLocalBinder()
     private var mBuilder: NotificationCompat.Builder? = null
     private var builder: NotificationCompat.Builder = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -138,7 +136,7 @@ class DownloadService : Service() {
                 currentList[index] = file.copy(downloadState = DownloadStatusState.DOWNLOADING)
                 DownloadManagerController._downloadList.postValue(currentList)
             }
-            scope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 UpdateToListUseCase(DownloadManagerApplication.downloadRepository)(
                     file.copy()
                 )
@@ -158,7 +156,7 @@ class DownloadService : Service() {
         }
         if (index != null && index != -1) {
 
-            job = scope.launch {
+            job = CoroutineScope(Dispatchers.IO).launch {
                 DownloadAFileUseCase(DownloadManagerApplication.downloadRepository)(
                     currentList[index],
                     context
@@ -204,7 +202,7 @@ class DownloadService : Service() {
 
         if (item.bytesCopied >= item.size) {
             manager.cancel(item.id.hashCode())
-            scope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 combineFile(item, this@DownloadService, if (item.protocol == "Socket") 1 else HttpProtocol.numberOfHTTPChunks)
             }
             job?.cancelChildren()
@@ -240,8 +238,4 @@ class DownloadService : Service() {
 
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        scope.cancel()
-    }
 }
