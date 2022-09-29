@@ -36,8 +36,6 @@ import kotlinx.coroutines.*
 
 
 class DownloadService : Service() {
-    private val serviceJob = SupervisorJob()
-    private val scope = CoroutineScope(Dispatchers.IO + serviceJob)
     private val binder = MyLocalBinder()
     private var builder: NotificationCompat.Builder = NotificationCompat.Builder(this, CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_baseline_arrow_downward_24)
@@ -45,7 +43,8 @@ class DownloadService : Service() {
         .setContentText(ConstantClass.WELCOME_CONTENT)
         .setGroup(CHANNEL_ID)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-    private var job: Job? = null
+    private val manager by lazy {getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager}
+    private var mBuilder: NotificationCompat.Builder? = null
 
     override fun onBind(intent: Intent?): IBinder {
         return binder
@@ -61,47 +60,6 @@ class DownloadService : Service() {
         super.onCreate()
         startForeground(1, builder.build())
     }
-
-
-    private fun onOpenNotification(item: StructureDownFile) {
-        val resultIntent = Intent(this@DownloadService, MainActivity::class.java)
-        val resultPendingIntent: PendingIntent? =
-            TaskStackBuilder.create(this@DownloadService).run {
-                addNextIntentWithParentStack(resultIntent)
-                getPendingIntent(
-                    0,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            }
-
-        val progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100).toInt()
-        val contentView = RemoteViews(packageName, R.layout.custom_notification)
-        contentView.apply {
-            setTextViewText(R.id.contentTitle, item.fileName)
-            setTextViewText(R.id.contentText, item.textProgressFormat)
-            setProgressBar(R.id.progressBar, 100, progress, false)
-        }
-
-        builder = NotificationCompat.Builder(this@DownloadService, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_baseline_arrow_downward_24)
-            .setContent(contentView)
-            .setOngoing(true)
-        //            .setContentIntent(resultPendingIntent)
-        val manager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        manager.notify(item.id.hashCode(), builder.build())
-
-        if (item.bytesCopied >= item.size) {
-            manager.cancel(item.id.hashCode())
-            scope.launch {
-                combineFile(item, this@DownloadService, if (item.protocol == "Socket") 1 else HttpProtocol.numberOfHTTPChunks)
-            }
-            job?.cancelChildren()
-            stopSelf()
-            findNextQueueDownloadFile(this@DownloadService)
-            return
-        }
-    }
-
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null) {
@@ -146,7 +104,8 @@ class DownloadService : Service() {
                 currentList[index] = file.copy(downloadState = DownloadStatusState.DOWNLOADING)
                 DownloadManagerController._downloadList.postValue(currentList)
             }
-            scope.launch {
+
+            CoroutineScope(Dispatchers.IO).launch {
                 UpdateToListUseCase(DownloadManagerApplication.downloadRepository)(
                     file.copy(),
                     context
@@ -166,7 +125,7 @@ class DownloadService : Service() {
             }
         }
         if (index != null && index != -1) {
-            job = scope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 DownloadAFileUseCase(DownloadManagerApplication.downloadRepository)(
                     currentList[index],
                     context
@@ -175,7 +134,10 @@ class DownloadService : Service() {
                         DownloadManagerController._progressFile.postValue(it)
                     }
                     withContext(Dispatchers.Main) {
-                        onOpenNotification(it)
+                        if(mBuilder == null){
+                            onOpenNotification(it)
+                        }
+                        onUpdateNotification(it)
                         onCalculateDownloadProgress(it)
                     }
                     if (!DownloadUtil.isNetworkAvailable(context)) {
@@ -183,15 +145,66 @@ class DownloadService : Service() {
                             if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.DOWNLOADING) {
                                 it.downloadState = DownloadStatusState.FAILED
                                 DownloadManagerController._progressFile.postValue(it)
-                                onOpenNotification(it)
+                                onUpdateNotification(it)
                             }
                         }
                     }
-                    if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.PAUSED) {
-                        findNextQueueDownloadFile(this@DownloadService)
+                    withContext(Dispatchers.Main){
+                        if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.PAUSED) {
+                            findNextQueueDownloadFile(this@DownloadService)
+                        }
                     }
                 }
             }
+        }
+    }
+
+    private fun onOpenNotification(item: StructureDownFile) {
+        val resultIntent = Intent(this@DownloadService, MainActivity::class.java)
+        val resultPendingIntent: PendingIntent? =
+            TaskStackBuilder.create(this@DownloadService).run {
+                addNextIntentWithParentStack(resultIntent)
+                getPendingIntent(
+                    0,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            }
+
+        val progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100).toInt()
+        val contentView = RemoteViews(packageName, R.layout.custom_notification)
+        contentView.apply {
+            setTextViewText(R.id.contentTitle, item.fileName)
+            setTextViewText(R.id.contentText, item.textProgressFormat)
+            setProgressBar(R.id.progressBar, 100, progress, false)
+        }
+        if(mBuilder == null){
+            mBuilder = NotificationCompat.Builder(this@DownloadService, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_baseline_arrow_downward_24)
+                .setContent(contentView)
+                .setOngoing(true)
+                .setSilent(true)
+        }
+    }
+
+    private fun onUpdateNotification(item: StructureDownFile){
+        val progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100).toInt()
+        val contentView = RemoteViews(packageName, R.layout.custom_notification)
+        contentView.apply {
+            setTextViewText(R.id.contentTitle, item.fileName)
+            setTextViewText(R.id.contentText, item.textProgressFormat)
+            setProgressBar(R.id.progressBar, 100, progress, false)
+        }
+        mBuilder?.setContent(contentView)
+        manager.notify(item.id.hashCode(), mBuilder?.build())
+
+        if (item.bytesCopied >= item.size) {
+            manager.cancel(item.id.hashCode())
+            CoroutineScope(Dispatchers.IO).launch {
+                combineFile(item, this@DownloadService, if (item.protocol == "Socket") 1 else HttpProtocol.numberOfHTTPChunks)
+            }
+            stopSelf()
+            findNextQueueDownloadFile(this@DownloadService)
+            return
         }
     }
 
@@ -218,11 +231,5 @@ class DownloadService : Service() {
                 speedController.value!![item.id]?.startTimes = speedController.value!![item.id]?.endTimes!!
             }
         }
-
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        scope.cancel()
     }
 }

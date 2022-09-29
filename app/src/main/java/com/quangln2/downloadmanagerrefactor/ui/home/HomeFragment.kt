@@ -22,6 +22,7 @@ import com.quangln2.downloadmanagerrefactor.R
 import com.quangln2.downloadmanagerrefactor.ViewModelFactory
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController._downloadList
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.commandDownload
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.downloadList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.filterList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.progressFile
@@ -32,6 +33,7 @@ import com.quangln2.downloadmanagerrefactor.data.model.settings.GlobalSettings
 import com.quangln2.downloadmanagerrefactor.data.repository.DefaultDownloadRepository
 import com.quangln2.downloadmanagerrefactor.data.source.local.LocalDataSourceImpl
 import com.quangln2.downloadmanagerrefactor.data.source.protocol.HttpProtocol
+import com.quangln2.downloadmanagerrefactor.data.source.protocol.SocketProtocol
 import com.quangln2.downloadmanagerrefactor.data.source.remote.RemoteDataSourceImpl
 import com.quangln2.downloadmanagerrefactor.databinding.DownloadItemBinding
 import com.quangln2.downloadmanagerrefactor.databinding.FragmentFirstBinding
@@ -100,17 +102,12 @@ class HomeFragment : Fragment() {
             ): Boolean {
                 return when (menuItem.itemId) {
                     R.id.delete_from_list_option -> {
+                        binding.root.visibility = View.GONE
                         viewModel.deleteFromList(item, context)
-                        binding.textView.text = ""
                         true
                     }
                     R.id.delete_permanently_option -> {
-                        val onHandle = fun(flag: Boolean) {
-                            if (flag) {
-                                binding.textView.text = ""
-                            }
-                        }
-                        viewModel.deletePermanently(context, item, onHandle)
+                        viewModel.deletePermanently(context, item)
                         true
                     }
                     else -> false
@@ -122,7 +119,13 @@ class HomeFragment : Fragment() {
                 item: StructureDownFile,
                 context: Context
             ) {
+                //Temporary fix for download success
+                binding.downloadStateButton.setOnClickListener {
+                    onOpen(item)
+                }
+
                 viewModel.update(item.copy(downloadState = DownloadStatusState.COMPLETED), context)
+
                 lifecycleScope.launch {
                     GlobalSettings.getVibrated(context).collect {
                         if (it) viewModel.vibratePhone(context)
@@ -140,10 +143,7 @@ class HomeFragment : Fragment() {
             override fun onUpdateToDatabase(item: StructureDownFile, context: Context) = viewModel.update(item, context)
         }
 
-        val animator: ItemAnimator = binding.downloadLists.itemAnimator!!
-        if (animator is DefaultItemAnimator) {
-            animator.supportsChangeAnimations = false
-        }
+        binding.downloadLists.itemAnimator = null
 
         binding.downloadLists.apply {
             adapter = adapterVal
@@ -172,7 +172,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        DownloadManagerController.filterList.observe(viewLifecycleOwner) {
+        filterList.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isEmpty()) {
                     binding.downloadLists.visibility = View.INVISIBLE
@@ -181,21 +181,31 @@ class HomeFragment : Fragment() {
                     binding.downloadLists.visibility = View.VISIBLE
                     binding.emptyDataParent.visibility = View.GONE
                     if (viewModel.textSearch.value != null) {
-                        if(DownloadManagerController.filterName == "All"){
-                            val result = it.filter { itr ->
-                                itr.fileName.lowercase().contains(
-                                    viewModel.textSearch.value!!.lowercase()
-                                )
+                        when(commandDownload){
+                            "insert" -> {
+                                adapterVal.submitList(it.toMutableList())
+                                adapterVal.notifyItemInserted(it.size - 1)
+                                commandDownload = "nothing"
                             }
-                            adapterVal.submitList(result.toMutableList())
-                        } else {
-                            val result = it.filter { itr ->
-                                itr.fileName.lowercase().contains(
-                                    viewModel.textSearch.value!!.lowercase()
-                                ) && itr.kindOf == DownloadManagerController.filterName
+                            else -> {
+                                if(DownloadManagerController.filterName == "All"){
+                                    val result = it.filter { itr ->
+                                        itr.fileName.lowercase().contains(
+                                            viewModel.textSearch.value!!.lowercase()
+                                        )
+                                    }
+                                    adapterVal.submitList(result.toMutableList())
+                                } else {
+                                    val result = it.filter { itr ->
+                                        itr.fileName.lowercase().contains(
+                                            viewModel.textSearch.value!!.lowercase()
+                                        ) && itr.kindOf == DownloadManagerController.filterName
+                                    }
+                                    adapterVal.submitList(result.toMutableList())
+                                }
                             }
-                            adapterVal.submitList(result.toMutableList())
                         }
+
 
                     }
                 }
@@ -205,23 +215,7 @@ class HomeFragment : Fragment() {
 
         progressFile.observe(viewLifecycleOwner) {
             it?.let {
-                if (DownloadManagerController.filterName == "All" || it.kindOf == DownloadManagerController.filterName) {
-                    val visibleChild =
-                        binding.downloadLists.getChildAt(filterList.value?.size?.minus(1) ?: 0)
-                    val lastChild = binding.downloadLists.getChildAdapterPosition(visibleChild)
-                    if (lastChild == filterList.value?.size?.minus(1)) {
-                        adapterVal.updateProgress(it)
-                    }
-
-                }
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val progress = (it.bytesCopied.toFloat() / it.size.toFloat() * 100).toInt()
-                    if (progress == 100) {
-                        it.downloadState = DownloadStatusState.COMPLETED
-                        viewModel.update(it, requireContext())
-                    }
-                }
-
+                adapterVal.updateProgress(it)
             }
         }
 
@@ -269,7 +263,7 @@ class HomeFragment : Fragment() {
 
     private fun deleteTempFile(file: StructureDownFile, context: Context) {
         val chunkNum =
-            if (file.protocol == "Socket") DownloadManagerController.numberOfSocketChunks else HttpProtocol.numberOfHTTPChunks
+            if (file.protocol == "Socket") SocketProtocol.numberOfSocketChunks else HttpProtocol.numberOfHTTPChunks
         (0 until chunkNum).forEach {
             val appSpecificExternalDir = File(context.getExternalFilesDir(null), file.chunkNames[it])
             if (appSpecificExternalDir.exists()) {

@@ -50,7 +50,6 @@ class SettingsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(TAG, "onCreateView: ")
         _binding = FragmentSecondBinding.inflate(inflater, container, false)
         return binding.root
 

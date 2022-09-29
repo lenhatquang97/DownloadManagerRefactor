@@ -50,6 +50,7 @@ class HomeViewModel(
             override fun onAcceptPress() {
                 val intent = Intent(context, DownloadService::class.java)
                 intent.putExtra("command", "WaitForDownload")
+                DownloadManagerController.commandDownload = "insert"
                 DownloadManagerController.newItem.value = file
                 context.startService(intent)
             }
@@ -127,7 +128,7 @@ class HomeViewModel(
         }
     }
 
-    fun deletePermanently(context: Context, file: StructureDownFile, onHandle: (Boolean) -> Unit) {
+    fun deletePermanently(context: Context, file: StructureDownFile) {
         val builder =
             MaterialAlertDialogBuilder(context, R.style.AlertDialogShow)
                 .setTitle(file.fileName)
@@ -135,9 +136,6 @@ class HomeViewModel(
                 .setMessage("Are you sure that you will delete this file? You cannot undo this action.")
                 .setPositiveButton(ConstantClass.POSITIVE_BUTTON) { a, _ ->
                     viewModelScope.launch(Dispatchers.IO) {
-                        withContext(Dispatchers.Main) {
-                            onHandle(true)
-                        }
                         deletePermanentlyUseCase(file, context)
 
                         //Double removal
@@ -152,7 +150,6 @@ class HomeViewModel(
                     }
                 }
                 .setNegativeButton(ConstantClass.NEGATIVE_BUTTON) { a, _ ->
-                    onHandle(false)
                     a.dismiss()
                 }
         builder.show()

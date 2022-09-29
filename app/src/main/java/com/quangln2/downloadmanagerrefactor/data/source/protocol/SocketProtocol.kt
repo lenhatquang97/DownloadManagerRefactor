@@ -39,6 +39,7 @@ class SocketProtocol : ProtocolInterface {
     }
 
     companion object {
+        const val numberOfSocketChunks = 1
         fun createJSONRule(command: String, content: String): String {
             val obj = JSONObject()
             obj.put("command", command)

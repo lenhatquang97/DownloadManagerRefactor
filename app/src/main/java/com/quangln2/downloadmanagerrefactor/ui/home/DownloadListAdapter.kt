@@ -180,12 +180,6 @@ class DownloadListAdapter(private var context: Context) :
 
     fun updateProgress(file: StructureDownFile) {
         val index = currentList.indexOfFirst { it.id == file.id }
-        val mutableList = currentList.toMutableList()
-        if (index == -1) {
-            return
-        }
-        mutableList[index] = file
-        submitList(mutableList)
         notifyItemChanged(index)
     }
     override fun getItemId(position: Int): Long {
