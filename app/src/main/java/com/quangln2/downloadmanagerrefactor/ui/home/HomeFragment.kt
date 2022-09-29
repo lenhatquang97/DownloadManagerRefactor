@@ -240,6 +240,10 @@ class HomeFragment : Fragment() {
             }
         })
 
+        binding.downloadLists.itemAnimator = null
+
+
+
 
         binding.stateGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
