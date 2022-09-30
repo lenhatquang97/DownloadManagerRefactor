@@ -32,7 +32,7 @@ class ConstantClass {
         const val DOWNLOAD_FOLDER_INTERNAL_PATH = "/storage/emulated/0/Download"
         const val MEDIA_TREE_FORMAT_DOWNLOAD_PATH = "/tree/downloads/document/downloads"
 
-        const val RANDOM_SALT = "vVG9k3LzBlfteUp+O3+7zA=="
+        private const val RANDOM_SALT = "vVG9k3LzBlfteUp+O3+7zA=="
 
         const val DOWNLOAD_LIST_SEPARATOR = "%${RANDOM_SALT}"
         const val DOWNLOAD_LIST_CHUNK_SEPARATOR = "@${RANDOM_SALT}"

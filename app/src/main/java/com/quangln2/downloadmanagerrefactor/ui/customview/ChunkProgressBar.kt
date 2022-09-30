@@ -25,7 +25,6 @@ class ChunkProgressBar
         setMeasuredDimension(width, 30)
     }
 
-    @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         val w = width.toFloat()
         val h = height.toFloat()
