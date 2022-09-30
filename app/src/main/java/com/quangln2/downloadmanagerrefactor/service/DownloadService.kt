@@ -26,6 +26,7 @@ import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
 import com.quangln2.downloadmanagerrefactor.data.model.settings.GlobalSettings
 import com.quangln2.downloadmanagerrefactor.data.source.protocol.HttpProtocol
+import com.quangln2.downloadmanagerrefactor.data.source.protocol.SocketProtocol
 import com.quangln2.downloadmanagerrefactor.domain.local.UpdateToListUseCase
 import com.quangln2.downloadmanagerrefactor.domain.remote.DownloadAFileUseCase
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
@@ -206,7 +207,7 @@ class DownloadService : Service() {
                 combineFile(
                     item,
                     this@DownloadService,
-                    if (item.protocol == "Socket") 1 else HttpProtocol.numberOfHTTPChunks
+                    if (item.protocol == "Socket") SocketProtocol.numberOfSocketChunks else HttpProtocol.numberOfHTTPChunks
                 )
             }
             stopSelf()
