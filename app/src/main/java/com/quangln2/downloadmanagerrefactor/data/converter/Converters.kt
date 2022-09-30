@@ -1,5 +1,6 @@
 package com.quangln2.downloadmanagerrefactor.data.converter
 
+import com.quangln2.downloadmanagerrefactor.data.constants.ConstantClass
 import com.quangln2.downloadmanagerrefactor.data.model.FromTo
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
@@ -11,12 +12,12 @@ class Converters {
             for (item in ls) {
                 arr.add(item.convertToJsonStringForKeyValueDB())
             }
-            return arr.joinToString(separator = "%") { it }
+            return arr.joinToString(separator = ConstantClass.DOWNLOAD_LIST_SEPARATOR) { it }
         }
 
         fun convertDownloadList(json: String): MutableList<StructureDownFile> {
             val arr = mutableListOf<StructureDownFile>()
-            val ls = json.split("%")
+            val ls = json.split(ConstantClass.DOWNLOAD_LIST_SEPARATOR)
             for (item in ls) {
                 arr.add(StructureDownFile.convertStringToClass(item))
             }
@@ -41,14 +42,14 @@ class Converters {
 
     fun convertListChunks(value: MutableList<FromTo>?): String {
         if (value != null) {
-            return value.joinToString("@") { "${it.from} ${it.to} ${it.curr}" }
+            return value.joinToString(ConstantClass.DOWNLOAD_LIST_CHUNK_SEPARATOR) { "${it.from} ${it.to} ${it.curr}" }
         }
         return ""
     }
 
     fun convertListChunks(value: String): MutableList<FromTo> {
         if (value.isNotEmpty()) {
-            return value.split("@").map {
+            return value.split(ConstantClass.DOWNLOAD_LIST_CHUNK_SEPARATOR).map {
                 val split = it.split(" ")
                 FromTo(split[0].toLong(), split[1].toLong(), split[2].toLong())
             }.toMutableList()
@@ -58,12 +59,12 @@ class Converters {
 
     fun convertChunkNames(value: MutableList<String>): String {
         if (value.size == 0) return ""
-        return value.joinToString("?")
+        return value.joinToString(ConstantClass.DOWNLOAD_CHUNK_NAMES_SEPARATOR)
     }
 
     fun convertChunkNames(value: String): MutableList<String> {
         if (value.isEmpty()) return mutableListOf()
-        return value.split("?").toMutableList()
+        return value.split(ConstantClass.DOWNLOAD_CHUNK_NAMES_SEPARATOR).toMutableList()
     }
 
 }

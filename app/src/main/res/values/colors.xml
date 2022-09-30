@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#0091FF</color>
+    <color name="baby_blue">#7EC8E3</color>
     <color name="failed">#EB0000</color>
     <color name="paused">#ECC332</color>
     <color name="success">#4B8673</color>

@@ -81,9 +81,9 @@ class AddToDownloadDialog : DialogFragment() {
         binding.addNewDownloadFileButton.setOnClickListener {
             val downloadLink = binding.linkTextField.editText?.text.toString()
             val downloadTo = binding.downloadToTextField.editText?.text.toString()
-            binding.addNewDownloadFileButton.icon = progressIndicatorDrawable
             val success = viewModel.addNewDownloadInfo(downloadLink, downloadTo)
             if (success) {
+                binding.addNewDownloadFileButton.icon = progressIndicatorDrawable
                 closeKeyboard(binding.linkTextField)
                 val onHandle: (StructureDownFile) -> Unit = {
                     val spaceRemained = DownloadUtil.checkAvailableSpace() - it.size

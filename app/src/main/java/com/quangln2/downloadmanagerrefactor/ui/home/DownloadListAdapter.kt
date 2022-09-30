@@ -92,6 +92,7 @@ class DownloadListAdapter(private var context: Context) :
                 }
                 popup.show()
             }
+            binding.textView.text = "${item.convertToSizeUnit()} - ${item.downloadState}"
         }
 
         fun bind(item: StructureDownFile, context: Context) {

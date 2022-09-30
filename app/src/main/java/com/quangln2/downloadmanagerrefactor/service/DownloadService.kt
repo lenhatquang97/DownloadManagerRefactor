@@ -9,9 +9,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
-import androidx.core.app.TaskStackBuilder
 import com.quangln2.downloadmanagerrefactor.DownloadManagerApplication
-import com.quangln2.downloadmanagerrefactor.MainActivity
 import com.quangln2.downloadmanagerrefactor.R
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.addToDownloadList
@@ -44,7 +42,6 @@ class DownloadService : Service() {
     private var builder: NotificationCompat.Builder = NotificationCompat.Builder(this, CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_baseline_arrow_downward_24)
         .setContentTitle(ConstantClass.WELCOME_TITLE)
-        .setContentText(ConstantClass.WELCOME_CONTENT)
         .setGroup(CHANNEL_ID)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
     private val manager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
@@ -134,46 +131,47 @@ class DownloadService : Service() {
                     currentList[index],
                     context
                 ).collect { it ->
+                    withContext(Dispatchers.Main){
+                        if (mBuilder == null) {
+                            onOpenNotification(it)
+                        }
+                        patchAboutTextSynchronization(it, context)
+                    }
+
                     withContext(Dispatchers.IO) {
                         DownloadManagerController._progressFile.postValue(it)
                     }
                     withContext(Dispatchers.Main) {
-                        if (mBuilder == null) {
-                            onOpenNotification(it)
-                        }
                         onUpdateNotification(it)
                         onCalculateDownloadProgress(it)
-                    }
-                    if (!DownloadUtil.isNetworkAvailable(context)) {
-                        DownloadManagerController._downloadList.value?.forEach { it ->
-                            if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.DOWNLOADING) {
-                                it.downloadState = DownloadStatusState.FAILED
-                                DownloadManagerController._progressFile.postValue(it)
-                                onUpdateNotification(it)
-                            }
-                        }
-                    }
-                    withContext(Dispatchers.Main) {
                         if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.PAUSED) {
                             findNextQueueDownloadFile(this@DownloadService)
                         }
                     }
+
                 }
             }
         }
     }
 
-    private fun onOpenNotification(item: StructureDownFile) {
-        val resultIntent = Intent(this@DownloadService, MainActivity::class.java)
-        val resultPendingIntent: PendingIntent? =
-            TaskStackBuilder.create(this@DownloadService).run {
-                addNextIntentWithParentStack(resultIntent)
-                getPendingIntent(
-                    0,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
+    private fun patchAboutTextSynchronization(item: StructureDownFile, context: Context){
+        if (!DownloadUtil.isNetworkAvailable(context)) {
+            DownloadManagerController._downloadList.value?.forEach { it ->
+                if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.DOWNLOADING) {
+                    it.downloadState = DownloadStatusState.FAILED
+                    it.textProgressFormat = "${it.convertToSizeUnit()} - ${it.downloadState}"
+                    DownloadManagerController._progressFile.postValue(it)
+                    onUpdateNotification(it)
+                }
             }
+            return
+        }
+        else if(item.downloadState == DownloadStatusState.FAILED){
+            item.textProgressFormat = "${item.convertToSizeUnit()} - ${item.downloadState}"
+        }
+    }
 
+    private fun onOpenNotification(item: StructureDownFile) {
         val progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100).toInt()
         val contentView = RemoteViews(packageName, R.layout.custom_notification)
         contentView.apply {

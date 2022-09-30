@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 
 class DownloadDao {
@@ -16,20 +17,18 @@ class DownloadDao {
         const val DOWNLOAD_LIST = "download_list"
     }
 
-    fun getAll(context: Context): Flow<List<StructureDownFile>> = flow {
-        val it = DownloadDataStore.getDownloadList(context).first()
-        val result = if (it.isEmpty()) {
-            emptyList<StructureDownFile>()
-        } else {
-            Converters.convertDownloadList(it)
-        }
-        emit(result)
-    }
+    fun getAll(context: Context): Flow<String> = DownloadDataStore.getDownloadList(context)
 
     suspend fun insert(file: StructureDownFile, context: Context) {
         val it = DownloadDataStore.getDownloadList(context).first()
         val list = if (it.isEmpty()) mutableListOf<StructureDownFile>() else Converters.convertDownloadList(it)
-        list.add(file)
+        val hasConflict = list.indexOfFirst { it.downloadLink == file.downloadLink }
+        if(hasConflict == -1){
+            list.add(file)
+        } else {
+            update(file, context)
+        }
+
         CoroutineScope(Dispatchers.IO).launch {
             DownloadDataStore.setDownloadList(context, Converters.convertDownloadList(list))
         }

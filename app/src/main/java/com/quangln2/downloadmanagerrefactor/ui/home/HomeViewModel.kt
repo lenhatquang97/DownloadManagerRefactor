@@ -160,8 +160,8 @@ class HomeViewModel(
             if (isValidIpPort) {
                 val ip = url.split(":")[0]
                 val port = url.split(":")[1].split("/")[0].toInt()
-                item.protocol = "Socket"
                 try {
+                    item.protocol = "Socket"
                     item.protocolInterface = SocketProtocol(ip, port)
                 } catch (e: Exception) {
                     return false

@@ -29,7 +29,7 @@ class SocketProtocol : ProtocolInterface {
     var socket: Socket? = null
     var inp: DataInputStream? = null
     var out: DataOutputStream? = null
-    val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     constructor(ip: String, port: Int) {
         this.ip = ip
@@ -59,6 +59,7 @@ class SocketProtocol : ProtocolInterface {
     private fun connectToServer(ip: String, port: Int) {
         try {
             socket = Socket(ip, port)
+            socket?.soTimeout = 2000
             if (socket != null) {
                 inp = DataInputStream(socket!!.getInputStream())
                 out = DataOutputStream(socket!!.getOutputStream())
@@ -101,8 +102,10 @@ class SocketProtocol : ProtocolInterface {
             out?.flush()
             var result = inp?.readLine()
             val start = System.currentTimeMillis()
-            val end = start + 3 * 1000
-            while (result == null && System.currentTimeMillis() < end) {
+            val end = start + 2 * 1000
+            while (result == null && System.currentTimeMillis() < end) {}
+            if(result == null){
+                throw Exception("Server is not responding")
             }
             val jsonObj = JSONObject(result)
             file.size = jsonObj.getLong("fileSize")

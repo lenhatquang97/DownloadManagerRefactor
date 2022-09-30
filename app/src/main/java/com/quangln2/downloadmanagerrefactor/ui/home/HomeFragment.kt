@@ -20,10 +20,12 @@ import com.quangln2.downloadmanagerrefactor.R
 import com.quangln2.downloadmanagerrefactor.ViewModelFactory
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController._downloadList
+import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController._filterList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.commandDownload
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.downloadList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.filterList
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController.progressFile
+import com.quangln2.downloadmanagerrefactor.data.converter.Converters
 import com.quangln2.downloadmanagerrefactor.data.database.DownloadDao
 import com.quangln2.downloadmanagerrefactor.data.model.StructureDownFile
 import com.quangln2.downloadmanagerrefactor.data.model.downloadstatus.DownloadStatusState
@@ -38,7 +40,11 @@ import com.quangln2.downloadmanagerrefactor.databinding.FragmentFirstBinding
 import com.quangln2.downloadmanagerrefactor.listener.EventListener
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -81,6 +87,26 @@ class HomeFragment : Fragment() {
     ): View {
         binding = FragmentFirstBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = this
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            val str = DownloadDao().getAll(requireContext()).first()
+            if(str.isNotEmpty()) {
+                val it = Converters.convertDownloadList(str)
+                if (it.isNotEmpty() && _downloadList.value != null &&
+                    _downloadList.value?.size == 0
+                ) {
+                    for (item in it) {
+                        if (item.downloadState == DownloadStatusState.DOWNLOADING) {
+                            item.downloadState = DownloadStatusState.PAUSED
+                        }
+                    }
+                    _downloadList.postValue(it.toMutableList())
+
+                }
+            }
+
+
+        }
         return binding.root
     }
 
@@ -146,26 +172,12 @@ class HomeFragment : Fragment() {
             adapter = adapterVal
             layoutManager = LinearLayoutManager(requireContext())
         }
-        lifecycleScope.launch {
-            val it = DownloadDao().getAll(requireContext()).first()
-            if (it.isNotEmpty() && _downloadList.value != null &&
-                _downloadList.value?.size == 0
-            ) {
-                val currentList = it
-                for (item in currentList) {
-                    if (item.downloadState == DownloadStatusState.DOWNLOADING) {
-                        item.downloadState = DownloadStatusState.PAUSED
-                    }
-                }
-                _downloadList.postValue(it.toMutableList())
-            }
 
-        }
 
 
         downloadList.observe(viewLifecycleOwner) {
             it?.let {
-                DownloadManagerController._filterList.value = it.toMutableList()
+                _filterList.value = it.toMutableList()
             }
         }
 

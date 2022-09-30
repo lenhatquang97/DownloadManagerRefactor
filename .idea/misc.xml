@@ -10,6 +10,7 @@
         <entry key="app/src/main/res/drawable/border_radius.xml" value="0.145" />
         <entry key="app/src/main/res/drawable/circle_shape.xml" value="0.13" />
         <entry key="app/src/main/res/drawable/dialog_bg.xml" value="0.145" />
+        <entry key="app/src/main/res/drawable/highlight_color.xml" value="0.139" />
         <entry key="app/src/main/res/drawable/ic_article.xml" value="0.13" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.13" />
         <entry key="app/src/main/res/drawable/ic_baseline_check_blue.xml" value="0.1545" />
@@ -27,6 +28,7 @@
         <entry key="app/src/main/res/drawable/ic_pause.xml" value="0.1245" />
         <entry key="app/src/main/res/drawable/ic_retry.xml" value="0.1245" />
         <entry key="app/src/main/res/drawable/ic_start.xml" value="0.1245" />
+        <entry key="app/src/main/res/drawable/selector.xml" value="0.139" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2" />
         <entry key="app/src/main/res/layout/add_download_dialog.xml" value="0.2660633484162896" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.18854166666666666" />
