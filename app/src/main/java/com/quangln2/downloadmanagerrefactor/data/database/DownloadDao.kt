@@ -9,7 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 
 class DownloadDao {
@@ -70,18 +69,18 @@ class DownloadDao {
 
     }
 
-     fun doesDownloadLinkExist(downloadLink: String, context: Context): Flow<Boolean> = flow {
-         val str = DownloadDataStore.getDownloadList(context).first()
-         if (str.isEmpty()) {
-             emit(false)
-         }
-         val list = Converters.convertDownloadList(str)
-         for (i in list.indices) {
-             if (list[i].downloadLink == downloadLink && (list[i].downloadState == DownloadStatusState.DOWNLOADING || list[i].downloadState == DownloadStatusState.COMPLETED)) {
-                 emit(true)
-             }
-         }
-         emit(false)
+    fun doesDownloadLinkExist(downloadLink: String, context: Context): Flow<Boolean> = flow {
+        val str = DownloadDataStore.getDownloadList(context).first()
+        if (str.isEmpty()) {
+            emit(false)
+        }
+        val list = Converters.convertDownloadList(str)
+        for (i in list.indices) {
+            if (list[i].downloadLink == downloadLink && (list[i].downloadState == DownloadStatusState.DOWNLOADING || list[i].downloadState == DownloadStatusState.COMPLETED)) {
+                emit(true)
+            }
+        }
+        emit(false)
     }
 
 }

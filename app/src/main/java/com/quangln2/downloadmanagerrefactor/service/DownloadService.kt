@@ -32,7 +32,10 @@ import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil.Companion.combineFile
 import com.quangln2.downloadmanagerrefactor.util.LogicUtil
 import com.quangln2.downloadmanagerrefactor.util.LogicUtil.Companion.roundSize
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class DownloadService : Service() {
@@ -43,7 +46,7 @@ class DownloadService : Service() {
         .setContentText(ConstantClass.WELCOME_CONTENT)
         .setGroup(CHANNEL_ID)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-    private val manager by lazy {getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager}
+    private val manager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
     private var mBuilder: NotificationCompat.Builder? = null
 
     override fun onBind(intent: Intent?): IBinder {
@@ -134,7 +137,7 @@ class DownloadService : Service() {
                         DownloadManagerController._progressFile.postValue(it)
                     }
                     withContext(Dispatchers.Main) {
-                        if(mBuilder == null){
+                        if (mBuilder == null) {
                             onOpenNotification(it)
                         }
                         onUpdateNotification(it)
@@ -149,7 +152,7 @@ class DownloadService : Service() {
                             }
                         }
                     }
-                    withContext(Dispatchers.Main){
+                    withContext(Dispatchers.Main) {
                         if (it.downloadState == DownloadStatusState.FAILED || it.downloadState == DownloadStatusState.PAUSED) {
                             findNextQueueDownloadFile(this@DownloadService)
                         }
@@ -177,7 +180,7 @@ class DownloadService : Service() {
             setTextViewText(R.id.contentText, item.textProgressFormat)
             setProgressBar(R.id.progressBar, 100, progress, false)
         }
-        if(mBuilder == null){
+        if (mBuilder == null) {
             mBuilder = NotificationCompat.Builder(this@DownloadService, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_baseline_arrow_downward_24)
                 .setContent(contentView)
@@ -186,7 +189,7 @@ class DownloadService : Service() {
         }
     }
 
-    private fun onUpdateNotification(item: StructureDownFile){
+    private fun onUpdateNotification(item: StructureDownFile) {
         val progress = (item.bytesCopied.toFloat() / item.size.toFloat() * 100).toInt()
         val contentView = RemoteViews(packageName, R.layout.custom_notification)
         contentView.apply {
@@ -200,7 +203,11 @@ class DownloadService : Service() {
         if (item.bytesCopied >= item.size) {
             manager.cancel(item.id.hashCode())
             CoroutineScope(Dispatchers.IO).launch {
-                combineFile(item, this@DownloadService, if (item.protocol == "Socket") 1 else HttpProtocol.numberOfHTTPChunks)
+                combineFile(
+                    item,
+                    this@DownloadService,
+                    if (item.protocol == "Socket") 1 else HttpProtocol.numberOfHTTPChunks
+                )
             }
             stopSelf()
             findNextQueueDownloadFile(this@DownloadService)

@@ -92,7 +92,7 @@ class DownloadUtil {
 
         //Merge multiple file into one file
         fun combineFile(file: StructureDownFile, context: Context, chunkNumbers: Int) {
-            try{
+            try {
                 val fout = FileOutputStream(file.downloadTo + "/" + file.fileName)
                 (0 until chunkNumbers).forEach {
                     val fin =

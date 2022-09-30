@@ -14,6 +14,7 @@ object DownloadDataStore {
             preferences[DOWNLOAD_LIST] ?: ""
         }
     }
+
     suspend fun setDownloadList(context: Context, downloadList: String) {
         context.dataStore.edit { preferences ->
             preferences[DOWNLOAD_LIST] = downloadList

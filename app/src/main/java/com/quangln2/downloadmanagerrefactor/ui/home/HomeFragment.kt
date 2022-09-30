@@ -15,9 +15,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.ItemAnimator
 import com.quangln2.downloadmanagerrefactor.R
 import com.quangln2.downloadmanagerrefactor.ViewModelFactory
 import com.quangln2.downloadmanagerrefactor.controller.DownloadManagerController
@@ -40,7 +38,6 @@ import com.quangln2.downloadmanagerrefactor.databinding.FragmentFirstBinding
 import com.quangln2.downloadmanagerrefactor.listener.EventListener
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.DownloadUtil
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.File
@@ -181,14 +178,14 @@ class HomeFragment : Fragment() {
                     binding.downloadLists.visibility = View.VISIBLE
                     binding.emptyDataParent.visibility = View.GONE
                     if (viewModel.textSearch.value != null) {
-                        when(commandDownload){
+                        when (commandDownload) {
                             "insert" -> {
                                 adapterVal.submitList(it.toMutableList())
                                 adapterVal.notifyItemInserted(it.size - 1)
                                 commandDownload = "nothing"
                             }
                             else -> {
-                                if(DownloadManagerController.filterName == "All"){
+                                if (DownloadManagerController.filterName == "All") {
                                     val result = it.filter { itr ->
                                         itr.fileName.lowercase().contains(
                                             viewModel.textSearch.value!!.lowercase()
@@ -205,8 +202,6 @@ class HomeFragment : Fragment() {
                                 }
                             }
                         }
-
-
                     }
                 }
 

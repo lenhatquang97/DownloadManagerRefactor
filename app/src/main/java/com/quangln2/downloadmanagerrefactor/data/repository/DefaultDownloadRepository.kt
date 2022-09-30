@@ -25,7 +25,7 @@ class DefaultDownloadRepository(
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun update(StructureDownFile: StructureDownFile, context: Context) {
-        localDataSource.update(StructureDownFile,context)
+        localDataSource.update(StructureDownFile, context)
     }
 
     @Suppress("RedundantSuspendModifier")

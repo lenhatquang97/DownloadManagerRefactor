@@ -182,6 +182,7 @@ class DownloadListAdapter(private var context: Context) :
         val index = currentList.indexOfFirst { it.id == file.id }
         notifyItemChanged(index)
     }
+
     override fun getItemId(position: Int): Long {
         return getItem(position).id.hashCode().toLong()
     }

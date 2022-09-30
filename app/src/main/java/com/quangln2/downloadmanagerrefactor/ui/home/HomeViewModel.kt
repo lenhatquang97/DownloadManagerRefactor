@@ -22,7 +22,6 @@ import com.quangln2.downloadmanagerrefactor.listener.OnAcceptPress
 import com.quangln2.downloadmanagerrefactor.service.DownloadService
 import com.quangln2.downloadmanagerrefactor.util.UIComponentUtil
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,7 +62,7 @@ class HomeViewModel(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 val result = doesDownloadLinkExistUseCase(file, context).first()
                 if (result) {
                     UIComponentUtil.showDownloadDialogAgain(context, file, onAcceptPress)
@@ -73,8 +72,6 @@ class HomeViewModel(
                     return@withContext
                 }
             }
-
-
 
 
         }
